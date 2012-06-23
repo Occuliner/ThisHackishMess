@@ -132,7 +132,7 @@ def loadPlayState( fileName, curTileSet ):
 			eachSprite.body.velocity_func = eachSprite.velocity_func
 			eachSprite.bodyId, eachSprite.shapeId = id( eachSprite.body ), id( eachSprite.shape )
 	#givenState.floor.image = pygame.image.fromstring( givenState.floor.imageStringBuffer, givenState.floor.size, "RGB" )
-	givenState.floor.image = pygame.image.fromstring( zlib.decompress( givenState.floor.imageStringBuffer ), givenState.floor.size, "RGB" )
+	givenState.floor.image = pygame.image.fromstring( zlib.decompress( givenState.floor.imageStringBuffer ), givenState.floor.size, "RGB" ).convert()
 
 	givenState.floor.imageStringBuffer = None
 	
