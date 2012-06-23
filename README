@@ -1,0 +1,10 @@
+This is ThisHackishMess, a gamedev-kit thing started by Connor Sherson in his spare time.
+
+It, as its name implies, is currently quite a mess. But it may become cleaner in the future.
+
+Requires:
+	-Python (Tested on 2.6.x and 2.7.x)
+	-Pygame (Tested on 1.9.1)
+	-Pymunk (Tested on 2.1.0)
+
+You may contact me for more information at cppsherson@gmail.com.
