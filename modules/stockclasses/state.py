@@ -255,7 +255,7 @@ class PlayState:
 			changeRects.extend( self.groups[eachVal].draw( surface ) )
 		
 		changeRects.extend( self.lineVisualiser.draw( surface ) )
-
+		
 		if self.rerenderEverything:
 			changeRects.extend( [ pygame.Rect( 0, 0, 800, 600 ) ] )
 			self.rerenderEverything = False
