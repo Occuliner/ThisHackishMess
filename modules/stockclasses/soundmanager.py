@@ -24,11 +24,17 @@ class Sound( pygame.mixer.Sound ):
 		pygame.mixer.Sound.__init__( self, filename )
 		self.soundManagerRef = weakref.ref( soundMgr )
 		self.priority = priority
+		
 	def play( self, loops=0, maxtime=0, fade_ms=0 ):
 		sndMgr = self.soundManagerRef()
-		destChannel = sndMgr.getChannel( self.priority )
+		destChannel, channelId = sndMgr.getChannel( self.priority )
 		if destChannel is not None:
 			destChannel.play(self, loops, maxtime, fade_ms )
+			return channelId
+		return None
+
+	def stop( self, channelId ):
+		pygame.mixer.Channel(channelId).stop()
 
 class SoundManager:
 	def __init__( self ):
@@ -46,10 +52,18 @@ class SoundManager:
 		return tmpSound
 
 	def getChannel( self, priority ):
-		attempt = pygame.mixer.find_channel()
-		if attempt is not None:
-			return attempt
-		lowest = min( self.channels, key=lambda x, y: cmp( x.get_sound().priority, y.get_sound().priority ) )
-		if lowest <= priority:
-			return lowest 
-		return None
+		#attempt = pygame.mixer.find_channel()
+		#if attempt is not None:
+		#	return attempt
+		#lowest = min( self.channels, key=lambda x, y: cmp( x.get_sound().priority, y.get_sound().priority ) )
+		#if lowest <= priority:
+		#	return lowest 
+		#return None
+		curGroup = (priority, 0, None)
+		for eachId, eachChannel in enumerate( self.channels ):
+			curSound = eachChannel.get_sound()
+			if curSound is None:
+				return eachChannel, eachId
+			if curSound.priority <= curGroup[0]:
+				curGroup = (curSound.priority, eachId, eachChannel)
+		return curGroup[2], curGroup[1]
