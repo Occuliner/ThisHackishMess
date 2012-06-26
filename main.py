@@ -46,7 +46,7 @@ screen = pygame.display.set_mode( (800, 600) )
 
 #pygame.event.set_allowed([QUIT, KEYDOWN, KEYUP])
 
-pygame.display.set_caption( 'Open' )
+pygame.display.set_caption( 'ThisHackishMess' )
 
 done = False
 
