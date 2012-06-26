@@ -20,7 +20,7 @@ import pygame, pymunk, sys, gc
 from booleangrid import BooleanGrid
 from collisionstate import CollisionState
 from linevisualiser import LineVisualiser
-
+from soundmanager import SoundManager
 
 """This module defines the PlayState class."""
 
@@ -74,6 +74,8 @@ class PlayState:
 		self.lineVisualiser = LineVisualiser( self )
 
 		self.rerenderEverything = False
+
+		self.soundManager = SoundManager()
 
 	def addBoundary( self, point1, point2 ):
 		newSeg = pymunk.Segment( self.boundaryBody, point1, point2, 1 )

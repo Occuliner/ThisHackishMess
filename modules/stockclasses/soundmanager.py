@@ -20,8 +20,9 @@ import pygame, weakref, os
 pygame.mixer.init()
 
 class Sound( pygame.mixer.Sound ):
-	def __init__( self, filename, priority, soundMgr ):
-		pygame.mixer.Sound.__init__( self, filename )
+	def __init__( self, fileName, priority, soundMgr ):
+		self.fileName = fileName
+		pygame.mixer.Sound.__init__( self, fileName )
 		self.soundManagerRef = weakref.ref( soundMgr )
 		self.priority = priority
 		
@@ -36,6 +37,13 @@ class Sound( pygame.mixer.Sound ):
 	def stop( self, channelId ):
 		pygame.mixer.Channel(channelId).stop()
 
+	def makePicklable( self ):
+		self.soundManagerRef = None
+
+	def makeUnpickable( self, sndMgr ):
+		self.soundManagerRef = weakref.ref( sndMgr )
+		pygame.mixer.Sound.__init__( self, self.fileName )
+
 class SoundManager:
 	def __init__( self ):
 		self.sounds = {}
@@ -43,13 +51,27 @@ class SoundManager:
 		self.channelCount = pygame.mixer.get_num_channels()
 		self.channels = [ pygame.mixer.Channel(idNum) for idNum in range( self.channelCount ) ]
 
-	def getSound( self, filename, priority ):
-		key = filename+str(priority)
+	def getSound( self, fileName, priority ):
+		key = fileName+str(priority)
 		if self.sounds.has_key( key ):
 			return self.sounds[key]()
-		tmpSound = Sound( os.path.join( self.path, filename ), priority, self )
+		tmpSound = Sound( os.path.join( self.path, fileName ), priority, self )
 		self.sounds[key] = weakref.ref( tmpSound )
 		return tmpSound
+
+	def makePicklable( self ):
+		self.channels = None
+		for eachKey, eachVal in self.sounds.items():
+			self.sounds[eachKey] = eachVal()
+		for eachSound in self.sounds.values():
+			eachSound.makePicklable()
+
+	def makeUnpicklable( self ):
+		self.channels = [ pygame.mixer.Channel(idNum) for idNum in range( self.channelCount ) ]
+		for eachSound in self.sounds.values():
+			eachSound.makeUnpickable( self )
+		for eachKey, eachVal in self.sounds.items():
+			self.sounds[eachKey] = weakref.ref( eachVal )
 
 	def getChannel( self, priority ):
 		#attempt = pygame.mixer.find_channel()

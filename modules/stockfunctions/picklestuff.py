@@ -87,8 +87,12 @@ def dumpPlayState( givenState, fileName ):
 
 	givenState.space, givenState.lineVisualiser, givenState.boundaryBody, givenState.boundaries = None, None, id( givenState.boundaryBody ), [ id( each ) for each in givenState.boundaries ]
 	
+	givenState.soundManager.makePicklable()
+
 	writeObjectToFile( givenState, fileName )
 
+	givenState.soundManager.makeUnpicklable()
+	
 	givenState.space, givenState.lineVisualiser, givenState.boundaries, givenState.boundaryBody = oldSpace, oldVis, oldBoundaries, oldBoundaryBody
 	#givenState.lineVisualiser.renderLines, givenState.lineVisualiser.renderPhysicsLines, givenState.lineVisualiser.forceNoRender = oldRenderLines, oldRenderPhysicsLines, oldForceNoRender
 
@@ -113,6 +117,8 @@ def loadPlayState( fileName, curTileSet ):
 		return None
 	givenState.forceUpdateEverything = True
 	givenState.floor.tileSet = curTileSet
+
+	givenState.soundManager.makeUnpicklable()
 
 	givenState.space, bodyDict, shapeDict = givenState.spaceGhost.resurrect()
 	givenState.spaceGhost = None
