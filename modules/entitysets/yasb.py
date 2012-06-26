@@ -107,6 +107,12 @@ class YasbClass( Entity ):
 		Entity.__init__( self, pos, vel, None, group, pygame.Rect( 0, 0, self.width, self.height ), animated=True )
 		
 		#self.acceleration[1] = 384
+		
+		self.randomSound = group.playState.soundManager.getSound( "sfx_step_grass-CCBY.wav", 0 )
+		self.randomSound.set_volume( 0.5 )
+		
+		self.stepsPlaying = False
+		self.stepsId = None
 
 		self.baseSheet = self.sheet.copy()
 		
@@ -254,6 +260,14 @@ class YasbClass( Entity ):
 	#	self.acceleration[1] += walk[1]
 
 	def update( self, dt ):
+		if self.stepsPlaying and not any( [self.walkingLeft, self.walkingRight, self.walkingForward, self.walkingBackward] ):
+			self.stepsPlaying = False
+			self.randomSound.stop( self.stepsId )
+		elif not self.stepsPlaying and any( [self.walkingLeft, self.walkingRight, self.walkingForward, self.walkingBackward] ):
+			self.stepsId = self.randomSound.play( loops=-1 )
+			if self.stepsId is not None:
+				self.stepsPlaying = True
+			
 		self.body.reset_forces()
 		#walk = self.applyWalk()
 		
