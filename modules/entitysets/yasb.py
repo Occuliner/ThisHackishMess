@@ -284,14 +284,15 @@ class YasbClass( Entity ):
 				
 				playerIsAt = map( int, self.standingAt )
 				#print playerIsAt
-				if curState.floor.kickUpMap[playerIsAt[0]][playerIsAt[1]] == True:
-					#print "Yay!"
-					#Generate kickup!
-					self.kickUp.changeColour( curState.floor.image.get_at( playerIsAt ) )
-					self.onKickUpArea = True
-				else:
-					#print "Nay!"
-					self.onKickUpArea = False
+				if playerIsAt[0] < curState.floor.size[0] and playerIsAt[1] < curState.floor.size[1]:
+					if curState.floor.kickUpMap[playerIsAt[0]][playerIsAt[1]] == True:
+						#print "Yay!"
+						#Generate kickup!
+						self.kickUp.changeColour( curState.floor.image.get_at( playerIsAt ) )
+						self.onKickUpArea = True
+					else:
+						#print "Nay!"
+						self.onKickUpArea = False
 		#self.velocity[0] -= walk[0]
 		#self.velocity[1] -= walk[1]
 
