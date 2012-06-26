@@ -15,7 +15,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import cPickle
+import cPickle, os
 #import msgpack
 import pygame
 import zlib, random
@@ -35,8 +35,11 @@ def writeObjectToFile( obj, fileName ):
 	destFile.close()
 	
 def loadObjectFromFile( fileName ):
+	if not os.path.isfile( fileName ):
+		return None
 	#return cPickle.load( file( fileName, "r" ) )
 	theFile = open( fileName, "rb" )
+	#Windows didn't like it without reading in in "rb" mode and replacing All "\r"
 	loadString = theFile.read().replace( "\r\n", "\n" )
 	theFile.close()
 	#Msgpack version.
@@ -105,6 +108,9 @@ def dumpPlayState( givenState, fileName ):
 
 def loadPlayState( fileName, curTileSet ):
 	givenState = loadObjectFromFile( fileName )
+	if givenState is None:
+		print "Map: " + fileName + " does not appear to exist."
+		return None
 	givenState.forceUpdateEverything = True
 	givenState.floor.tileSet = curTileSet
 

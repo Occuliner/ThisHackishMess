@@ -54,6 +54,7 @@ class GenericBlock( Entity ):
 		#print self.idleDeceleration		
 		#if self.acceleration[0] != 0.0 or self.acceleration[1] != 0.0:
 		#	print self.acceleration
+		#self.body.velocity.x = 0
 		Entity.update( self, dt )
 		#self.time = 0
 		#self.time += dt

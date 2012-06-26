@@ -30,15 +30,22 @@ def levelWarpFunc( givenWarp, givenObject ):
 	if givenObject in curPlayState.playersGroup:
 		givenWarp.collidedWith.add( givenObject )
 		if givenObject not in givenWarp.ignore:
-			givenObject.removeFromGroup( curPlayState.playersGroup )
-			for each in givenObject.children:
-				each.removeFromGroup( curPlayState.playersGroup )
-			curPlayState.swap( loadPlayState( os.path.join( "data", "maps", givenWarp.tags["warpDest"] ), curPlayState.floor.tileSet ) )
-			for each in curPlayState.levelWarpGroup:
+			dest = loadPlayState( os.path.join( "data", "maps", givenWarp.tags["warpDest"] ), curPlayState.floor.tileSet )
+			if dest is None:
+				return None
+			targetWarp = None
+			for each in dest.levelWarpGroup:
 				if each.tags.get("warpKey") == givenWarp.tags["warpKey"]:
 					targetWarp = each
 					break
+			if targetWarp is None:
+				print "No levelWarp with warpKey: " + givenWarp.tags["warpKey"] + " appears to exist in the destination map."
+				return None
+			givenObject.removeFromGroup( curPlayState.playersGroup )
+			for each in givenObject.children:
+				each.removeFromGroup( curPlayState.playersGroup )
 			givenObject.body.position = targetWarp.body.position.x, targetWarp.body.position.y
+			curPlayState.swap( dest )
 			givenObject.addToGroup( curPlayState.playersGroup )
 			for each in givenObject.children:
 				each.addToGroup( curPlayState.playersGroup )
