@@ -34,6 +34,8 @@ from scale import scaleSurface
 
 from staticimage import StaticImage
 
+from selectionbox import SelectionBox
+
 class EntButton( Button ):
 	"""EntButton is a generic class that inits a Button from a given Entity-class.\n""" \
 	"""It is used in EntityEditState to create buttons to pick which entity type to\n""" \
@@ -54,6 +56,10 @@ class EntButton( Button ):
 				return None
 			self.parentState.selectedButton = self
 			self.parentState.entNum = self.entNum
+			self.parentState.removeSprite( self.parentState.entSelectionBox )
+			self.parentState.entSelectionBox = SelectionBox( self, self.parentState )
+			self.parentState.addSprite( self.parentState.entSelectionBox )
+			self.parentState.menu.loadMenuState( self.parentState )
 		
 class EntityEditState( MenuState ):
 	"""EntityEditState is a MenuState class that creates Entity-placing functionality,\n""" \
@@ -63,7 +69,6 @@ class EntityEditState( MenuState ):
 		MenuState.__init__( self, menu, sprites )
 
 		self.entNum = 0
-		self.selectedButton = None
 		self.sprites = []
 		self.buttons = []
 
@@ -77,6 +82,11 @@ class EntityEditState( MenuState ):
 		self.processedEnts = []
 
 		self.generateButtons()
+
+		self.selectedButton = self.buttons[self.entNum]
+		self.entSelectionBox = SelectionBox( self.selectedButton , self )
+		self.addSprite( self.entSelectionBox )
+
 		#curEntNum = 0
 		#xPos = 0
 		#yPos = 0

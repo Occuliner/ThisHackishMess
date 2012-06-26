@@ -28,6 +28,8 @@ from gridrounding import gridRound
 
 from staticimage import StaticImage
 
+from selectionbox import SelectionBox
+
 class UndoButton( Button ):
 	"""UndoButton class, pretty obvious what it does."""
 	image = loadImage("undo.png")
@@ -60,8 +62,13 @@ class TileButton( Button ):
 		self.tileNum = tileNum
 	def push( self, clickKey ):
 		"""Sets the parentState (Should be FloorEditState) to start using this given Tile."""
-		if clickKey is 'mouse1up':
+		print self.parentState.tileNum, self.tileNum
+		if clickKey is 'mouse1up' and self.parentState.tileNum is not self.tileNum:
 			self.parentState.tileNum = self.tileNum
+			self.parentState.removeSprite( self.parentState.tileSelectionBox )
+			self.parentState.tileSelectionBox = SelectionBox( self, self.parentState )
+			self.parentState.addSprite( self.parentState.tileSelectionBox )
+			self.parentState.menu.loadMenuState( self.parentState )
 
 class FloorEditState( MenuState ):
 	"""The FloorEditState class, a MenuState for editing the current PlayState's Floor."""
@@ -89,7 +96,8 @@ class FloorEditState( MenuState ):
 		#A local copy to prevent excessive look ups.
 		self.floor = self.menu.playState.floor
 
-		self.tileNum = 1
+		self.tileNum = 0
+
 
 		#For the tile placing functionality.
 		self.startOfBlock = None
@@ -106,6 +114,9 @@ class FloorEditState( MenuState ):
 				column = 0
 				row += 1
 			curTileNum += 1
+
+		self.tileSelectionBox = SelectionBox( self.buttons[2], self )
+		self.addSprite( self.tileSelectionBox )
 
 	def update( self, dt, click, clickKey, curMousePos=None ):
 		"""Where the actual Tile placing on the Floor happens."""

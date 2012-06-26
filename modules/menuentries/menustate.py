@@ -63,6 +63,13 @@ class MenuState:
 		sprite.rect.y += self.y
 		self.sprites.append( sprite )
 
+	def removeSprite( self, sprite ):
+		self.sprites.remove( sprite )
+		
+	def removeButton( self, button ):
+		self.removeSprite( button )
+		self.buttons.remove( button )
+
 	def emptyMenuUpdate( self, dt, clickPoint, clickKey, curMousePos ):
 		"""Does absolutely nothing! This is the default to MenuState.update,\n""" \
 		"""the method that runs when the user has clicked somewhere outside of the menu,\n""" \

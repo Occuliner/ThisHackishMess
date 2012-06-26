@@ -27,6 +27,8 @@ from staticimage import StaticImage
 
 from gridrounding import gridRound
 
+from selectionbox import SelectionBox
+
 class SnapToGridButton( Button ):
 	image = loadImage("gridbutton.png")
 	def __init__( self, menu=None ):
@@ -89,7 +91,12 @@ class BoundaryEditState( MenuState ):
 
 		self.snapToGridButton = SnapToGridButton( self )
 		self.addButton( self.snapToGridButton )
+
+		self.buttonSelectionBox = SelectionBox( self.addBoundButton, self )
+		self.addSprite( self.buttonSelectionBox )
 		
+		self.gridButtonSelectionBox = None
+
 		self.addingMode = True
 		self.removingMode = False
 
@@ -100,14 +107,29 @@ class BoundaryEditState( MenuState ):
 
 	def toggleSnapToGrid( self ):
 		self.snapToGrid = not self.snapToGrid
+		if self.gridButtonSelectionBox is None:
+			self.gridButtonSelectionBox = SelectionBox( self.snapToGridButton, self )
+			self.addSprite( self.gridButtonSelectionBox )
+		else:
+			self.removeSprite( self.gridButtonSelectionBox )
+			self.gridButtonSelectionBox = None
+		self.menu.loadMenuState( self )
 
 	def addMode( self ):
 		self.addingMode = True
 		self.removingMode = False
+		self.removeSprite( self.buttonSelectionBox )
+		self.buttonSelectionBox = SelectionBox( self.addBoundButton, self )
+		self.addSprite( self.buttonSelectionBox )
+		self.menu.loadMenuState( self )
 
 	def removeMode( self ):
 		self.removingMode = True
 		self.addingMode = False
+		self.removeSprite( self.buttonSelectionBox )
+		self.buttonSelectionBox = SelectionBox( self.removeBoundButton , self )
+		self.addSprite( self.buttonSelectionBox )
+		self.menu.loadMenuState( self )
 
 	def selectSegmentEnd( self, point, threshold ):
 		possib = {}		
