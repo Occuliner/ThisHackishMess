@@ -57,7 +57,7 @@ class EntButton( Button ):
 			self.parentState.selectedButton = self
 			self.parentState.entNum = self.entNum
 			self.parentState.removeSprite( self.parentState.entSelectionBox )
-			self.parentState.entSelectionBox = SelectionBox( self, self.parentState )
+			self.parentState.entSelectionBox = SelectionBox( self.rect, self.parentState )
 			self.parentState.addSprite( self.parentState.entSelectionBox )
 			self.parentState.menu.loadMenuState( self.parentState )
 		
@@ -84,7 +84,7 @@ class EntityEditState( MenuState ):
 		self.generateButtons()
 
 		self.selectedButton = self.buttons[self.entNum]
-		self.entSelectionBox = SelectionBox( self.selectedButton , self )
+		self.entSelectionBox = SelectionBox( self.selectedButton.rect, self )
 		self.addSprite( self.entSelectionBox )
 
 		#curEntNum = 0

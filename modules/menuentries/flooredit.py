@@ -66,7 +66,7 @@ class TileButton( Button ):
 		if clickKey is 'mouse1up' and self.parentState.tileNum is not self.tileNum:
 			self.parentState.tileNum = self.tileNum
 			self.parentState.removeSprite( self.parentState.tileSelectionBox )
-			self.parentState.tileSelectionBox = SelectionBox( self, self.parentState )
+			self.parentState.tileSelectionBox = SelectionBox( self.rect, self.parentState )
 			self.parentState.addSprite( self.parentState.tileSelectionBox )
 			self.parentState.menu.loadMenuState( self.parentState )
 
@@ -115,7 +115,7 @@ class FloorEditState( MenuState ):
 				row += 1
 			curTileNum += 1
 
-		self.tileSelectionBox = SelectionBox( self.buttons[2], self )
+		self.tileSelectionBox = SelectionBox( self.buttons[2].rect, self )
 		self.addSprite( self.tileSelectionBox )
 
 	def update( self, dt, click, clickKey, curMousePos=None ):

@@ -22,9 +22,9 @@ from staticimage import StaticImage
 class SelectionBox( StaticImage ):
 	red = pygame.Color( 255, 0, 0, 255 )
 	empty = pygame.Color( 0, 0, 0, 0 )
-	def __init__( self, button, parentState ):
+	def __init__( self, rect, parentState ):
 		StaticImage.__init__( self, None, None, parentState )
-		self.image = pygame.Surface( ( button.rect.w, button.rect.h ) ).convert_alpha()
+		self.image = pygame.Surface( ( rect.w, rect.h ) ).convert_alpha()
 		self.image.fill( self.empty )
-		self.rect = button.rect.copy().move( -parentState.x, -parentState.y )
+		self.rect = rect.copy().move( -parentState.x, -parentState.y )
 		pygame.draw.rect( self.image, self.red, self.rect.move( -(self.rect.left), -(self.rect.top) ), 2 )

@@ -92,7 +92,7 @@ class BoundaryEditState( MenuState ):
 		self.snapToGridButton = SnapToGridButton( self )
 		self.addButton( self.snapToGridButton )
 
-		self.buttonSelectionBox = SelectionBox( self.addBoundButton, self )
+		self.buttonSelectionBox = SelectionBox( self.addBoundButton.rect, self )
 		self.addSprite( self.buttonSelectionBox )
 		
 		self.gridButtonSelectionBox = None
@@ -108,7 +108,7 @@ class BoundaryEditState( MenuState ):
 	def toggleSnapToGrid( self ):
 		self.snapToGrid = not self.snapToGrid
 		if self.gridButtonSelectionBox is None:
-			self.gridButtonSelectionBox = SelectionBox( self.snapToGridButton, self )
+			self.gridButtonSelectionBox = SelectionBox( self.snapToGridButton.rect, self )
 			self.addSprite( self.gridButtonSelectionBox )
 		else:
 			self.removeSprite( self.gridButtonSelectionBox )
@@ -119,7 +119,7 @@ class BoundaryEditState( MenuState ):
 		self.addingMode = True
 		self.removingMode = False
 		self.removeSprite( self.buttonSelectionBox )
-		self.buttonSelectionBox = SelectionBox( self.addBoundButton, self )
+		self.buttonSelectionBox = SelectionBox( self.addBoundButton.rect, self )
 		self.addSprite( self.buttonSelectionBox )
 		self.menu.loadMenuState( self )
 
@@ -127,7 +127,7 @@ class BoundaryEditState( MenuState ):
 		self.removingMode = True
 		self.addingMode = False
 		self.removeSprite( self.buttonSelectionBox )
-		self.buttonSelectionBox = SelectionBox( self.removeBoundButton , self )
+		self.buttonSelectionBox = SelectionBox( self.removeBoundButton.rect, self )
 		self.addSprite( self.buttonSelectionBox )
 		self.menu.loadMenuState( self )
 
