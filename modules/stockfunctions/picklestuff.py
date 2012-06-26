@@ -36,8 +36,8 @@ def writeObjectToFile( obj, fileName ):
 	
 def loadObjectFromFile( fileName ):
 	#return cPickle.load( file( fileName, "r" ) )
-	theFile = open( fileName, "r" )
-	loadString = theFile.read()
+	theFile = open( fileName, "rb" )
+	loadString = theFile.read().replace( "\r\n", "\n" )
 	theFile.close()
 	#Msgpack version.
 	#return msgpack.unpackb( zlib.decompress( loadString ) )
