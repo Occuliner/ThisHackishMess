@@ -43,7 +43,7 @@ class PlayState:
 		self.floor = None
 		self.space = pymunk.Space()
 		self.space.gravity = ( 0.0, 0.0 )
-		self.space.damping = 0.005
+		self.space.damping = 0.00025
 		#self.space.set_default_collision_handler()
 		self.space.add_collision_handler( 1, 2, callSpeshulEffect )
 		self.space.add_collision_handler( 2, 2, callSpeshulEffect )
