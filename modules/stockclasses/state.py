@@ -25,7 +25,6 @@ from soundmanager import SoundManager
 """This module defines the PlayState class."""
 
 def callSpeshulEffect( space, arbiter, *args, **kwargs ):
-	print "Yay"
 	objA, objB = arbiter.shapes[0].entity, arbiter.shapes[1].entity
 	if hasattr( objA, "specialCollision" ):
 		if objA.specialCollision is not None:
