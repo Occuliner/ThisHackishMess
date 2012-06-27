@@ -93,6 +93,14 @@ class YasbClass( Entity ):
 
 	width = 28
 	height = 36
+	#bWidth = width
+	#bHeight = height
+	#bdx = 0
+	#bdy = 0
+	#wbWidth = 24
+	#wbHeight = 8
+	#wbdx = 2
+	#wbdy = 28
 
 	collideMaskMaster = booleanGridFromAlpha( sheet )
 	collideId = 1

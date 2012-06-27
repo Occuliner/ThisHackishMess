@@ -70,7 +70,7 @@ currentState.addGroup( levelWarpGroup, name="levelWarpGroup" )
 
 currentState.addGroup( playerGroup, isPlayerGroupBool=True )
 
-currentState.addGroup( genericStuffGroup, name="genericStuffGroup" )
+currentState.addGroup( genericStuffGroup, name="genericStuffGroup", indexValue=0 )
 
 #
 #	This import seems pointless, but without there won't actually be any 

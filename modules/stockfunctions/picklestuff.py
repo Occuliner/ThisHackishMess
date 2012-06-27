@@ -67,6 +67,9 @@ def dumpPlayState( givenState, fileName ):
 			eachSprite.body = None
 			eachSprite.shape = None
 			eachSprite.physicsObjects = []
+			if hasattr( eachSprite, "sensorBox" ):
+				allTheEntShapes[eachSprite.sensorId] = eachSprite.sensorBox
+				eachSprite.sensorBox = None
 		
 	floorImage = givenState.floor.image
 	#givenState.floor.imageStringBuffer = pygame.image.tostring( givenState.floor.image, "RGB" )
@@ -106,6 +109,9 @@ def dumpPlayState( givenState, fileName ):
 			eachSprite.body = allTheEntBodies[eachSprite.bodyId]
 			eachSprite.shape = allTheEntShapes[eachSprite.shapeId]
 			eachSprite.physicsObjects = [ eachSprite.body, eachSprite.shape ]
+			if hasattr( eachSprite, "sensorBox" ):
+				eachSprite.sensorBox = allTheEntShapes[eachSprite.sensorId]
+				eachSprite.physicsObjects.append( eachSprite.sensorBox )
 
 	givenState.floor.image = floorImage
 	givenState.floor.changes, givenState.floor.undoneChanges, givenState.floor.tileSet = backupChanges, backupUndoneChanges, backUpTileSet
@@ -141,6 +147,9 @@ def loadPlayState( fileName, curTileSet ):
 			eachSprite.shape = shapeDict[eachSprite.shapeId]
 			eachSprite.shape.entity = eachSprite
 			eachSprite.physicsObjects = [ eachSprite.body, eachSprite.shape ]
+			if hasattr( eachSprite, "sensorBox" ):
+				eachSprite.sensorBox = shapeDict[eachSprite.sensorId]
+				eachSprite.physicsObjects.append( eachSprite.sensorBox )
 			eachSprite.body.velocity_func = eachSprite.velocity_func
 			eachSprite.bodyId, eachSprite.shapeId = id( eachSprite.body ), id( eachSprite.shape )
 	#givenState.floor.image = pygame.image.fromstring( givenState.floor.imageStringBuffer, givenState.floor.size, "RGB" )

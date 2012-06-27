@@ -31,6 +31,9 @@ class EntityGroup( pygame.sprite.LayeredDirty ):
 		for sprite in sprites:
 			#if hasattr( sprite, "shape" ):
 			if sprite.collidable:
+				if hasattr( sprite, "sensorBox" ):
+					if sprite.sensorBox not in self.playState.space.shapes:
+						self.playState.space.add( sprite.sensorBox )
 				if sprite.shape not in self.playState.space.shapes:
 					self.playState.space.add( sprite.shape )
 				if sprite.body not in self.playState.space.bodies:
@@ -59,6 +62,9 @@ class Entity( pygame.sprite.DirtySprite ):
 
 	notDirectlyRemovable = False
 	mass = 1
+	#Width and Height are for the frames, bWidth and bHeight for sensor boxes, wbWidth and wbHeight for "physics" boxes.
+	width, height, bWidth, bHeight, wbWidth, wbHeight = None, None, None, None, None, None
+	bdx, bdy = 0, 0
 	
 	def __init__( self, pos, vel, image=None, group=None, rect=None, animated=None, collidable=None, collideByPixels=None, collideId=None, collideWith=None, collideMaskMaster=None, mass=None, specialCollision=None, solid=None ):
 		pygame.sprite.DirtySprite.__init__( self )
@@ -100,7 +106,22 @@ class Entity( pygame.sprite.DirtySprite ):
 			#self.shape = pymunk.Poly( self.body, [ self.rect.bottomright, self.rect.topright, self.rect.topleft, self.rect.bottomleft ] )
 			#self.shape = pymunk.Circle( self.body, 5 )
 			width, height = self.rect.width, self.rect.height
-			self.shape = pymunk.Poly( self.body, map( pymunk.vec2d.Vec2d, [ (width, 0), (width, height), (0, height), (0, 0) ] ) )
+			self.physicsObjects = [self.body]
+
+			if self.bHeight is not None and self.bWidth is not None:
+				self.sensorBox = pymunk.Poly( self.body, map( pymunk.vec2d.Vec2d, [ (self.bWidth+self.bdx, 0+self.bdy), (self.bWidth+self.bdx, self.bHeight+self.bdy), (0+self.bdx, self.bHeight+self.bdy), (0+self.bdx, 0+self.bdy) ] ) )
+				self.sensorBox.sensor = True
+				self.sensorBox.collision_type = 2
+				self.sensorBox.entity = self
+				self.sensorId = id( self.sensorBox )
+				self.physicsObjects.append( self.sensorBox )
+			if self.wbHeight is not None and self.wbWidth is not None:
+				self.shape = pymunk.Poly( self.body, map( pymunk.vec2d.Vec2d, [ (self.wbWidth+self.wbdx, 0+self.wbdy), (self.wbWidth+self.wbdx, self.wbHeight+self.wbdy), (0+self.wbdx, self.wbHeight+self.wbdy), (0+self.wbdx, 0+self.wbdy) ] ) )
+			elif height is not None and width is not None:
+				self.shape = pymunk.Poly( self.body, map( pymunk.vec2d.Vec2d, [ (width, 0), (width, height), (0, height), (0, 0) ] ) )
+			else:
+				self.shape = pymunk.Poly( self.body, map( pymunk.vec2d.Vec2d, [ (self.rect.w, 0), (self.rect.w, self.rect.h), (0, self.rect.h), (0, 0) ] ) )
+			self.physicsObjects.append( self.shape )
 			self.shape.sensor = not self.solid
 			self.shape.elasticity = 0.0
 			self.shape.friction = 0.5
@@ -112,7 +133,7 @@ class Entity( pygame.sprite.DirtySprite ):
 				self.shape.collision_type = 2
 			self.shape.entity = self
 			#group.playState.space.add( self.body, self.shape )
-			self.physicsObjects = [ self.body, self.shape ]
+			#self.physicsObjects = [ self.body, self.shape ]
 
 			self.bodyId = id( self.body )
 			self.shapeId = id( self.shape )
@@ -172,6 +193,9 @@ class Entity( pygame.sprite.DirtySprite ):
 	def addToGroup( self, *groups ):
 		if self.collidable:
 			for group in groups:
+				if hasattr( self, "sensorBox" ):
+					if self.sensorBox not in group.playState.space.shapes:
+						group.playState.space.add( self.sensorBox )
 				if self.body not in group.playState.space.bodies:
 					group.playState.space.add( self.body )
 				if self.shape not in group.playState.space.shapes:
