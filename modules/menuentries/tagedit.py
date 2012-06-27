@@ -25,6 +25,8 @@ from menustate import MenuState
 
 from staticimage import StaticImage
 
+from label import Label
+
 class TagEditButton( Button ):
 	image = loadImage("tageditbutton.png")
 	rect = image.get_rect()
@@ -138,6 +140,8 @@ class TagEditState( MenuState ):
 		self.addButton( self.plusTagButton )
 		self.subTagButton = SubTagButton( self )
 		self.addButton( self.subTagButton )
+		self.fileNameLabel = Label( self, menu.playState.fileName, (0,570) )
+		self.addSprite( self.fileNameLabel )
 
 		self.curEnt = None
 
@@ -150,7 +154,7 @@ class TagEditState( MenuState ):
 		self.tagButtons = []
 
 		self.carryMeOverButtons = [self.plusTagButton, self.subTagButton]
-		self.carryMeOverSprites = [self.panel] + self.carryMeOverButtons
+		self.carryMeOverSprites = [self.panel,self.fileNameLabel] + self.carryMeOverButtons
 
 	def addButton( self, givenButton ):
 		MenuState.addButton( self, givenButton )

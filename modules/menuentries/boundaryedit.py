@@ -29,6 +29,8 @@ from gridrounding import gridRound
 
 from selectionbox import SelectionBox
 
+from label import Label
+
 class SnapToGridButton( Button ):
 	image = loadImage("gridbutton.png")
 	def __init__( self, menu=None ):
@@ -94,6 +96,9 @@ class BoundaryEditState( MenuState ):
 
 		self.buttonSelectionBox = SelectionBox( self.addBoundButton.rect, self )
 		self.addSprite( self.buttonSelectionBox )
+
+		self.fileNameLabel = Label( self, menu.playState.fileName, (0,570) )
+		self.addSprite( self.fileNameLabel )
 		
 		self.gridButtonSelectionBox = None
 

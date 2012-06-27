@@ -21,6 +21,7 @@ from picklestuff import dumpPlayState
 from menustate import MenuState
 from staticimage import StaticImage
 from filedialog import FileDialogState
+
 import os
 import pygame
 
@@ -34,6 +35,7 @@ class FileSaveButton( Button ):
 		self.rect.topleft = pos
 	def push( self, clickKey ):
 		if "up" in clickKey:
+			self.parentState.menu.playState.fileName = self.text
 			dumpPlayState( self.parentState.menu.playState, os.path.join( "data", "maps", self.text ) )
 			self.parentState.menu.backToDefault()
 

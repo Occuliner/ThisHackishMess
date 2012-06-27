@@ -19,6 +19,7 @@ from button import Button
 from imageload import loadImage
 from menustate import MenuState
 from staticimage import StaticImage
+from label import Label
 import pygame
 import os
 
@@ -50,6 +51,8 @@ class FileDialogState( MenuState ):
 		sprites.append( self.backButton )
 		self.nextButton = ScrollNextButton( self )
 		sprites.append( self.nextButton )
+		self.fileNameLabel = Label( self, menu.playState.fileName, (0,570) )
+		sprites.append( self.fileNameLabel )
 		MenuState.__init__( self, menu, sprites )
 		self.keyboardEnabled = True
 		self.currentString = ""
@@ -68,7 +71,7 @@ class FileDialogState( MenuState ):
 
 		self.userFont = pygame.font.Font( os.path.join( "data", "fonts", "PD-tarzeau_-_Atari_Small.ttf" ), 24 )
 		#Carry these sprites over each update.
-		self.carryMeOverSprites = []
+		self.carryMeOverSprites = [ self.fileNameLabel ]
 		self.carryMeOverButtons = []
 
 		

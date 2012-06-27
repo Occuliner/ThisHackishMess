@@ -77,6 +77,8 @@ class PlayState:
 
 		self.soundManager = SoundManager()
 
+		self.fileName = "Untitled"
+
 	def addBoundary( self, point1, point2 ):
 		newSeg = pymunk.Segment( self.boundaryBody, point1, point2, 1 )
 		self.boundaries.append( newSeg )
@@ -143,7 +145,6 @@ class PlayState:
 		
 		for eachGroup in self.groups:
 			eachGroup.update( dt )
-		
 		#self.collideSystem( dt )
 		#print 1.0000/dt, len( self.sprites() )
 			

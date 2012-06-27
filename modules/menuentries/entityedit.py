@@ -36,6 +36,8 @@ from staticimage import StaticImage
 
 from selectionbox import SelectionBox
 
+from label import Label
+
 class EntButton( Button ):
 	"""EntButton is a generic class that inits a Button from a given Entity-class.\n""" \
 	"""It is used in EntityEditState to create buttons to pick which entity type to\n""" \
@@ -86,6 +88,8 @@ class EntityEditState( MenuState ):
 		self.selectedButton = self.buttons[self.entNum]
 		self.entSelectionBox = SelectionBox( self.selectedButton.rect, self )
 		self.addSprite( self.entSelectionBox )
+		self.fileNameLabel = Label( self, menu.playState.fileName, (0,570) )
+		self.addSprite( self.fileNameLabel )
 
 		#curEntNum = 0
 		#xPos = 0

@@ -78,7 +78,11 @@ class DevMenu( pygame.sprite.OrderedUpdates ):
 		self.backToDefault()
 
 	def backToDefault( self ):
+		self.defaultMenuState.removeSprite( self.defaultMenuState.fileNameLabel )
+		self.defaultMenuState.fileNameLabel = Label( self, self.playState.fileName, (0,570) )
+		self.defaultMenuState.addSprite( self.defaultMenuState.fileNameLabel )
 		self.loadMenuState( self.defaultMenuState )
+		
 	
 	def update( self, dt ):
 		"""Generic update function.
