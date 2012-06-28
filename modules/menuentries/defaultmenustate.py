@@ -61,5 +61,3 @@ class DefaultMenuState( MenuState ):
 
 	def __init__( self, menu, sprites=[panel, floorEditButton, entityEditButton, saveMapButton, loadMapButton, tagEditButton, boundEditButton, physicsVisButton] ):
 		MenuState.__init__( self, menu, sprites )
-		self.fileNameLabel = Label( self, menu.playState.fileName, (0,570) )
-		self.addSprite( self.fileNameLabel )

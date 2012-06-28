@@ -79,7 +79,7 @@ def distance( point1, point2 ):
 class BoundaryEditState( MenuState ):
 	def __init__( self, menu, sprites=[] ):
 		MenuState.__init__( self, menu, sprites )
-		self.sprites = []
+		self.sprites = [self.fileNameLabel]
 		self.buttons = []
 
 		self.panel = StaticImage(loadImage("devmenu.png"), (10, 10))
@@ -96,9 +96,6 @@ class BoundaryEditState( MenuState ):
 
 		self.buttonSelectionBox = SelectionBox( self.addBoundButton.rect, self )
 		self.addSprite( self.buttonSelectionBox )
-
-		self.fileNameLabel = Label( self, menu.playState.fileName, (0,570) )
-		self.addSprite( self.fileNameLabel )
 		
 		self.gridButtonSelectionBox = None
 

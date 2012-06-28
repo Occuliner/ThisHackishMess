@@ -26,8 +26,8 @@ class Button( StaticImage ):
 	"""or for extension to create more specific Button classes."""
 	button = True
 	
-	def __init__( self, image, pos, parentState=None ):
-		StaticImage.__init__( self, image, pos, parentState )
+	def __init__( self, image, pos, parentState=None, fixed=False ):
+		StaticImage.__init__( self, image, pos, parentState, fixed )
 		#self.parentState = parentState
 	def emptyCallback( self, clickKey ):
 		"""Does absolutely nothing! Button.push defaults to this. push()\n""" \

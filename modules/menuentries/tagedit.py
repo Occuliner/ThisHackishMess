@@ -131,7 +131,7 @@ class SubTagButton( Button ):
 class TagEditState( MenuState ):
 	def __init__( self, menu, sprites=[] ):
 		MenuState.__init__( self, menu, sprites )
-		self.sprites = []
+		self.sprites = [self.fileNameLabel]
 		self.buttons = []
 
 		self.panel = StaticImage(loadImage("tageditorbackground.png"), (10, 10))
@@ -140,8 +140,6 @@ class TagEditState( MenuState ):
 		self.addButton( self.plusTagButton )
 		self.subTagButton = SubTagButton( self )
 		self.addButton( self.subTagButton )
-		self.fileNameLabel = Label( self, menu.playState.fileName, (0,570) )
-		self.addSprite( self.fileNameLabel )
 
 		self.curEnt = None
 

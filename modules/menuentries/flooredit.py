@@ -84,7 +84,7 @@ class FloorEditState( MenuState ):
 
 		#print len( self.buttons ), len( self.sprites ), len( sprites )
 		self.buttons = []
-		self.sprites = []
+		self.sprites = [self.fileNameLabel]
 
 		self.panel = StaticImage( loadImage( "devmenu.png" ), ( 10, 10 ) )
 		self.addSprite( self.panel )
@@ -119,9 +119,6 @@ class FloorEditState( MenuState ):
 
 		self.tileSelectionBox = SelectionBox( self.buttons[2].rect, self )
 		self.addSprite( self.tileSelectionBox )
-
-		self.fileNameLabel = Label( self, menu.playState.fileName, (0,570) )
-		self.addSprite( self.fileNameLabel )
 
 	def update( self, dt, click, clickKey, curMousePos=None ):
 		"""Where the actual Tile placing on the Floor happens."""

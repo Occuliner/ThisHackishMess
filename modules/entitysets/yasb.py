@@ -268,13 +268,13 @@ class YasbClass( Entity ):
 	#	self.acceleration[1] += walk[1]
 
 	def update( self, dt ):
-		if self.stepsPlaying and not any( [self.walkingLeft, self.walkingRight, self.walkingForward, self.walkingBackward] ):
-			self.stepsPlaying = False
-			self.randomSound.stop( self.stepsId )
-		elif not self.stepsPlaying and any( [self.walkingLeft, self.walkingRight, self.walkingForward, self.walkingBackward] ):
-			self.stepsId = self.randomSound.play( loops=-1 )
-			if self.stepsId is not None:
-				self.stepsPlaying = True
+		#if self.stepsPlaying and not any( [self.walkingLeft, self.walkingRight, self.walkingForward, self.walkingBackward] ):
+		#	self.stepsPlaying = False
+		#	self.randomSound.stop( self.stepsId )
+		#elif not self.stepsPlaying and any( [self.walkingLeft, self.walkingRight, self.walkingForward, self.walkingBackward] ):
+		#	#self.stepsId = self.randomSound.play( loops=-1 )
+		#	if self.stepsId is not None:
+		#		self.stepsPlaying = True
 			
 		self.body.reset_forces()
 		#walk = self.applyWalk()

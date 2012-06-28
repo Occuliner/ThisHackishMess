@@ -21,7 +21,7 @@ from staticimage import StaticImage
 class Label( StaticImage ):
 	LabelText = pygame.font.Font( os.path.join( "data", "fonts", "PD-tarzeau_-_Atari_Small.ttf" ), 32 )
 	def __init__( self, parentState, text, pos ):
-		StaticImage.__init__( self, None, None, parentState )
+		StaticImage.__init__( self, None, None, parentState, True )
 		self.text = text
 		self.image = self.LabelText.render( text, False, pygame.Color( 0, 0, 0 ) )
 		self.rect = self.image.get_rect()

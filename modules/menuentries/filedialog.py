@@ -51,8 +51,6 @@ class FileDialogState( MenuState ):
 		sprites.append( self.backButton )
 		self.nextButton = ScrollNextButton( self )
 		sprites.append( self.nextButton )
-		self.fileNameLabel = Label( self, menu.playState.fileName, (0,570) )
-		sprites.append( self.fileNameLabel )
 		MenuState.__init__( self, menu, sprites )
 		self.keyboardEnabled = True
 		self.currentString = ""

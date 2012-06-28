@@ -71,7 +71,7 @@ class EntityEditState( MenuState ):
 		MenuState.__init__( self, menu, sprites )
 
 		self.entNum = 0
-		self.sprites = []
+		self.sprites = [self.fileNameLabel]
 		self.buttons = []
 
 		self.panel = StaticImage(loadImage("devmenu.png"), (10, 10))
@@ -88,8 +88,6 @@ class EntityEditState( MenuState ):
 		self.selectedButton = self.buttons[self.entNum]
 		self.entSelectionBox = SelectionBox( self.selectedButton.rect, self )
 		self.addSprite( self.entSelectionBox )
-		self.fileNameLabel = Label( self, menu.playState.fileName, (0,570) )
-		self.addSprite( self.fileNameLabel )
 
 		#curEntNum = 0
 		#xPos = 0

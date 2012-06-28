@@ -17,6 +17,8 @@
 
 """This file defines the MenuState class."""
 
+from label import Label
+
 class MenuState:
 	"""The MenuState class. Generally serves two purposes:\n""" \
 	"""-Contains Buttons to be displayed and potentially clicked on.\n""" \
@@ -34,6 +36,8 @@ class MenuState:
 		self.keyInput = ""
 		self.keyboardEnabled = False
 		self.x, self.y = 0, 0
+		self.fileNameLabel = Label( self, menu.playState.fileName, (0,570) )
+		self.addSprite( self.fileNameLabel )
 
 	def moveTo( self, x, y ):
 		if x-self.x+self.panel.rect.left < 0:
@@ -46,7 +50,7 @@ class MenuState:
 			y -= y-self.y+self.panel.rect.bottom-600
 		dx, dy = x-self.x,y-self.y
 		self.x, self.y = x, y
-		for each in self.sprites:
+		for each in [ sprite for sprite in self.sprites if not sprite.fixed ]:
 			each.rect.topleft = each.rect.x+dx, each.rect.y+dy
 
 	def addButton( self, button ):
@@ -59,8 +63,9 @@ class MenuState:
 	def addSprite( self, sprite ):
 		"""Adds a sprite to the MenuState."""
 		sprite.parentState = self
-		sprite.rect.x += self.x
-		sprite.rect.y += self.y
+		if not sprite.fixed:
+			sprite.rect.x += self.x
+			sprite.rect.y += self.y
 		self.sprites.append( sprite )
 
 	def removeSprite( self, sprite ):
