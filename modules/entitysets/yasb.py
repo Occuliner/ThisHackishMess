@@ -116,8 +116,8 @@ class YasbClass( Entity ):
 		
 		#self.acceleration[1] = 384
 		
-		self.randomSound = group.playState.soundManager.getSound( "sfx_step_grass-CCBY.wav", 0 )
-		self.randomSound.set_volume( 0.5 )
+		#self.randomSound = group.playState.soundManager.getSound( "sfx_step_grass-CCBY.wav", 0 )
+		#self.randomSound.set_volume( 0.5 )
 		
 		self.stepsPlaying = False
 		self.stepsId = None
