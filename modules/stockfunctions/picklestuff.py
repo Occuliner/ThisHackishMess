@@ -28,7 +28,7 @@ from linevisualiser import LineVisualiser
 
 def writeObjectToFile( obj, fileName ):
 	#cPickle.dump( obj, file( fileName, "w" ), 2 )
-	destFile = open( fileName, "w" )
+	destFile = open( fileName, "wb" )
 	destFile.write( zlib.compress( cPickle.dumps( obj, 2 ) ) )
 	#Msgpack version.
 	#destFile.write( zlib.compress( msgpack.packb( obj ) ) )
@@ -150,6 +150,7 @@ def loadPlayState( fileName, curTileSet ):
 			if hasattr( eachSprite, "sensorBox" ):
 				eachSprite.sensorBox = shapeDict[eachSprite.sensorId]
 				eachSprite.physicsObjects.append( eachSprite.sensorBox )
+				eachSprite.sensorId = id( eachSprite.sensorBox )
 			eachSprite.body.velocity_func = eachSprite.velocity_func
 			eachSprite.bodyId, eachSprite.shapeId = id( eachSprite.body ), id( eachSprite.shape )
 	#givenState.floor.image = pygame.image.fromstring( givenState.floor.imageStringBuffer, givenState.floor.size, "RGB" )
