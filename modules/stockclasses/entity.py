@@ -194,22 +194,27 @@ class Entity( pygame.sprite.DirtySprite ):
 	def addToGroup( self, *groups ):
 		if self.collidable:
 			for group in groups:
-				if hasattr( self, "sensorBox" ):
-					if self.sensorBox not in group.playState.space.shapes:
-						group.playState.space.add( self.sensorBox )
-				if self.body not in group.playState.space.bodies:
-					group.playState.space.add( self.body )
-				if self.shape not in group.playState.space.shapes:
-					group.playState.space.add( self.shape )
+				group.playState.space.add( self.physicsObjects )
+				#if hasattr( self, "sensorBox" ):
+				#	if self.sensorBox not in group.playState.space.shapes:
+				#		group.playState.space.add( self.sensorBox )
+				#if self.body not in group.playState.space.bodies:
+				#	group.playState.space.add( self.body )
+				#if self.shape not in group.playState.space.shapes:
+				#	group.playState.space.add( self.shape )
 		pygame.sprite.DirtySprite.add( self, groups )
 
 	def removeFromGroup( self, *groups ):
 		if self.collidable:
 			for group in groups:
-				if self.body in group.playState.space.bodies:
-					group.playState.space.remove( self.body )
-				if self.shape in group.playState.space.shapes:
-					group.playState.space.remove( self.shape )
+				group.playState.space.remove( self.physicsObjects )
+				#if hasattr( self, "sensorBox" ):
+				#	if self.sensorBox in group.playState.space.shapes:
+				#		group.playState.space.remove( self.sensorBox )
+				#if self.body in group.playState.space.bodies:
+				#	group.playState.space.remove( self.body )
+				#if self.shape in group.playState.space.shapes:
+				#	group.playState.space.remove( self.shape )
 		pygame.sprite.DirtySprite.remove( self, groups )
 
 	def getPosition( self ):
