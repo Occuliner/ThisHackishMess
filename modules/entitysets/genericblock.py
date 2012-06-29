@@ -28,6 +28,14 @@ import math
 class GenericBlock( Entity ):
 	width = 32
 	height = 32
+	bWidth = width
+	bHeight = height
+	bdx = 0
+	bdy = 0
+	wbWidth = 32
+	wbHeight = 16
+	wbdx = 0
+	wbdy = 16
 
 	playStateGroup = "genericStuffGroup"
 	setName = "genericstuff"

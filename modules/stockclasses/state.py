@@ -254,8 +254,15 @@ class PlayState:
 		"""Draw all the child entity groups in PlayState, returning changed area rects"""
 		changeRects = []
 		self.floor.draw( surface )
-		for eachVal in self.drawOrder:
-			changeRects.extend( self.groups[eachVal].draw( surface ) )
+		#for eachVal in self.drawOrder:
+		#	changeRects.extend( self.groups[eachVal].draw( surface ) )
+		
+		renderList = sorted( self.sprites(), lambda x, y: cmp( x.rect.bottom, y.rect.bottom ) )
+		#I probably shouldn't be doing this.
+		tmpDrawGroup = pygame.sprite.LayeredDirty( renderList )
+		changeRects.extend( tmpDrawGroup.draw( surface ) )
+		tmpDrawGroup.empty()
+		del tmpDrawGroup
 		
 		changeRects.extend( self.lineVisualiser.draw( surface ) )
 		

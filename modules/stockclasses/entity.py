@@ -43,6 +43,7 @@ class EntityGroup( pygame.sprite.LayeredDirty ):
 	def update( self, dt ):
 		for each in iter( self ):
 			each.update( dt )
+			
 	def readyAccel( self, dt ):
 		for each in iter( self ):
 			each.readyAccel( dt )
@@ -368,99 +369,12 @@ class Entity( pygame.sprite.DirtySprite ):
 				self.nextFrame()
 				self.frameTime = self.maxFrameTime
 		
-		#if abs( self.acceleration[0] ) < 0.1:
-		#	self.acceleration[0] = 0.0
-		#if abs( self.acceleration[1] ) < 0.1:
-		#	self.acceleration[1] = 0.0
-
-		#self.velocity[0] += self.acceleration[0]*dt
-		#self.velocity[1] += self.acceleration[1]*dt
-
-		#print dt
-		
-		#if self.velocity[0] != 0:# and self.acceleration[0] == 0:
-		#	#print self.velocity[0],
-		#	sign = self.velocity[0]/abs(self.velocity[0])
-		#	self.velocity[0] -= sign*self.idleDeceleration*dt#*self.velocity[0]/self.maxVel
-		#	#print self.velocity[0],
-		#	if sign*self.velocity[0] < 0:
-		#		self.velocity[0] = 0
-		#	#print self.velocity[0]
-		
-		#if self.velocity[1] != 0:# and self.acceleration[1] == 0:
-		#	#print self.velocity[1],
-		#	sign = self.velocity[1]/abs(self.velocity[1])
-		#	self.velocity[1] -= sign*self.idleDeceleration*dt#*self.velocity[1]/self.maxVel
-		#	#print self.velocity[1],
-		#	if sign*self.velocity[1] < 0:
-		#		self.velocity[1] = 0
-		#	#print self.velocity[1]
-		##if self.idle[0] and self.acceleration[0] == 0:
-		##if self.velocity[0] != 0:
-		##	if self.velocity[0] < 0:
-		##		self.velocity[0] += self.idleDeceleration*dt
-		#		#if self.velocity[0] > 0:
-		#		#	self.velocity[0] = 0
-		##	else:
-		##		self.velocity[0] -= self.idleDeceleration*dt
-		#		#if self.velocity[0] < 0:
-		#		#	self.velocity[0] = 0
-		#		#self.velocity[0] = 0
-		##if self.idle[1] and self.acceleration[1] == 0:
-		##if self.velocity[1] != 0:
-		##	if self.velocity[1] < 0:
-		##		self.velocity[1] += self.idleDeceleration*dt
-		##		if self.velocity[1] > 0:
-		##			self.velocity[1] = 0
-		##	else:
-		##		self.velocity[1] -= self.idleDeceleration*dt
-		##		if self.velocity[1] < 0:
-		##			self.velocity[1] = 0
-		#		#self.velocity[1] = 0
-#
-#		if self.maxVel < self.velocity[0]:
-#			self.velocity[0] = self.maxVel
-#		elif -(self.maxVel) > self.velocity[0]:
-#			self.velocity[0] = -(self.maxVel)
-#
-#		if self.maxVel < self.velocity[1]:
-#			self.velocity[1] = self.maxVel
-#		elif -(self.maxVel) > self.velocity[1]:
-#			self.velocity[1] = -(self.maxVel)
-#
-#
-#		self.position[0] = ( self.velocity[0] * dt + self.position[0] )
-#		self.position[1] = ( self.velocity[1] * dt * 0.5 + self.position[1] )
-#
-#
-#		if self.position[1] + self.image.get_height() > 600:
-#			self.position[1] = 600 - self.image.get_height()
-#			self.velocity[1] = 0
-#		elif self.position[1] < 0:
-#			self.position[1] = 0
-#			self.velocity[1] = 0
-#			
-#		if self.position[0] < 0:
-#			self.position[0] = 0
-#			self.velocity[0] = 0
-#		elif self.position[0] + self.image.get_width() > 800:
-#			self.position[0] = 800 - self.image.get_width()
-#			self.velocity[0] = 0
-#		
-#		newx = int( round( self.position[0] ) )
-#		newy = int( round( self.position[1] ) )
 		if self.collidable:
 			self.rect.topleft = self.body.position.x, self.body.position.y
 		else:
 			self.rect.topleft = int( round( self.position[0] ) ), int( round( self.position[1] ) )
-		#print self.body.is_sleeping, self.body.is_static
-#		self.rect.topleft = (newx, newy)
-#
 #		#Assume idle at end of frame
 		self.idle = [True, True]
-#		self.lastAcceleration = self.acceleration
-#		self.acceleration = [0,0]
-#		self.accelerationBarrier = { '-x':False, 'x':False, '-y':False, 'y':False }
 
 		#Check if class has been updated.
 		if self.classUpdated:
@@ -488,4 +402,3 @@ class Entity( pygame.sprite.DirtySprite ):
 			raise Exception( "An instance of Entity is in more than one group, that should probably not be happening." )
 
 		self.pushed = [0, 0]
-		
