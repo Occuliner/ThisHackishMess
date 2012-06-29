@@ -15,10 +15,8 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import cPickle, os
+import cPickle, os, pygame, zlib, gzip
 #import msgpack
-import pygame
-import zlib, random
 
 from imageload import loadImage
 
@@ -27,9 +25,11 @@ from physicsserialize import SpaceGhost
 from linevisualiser import LineVisualiser
 
 def writeObjectToFile( obj, fileName ):
+	destFile = gzip.open( fileName, 'wb' )
+	destFile.write( cPickle.dumps( obj, 2 ) )
 	#cPickle.dump( obj, file( fileName, "w" ), 2 )
-	destFile = open( fileName, "wb" )
-	destFile.write( zlib.compress( cPickle.dumps( obj, 2 ) ) )
+	#destFile = open( fileName, "wb" )
+	#destFile.write( zlib.compress( cPickle.dumps( obj, 2 ) ) )
 	#Msgpack version.
 	#destFile.write( zlib.compress( msgpack.packb( obj ) ) )
 	destFile.close()
@@ -37,14 +37,16 @@ def writeObjectToFile( obj, fileName ):
 def loadObjectFromFile( fileName ):
 	if not os.path.isfile( fileName ):
 		return None
+	theFile = gzip.open( fileName, 'rb' )
+	loadString = theFile.read()	
 	#return cPickle.load( file( fileName, "r" ) )
-	theFile = open( fileName, "rb" )
+	#theFile = open( fileName, "rb" )
 	#Windows didn't like it without reading in in "rb" mode and replacing All "\r"
-	loadString = theFile.read().replace( "\r\n", "\n" )
+	#loadString = theFile.read().replace( "\r\n", "\n" )
 	theFile.close()
 	#Msgpack version.
 	#return msgpack.unpackb( zlib.decompress( loadString ) )
-	return cPickle.loads( zlib.decompress( loadString ) )
+	return cPickle.loads( loadString )
 	
 
 def dumpPlayState( givenState, fileName ):
@@ -149,6 +151,7 @@ def loadPlayState( fileName, curTileSet ):
 			eachSprite.physicsObjects = [ eachSprite.body, eachSprite.shape ]
 			if hasattr( eachSprite, "sensorBox" ):
 				eachSprite.sensorBox = shapeDict[eachSprite.sensorId]
+				eachSprite.sensorBox.entity = eachSprite
 				eachSprite.physicsObjects.append( eachSprite.sensorBox )
 				eachSprite.sensorId = id( eachSprite.sensorBox )
 			eachSprite.body.velocity_func = eachSprite.velocity_func
