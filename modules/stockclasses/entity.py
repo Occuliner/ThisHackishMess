@@ -67,7 +67,7 @@ class Entity( pygame.sprite.DirtySprite ):
 	width, height, bWidth, bHeight, wbWidth, wbHeight = None, None, None, None, None, None
 	bdx, bdy = 0, 0
 	pureSensor = False
-	def __init__( self, pos, vel, image=None, group=None, rect=None, animated=None, collidable=None, collideId=None, collideWith=None, mass=None, specialCollision=None, solid=None, pureSensor=False ):
+	def __init__( self, pos, vel, image=None, group=None, rect=None, animated=None, collidable=None, collideId=None, collideWith=None, mass=None, specialCollision=None, solid=None, pureSensor=None ):
 		pygame.sprite.DirtySprite.__init__( self )
 		
 		#All of these are purely so that instances CAN have their own unique one of each of these variables, but if one isn't specified, it'll use its Class's one.
