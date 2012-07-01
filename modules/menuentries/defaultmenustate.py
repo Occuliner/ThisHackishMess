@@ -32,6 +32,8 @@ from tagedit import TagEditButton
 
 from boundaryedit import BoundaryEditButton
 
+from sensoredit import SensorEditButton
+
 from physicsvis import PhysicsVisButton
 
 from staticimage import StaticImage
@@ -57,7 +59,9 @@ class DefaultMenuState( MenuState ):
 
 	physicsVisButton = PhysicsVisButton()
 
+	sensorEditButton = SensorEditButton ()
+
 	panel = StaticImage( loadImage("devmenu.png"), (10, 10) )
 
-	def __init__( self, menu, sprites=[panel, floorEditButton, entityEditButton, saveMapButton, loadMapButton, tagEditButton, boundEditButton, physicsVisButton] ):
+	def __init__( self, menu, sprites=[panel, floorEditButton, entityEditButton, saveMapButton, loadMapButton, tagEditButton, boundEditButton, physicsVisButton, sensorEditButton] ):
 		MenuState.__init__( self, menu, sprites )

@@ -139,7 +139,11 @@ def loadPlayState( fileName, curTileSet ):
 	givenState.lineVisualiser = LineVisualiser( givenState )
 
 	for eachSprite in givenState.sprites():
-		eachSprite.sheet = loadImage( eachSprite.sheetFileName )
+		if eachSprite.sheetFileName is not None:
+			eachSprite.sheet = loadImage( eachSprite.sheetFileName )
+		else:
+			eachSprite.sheet = pygame.Surface( ( 1, 1 ) ).convert_alpha()
+			eachSprite.sheet.fill( pygame.Color( 0, 0, 0, 0 ) )		
 		eachSprite.createFrames()
 		eachSprite.image = eachSprite.frames[eachSprite.curAnimation['frames'][eachSprite.frame]]
 		if hasattr( eachSprite, "baseSheet" ):

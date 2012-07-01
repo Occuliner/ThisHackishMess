@@ -93,6 +93,10 @@ class Entity( pygame.sprite.DirtySprite ):
 			self.solid = solid
 		if pureSensor is not None:
 			self.pureSensor = pureSensor
+		if self.width is None:
+			self.width = self.rect.w
+		if self.height is None:
+			self.height = self.rect.h
 
 		if self.collidable:
 			self.body = pymunk.Body( self.mass, 1e100 )
@@ -212,6 +216,8 @@ class Entity( pygame.sprite.DirtySprite ):
 					if x + self.width <= self.sheet.get_width():
 						tmpRect.topleft = (x, y)
 						self.frames.append( self.sheet.subsurface( tmpRect ) )
+		if len( self.frames ) is 0:
+			self.frames = [self.sheet]
 
 	def setVisible( self, theBool ):
 		if theBool:
