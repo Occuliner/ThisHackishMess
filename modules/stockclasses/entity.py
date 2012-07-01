@@ -67,6 +67,7 @@ class Entity( pygame.sprite.DirtySprite ):
 	width, height, bWidth, bHeight, wbWidth, wbHeight = None, None, None, None, None, None
 	bdx, bdy = 0, 0
 	pureSensor = False
+	scale = 1
 	def __init__( self, pos, vel, image=None, group=None, rect=None, animated=None, collidable=None, collideId=None, collideWith=None, mass=None, specialCollision=None, solid=None, pureSensor=None ):
 		pygame.sprite.DirtySprite.__init__( self )
 		

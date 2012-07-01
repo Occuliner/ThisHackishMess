@@ -34,7 +34,7 @@ from selectionbox import SelectionBox
 from label import Label
 
 class SnapToGridButton( Button ):
-	image = loadImage("gridbutton.png")
+	image = loadImage( "gridbutton.png", 2 )
 	def __init__( self, menu=None ):
 		Button.__init__( self, None, None, menu )
 		self.rect = self.image.get_rect()
@@ -44,7 +44,7 @@ class SnapToGridButton( Button ):
 			self.parentState.toggleSnapToGrid()
 
 class SensorEditButton( Button ):
-	image = loadImage("sensoreditbutton.png")
+	image = loadImage( "sensoreditbutton.png", 2 )
 	rect = image.get_rect()
 	rect.topleft = ( 24, 144 )
 	def __init__( self, menu=None ):
@@ -61,7 +61,7 @@ class SensorEditState( MenuState ):
 		self.sprites = [self.fileNameLabel]
 		self.buttons = []
 
-		self.panel = StaticImage(loadImage("devmenu.png"), (10, 10))
+		self.panel = StaticImage(loadImage( "devmenu.png", 2 ), (10, 10))
 		self.addSprite( self.panel )
 
 		self.snapToGridButton = SnapToGridButton( self )

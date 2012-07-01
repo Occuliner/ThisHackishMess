@@ -61,7 +61,7 @@ class DefaultMenuState( MenuState ):
 
 	sensorEditButton = SensorEditButton ()
 
-	panel = StaticImage( loadImage("devmenu.png"), (10, 10) )
+	panel = StaticImage( loadImage("devmenu.png", 2), (10, 10) )
 
 	def __init__( self, menu, sprites=[panel, floorEditButton, entityEditButton, saveMapButton, loadMapButton, tagEditButton, boundEditButton, physicsVisButton, sensorEditButton] ):
 		MenuState.__init__( self, menu, sprites )

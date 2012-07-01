@@ -57,7 +57,7 @@ class SaveMapState( FileDialogState ):
 
 class SaveMapButton( Button ):
 	"""Save the current playState with cPickle."""
-	image = loadImage("savemapbutton.png")
+	image = loadImage("savemapbutton.png",2)
 	rect = image.get_rect()
 	rect.topleft = ( 24, 64 )
 	def __init__( self, parentState=None ):

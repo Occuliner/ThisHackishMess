@@ -32,7 +32,7 @@ from selectionbox import SelectionBox
 from label import Label
 
 class SnapToGridButton( Button ):
-	image = loadImage("gridbutton.png")
+	image = loadImage("gridbutton.png", 2 )
 	def __init__( self, menu=None ):
 		Button.__init__( self, None, None, menu )
 		self.rect = self.image.get_rect()
@@ -42,7 +42,7 @@ class SnapToGridButton( Button ):
 			self.parentState.toggleSnapToGrid()
 
 class RemoveBoundaryButton( Button ):
-	image = loadImage("remove.png")
+	image = loadImage("remove.png", 2 )
 	def __init__( self, menu=None ):
 		Button.__init__( self, None, None, menu )
 		self.rect = self.image.get_rect()
@@ -52,7 +52,7 @@ class RemoveBoundaryButton( Button ):
 			self.parentState.removeMode()
 
 class AddBoundaryButton( Button ):
-	image = loadImage("add.png")
+	image = loadImage("add.png", 2 )
 	def __init__( self, menu=None ):
 		Button.__init__( self, None, None, menu )
 		self.rect = self.image.get_rect()
@@ -62,7 +62,7 @@ class AddBoundaryButton( Button ):
 			self.parentState.addMode()
 
 class BoundaryEditButton( Button ):
-	image = loadImage("boundaryeditbutton.png")
+	image = loadImage("boundaryeditbutton.png", 2 )
 	rect = image.get_rect()
 	rect.topleft = ( 24, 124 )
 	def __init__( self, menu=None ):
@@ -82,7 +82,7 @@ class BoundaryEditState( MenuState ):
 		self.sprites = [self.fileNameLabel]
 		self.buttons = []
 
-		self.panel = StaticImage(loadImage("devmenu.png"), (10, 10))
+		self.panel = StaticImage(loadImage("devmenu.png", 2 ), (10, 10))
 		self.addSprite( self.panel )
 
 		self.addBoundButton = AddBoundaryButton( self )

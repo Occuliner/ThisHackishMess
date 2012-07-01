@@ -20,7 +20,7 @@ from imageload import loadImage
 from button import Button
 
 class PhysicsVisButton( Button ):
-	image = loadImage("physicsvis.png")
+	image = loadImage("physicsvis.png",2)
 	def __init__( self, menu=None ):
 		Button.__init__( self, None, None, menu )
 		self.rect = self.image.get_rect()

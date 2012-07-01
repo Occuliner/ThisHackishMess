@@ -74,7 +74,7 @@ class EntityEditState( MenuState ):
 		self.sprites = [self.fileNameLabel]
 		self.buttons = []
 
-		self.panel = StaticImage(loadImage("devmenu.png"), (10, 10))
+		self.panel = StaticImage(loadImage("devmenu.png", 2), (10, 10))
 		self.addSprite( self.panel )
 		
 		self.curEntNum = 0
@@ -171,7 +171,7 @@ class EntityEditState( MenuState ):
 class EntityEditButton( Button ):
 	"""EntityEditButton is a Button that appears in the DefaultMenuState.\n"""\
 	"""It merely invokes the EntityEditState MenuState."""
-	image = loadImage("entityeditbutton.png")
+	image = loadImage("entityeditbutton.png", 2)
 	rect = image.get_rect()
 	rect.topleft = ( 24, 44 )
 	def __init__( self, menu=None ):

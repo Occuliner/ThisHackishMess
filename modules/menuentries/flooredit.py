@@ -34,7 +34,7 @@ from label import Label
 
 class UndoButton( Button ):
 	"""UndoButton class, pretty obvious what it does."""
-	image = loadImage("undo.png")
+	image = loadImage("undo.png", 2)
 	
 	def __init__( self, parentState=None ):
 		Button.__init__( self, None, None, parentState )
@@ -47,7 +47,7 @@ class UndoButton( Button ):
 
 class RedoButton( Button ):
 	"""RedoButton class, also pretty obvious what it does."""
-	image = loadImage("redo.png")
+	image = loadImage("redo.png", 2)
 	
 	def __init__( self, parentState=None ):
 		Button.__init__( self, None, None, parentState )
@@ -72,6 +72,24 @@ class TileButton( Button ):
 			self.parentState.addSprite( self.parentState.tileSelectionBox )
 			self.parentState.menu.loadMenuState( self.parentState )
 
+class ScrollBackButton( Button ):
+	def __init__( self, parentState=None ):
+		Button.__init__( self, loadImage( "backarrow.png", 2 ), ( 42, 526 ), parentState )
+	def push( self, clickKey ):
+		if "up" in clickKey:
+			if self.parentState.startButtonIndex - self.parentState.pageLength >= 0 and self.parentState.pageLength != 0:
+				self.parentState.forceUpdate = True
+				self.parentState.startButtonIndex -= self.parentState.pageLength
+
+class ScrollNextButton( Button ):
+	def __init__( self, parentState=None ):
+		Button.__init__( self, loadImage( "forwardarrow.png", 2 ), ( 670, 526 ), parentState )
+	def push( self, clickKey ):
+		if "up" in clickKey:
+			if self.parentState.startButtonIndex + self.parentState.pageLength < len( self.parentState.allTheFiles ) - 1:
+				self.parentState.forceUpdate = True
+				self.parentState.startButtonIndex += self.parentState.pageLength
+
 class FloorEditState( MenuState ):
 	"""The FloorEditState class, a MenuState for editing the current PlayState's Floor."""
 	#Create the floorEditUpdate function, and create a loop that generates a grid of all of the tiles to select from.
@@ -86,7 +104,7 @@ class FloorEditState( MenuState ):
 		self.buttons = []
 		self.sprites = [self.fileNameLabel]
 
-		self.panel = StaticImage( loadImage( "devmenu.png" ), ( 10, 10 ) )
+		self.panel = StaticImage( loadImage( "devmenu.png", 2 ), ( 10, 10 ) )
 		self.addSprite( self.panel )
 
 		self.undoButton = UndoButton( self )
@@ -151,7 +169,7 @@ class FloorEditState( MenuState ):
 
 class FloorEditButton( Button ):
 	"""The FloorEditButton class, just creates a Button that invokes FloorEditState on the DevMenu."""
-	image = loadImage("flooreditbutton.png")
+	image = loadImage("flooreditbutton.png", 2 )
 	rect = image.get_rect()
 	rect.topleft = ( 24, 24 )
 	def __init__( self, parentState=None ):

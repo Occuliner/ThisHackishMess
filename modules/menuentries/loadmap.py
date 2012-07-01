@@ -41,7 +41,7 @@ class FileLoadButton( Button ):
 
 class LoadMapButton( Button ):
 	"""Load the current playState with cPickle."""
-	image = loadImage( "loadmapbutton.png" )
+	image = loadImage( "loadmapbutton.png", 2 )
 	rect = image.get_rect()
 	rect.topleft = ( 24, 84 )
 	def __init__( self, parentState=None ):

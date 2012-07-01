@@ -28,7 +28,7 @@ class KickUp( Entity ):
 	width = 16
 	height = 16
 	sheetFileName = "kickup.png"
-	sheet = loadImage( sheetFileName )
+	sheet = loadImage( sheetFileName, 2 )
 
 	collideMaskMaster = booleanGridFromAlpha( sheet )
 	collideId = 0
@@ -38,6 +38,7 @@ class KickUp( Entity ):
 	solid = False
 
 	notDirectlyRemovable = True
+	scale = 2
 	
 	def __init__( self, group, host ):
 		Entity.__init__( self, [0,0], [0,0], None, group, pygame.Rect( 0, 0, self.width, self.height ), animated=True )
@@ -88,7 +89,8 @@ class YasbClass( Entity ):
 	playStateGroup = "playersGroup"
 	
 	sheetFileName = "yasb.png"
-	sheet = loadImage( sheetFileName )
+	sheet = loadImage( sheetFileName, 2 )
+	scale = 2
 	#white = pygame.Color( 255, 255, 255 )
 
 	width = 28

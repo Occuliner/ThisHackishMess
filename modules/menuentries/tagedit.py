@@ -28,7 +28,7 @@ from staticimage import StaticImage
 from label import Label
 
 class TagEditButton( Button ):
-	image = loadImage("tageditbutton.png")
+	image = loadImage( "tageditbutton.png", 2 )
 	rect = image.get_rect()
 	rect.topleft = ( 24, 104 )
 	def __init__( self, menu=None ):
@@ -93,7 +93,7 @@ class TagButton( Button ):
 			self.toggleSelect()
 
 class AddTagButton( Button ):
-	image = loadImage("add.png")
+	image = loadImage( "add.png", 2 )
 	def __init__( self, parentState=None ):
 		Button.__init__( self, None, None, parentState )
 		self.rect = self.image.get_rect()
@@ -113,7 +113,7 @@ class AddTagButton( Button ):
 				self.parentState.getTagButtons()
 
 class SubTagButton( Button ):
-	image = loadImage("sub.png")
+	image = loadImage( "sub.png", 2 )
 	def __init__( self, parentState=None ):
 		Button.__init__( self, None, None, parentState )
 		self.rect = self.image.get_rect()
@@ -134,7 +134,7 @@ class TagEditState( MenuState ):
 		self.sprites = [self.fileNameLabel]
 		self.buttons = []
 
-		self.panel = StaticImage(loadImage("tageditorbackground.png"), (10, 10))
+		self.panel = StaticImage( loadImage( "tageditorbackground.png", 2 ), (10, 10) )
 		self.addSprite( self.panel )
 		self.plusTagButton = AddTagButton( self )
 		self.addButton( self.plusTagButton )

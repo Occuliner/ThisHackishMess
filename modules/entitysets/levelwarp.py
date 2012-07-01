@@ -58,6 +58,9 @@ def queueLoad( givenWarp, givenObject ):
 	curPlayState.postStepQueue.append( ( levelWarpFunc, givenWarp, givenObject ) )
 
 class LevelWarp( Entity ):
+
+	scale = 2 
+	
 	width = 16
 	height = 16
 
@@ -65,7 +68,7 @@ class LevelWarp( Entity ):
 	setName = "levelwarp"
 
 	sheetFileName = "block.png"
-	sheet = loadImage( sheetFileName )
+	sheet = loadImage( sheetFileName, scale )
 
 	collideMaskMaster = booleanGridFromAlpha( sheet )
 	specialCollision = queueLoad

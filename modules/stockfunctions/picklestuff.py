@@ -140,7 +140,7 @@ def loadPlayState( fileName, curTileSet ):
 
 	for eachSprite in givenState.sprites():
 		if eachSprite.sheetFileName is not None:
-			eachSprite.sheet = loadImage( eachSprite.sheetFileName )
+			eachSprite.sheet = loadImage( eachSprite.sheetFileName, eachSprite.scale )
 		else:
 			eachSprite.sheet = pygame.Surface( ( 1, 1 ) ).convert_alpha()
 			eachSprite.sheet.fill( pygame.Color( 0, 0, 0, 0 ) )		

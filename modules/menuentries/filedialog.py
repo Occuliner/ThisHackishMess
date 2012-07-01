@@ -25,7 +25,7 @@ import os
 
 class ScrollBackButton( Button ):
 	def __init__( self, parentState=None ):
-		Button.__init__( self, loadImage( "backarrow.png" ), ( 42, 526 ), parentState )
+		Button.__init__( self, loadImage( "backarrow.png", 2 ), ( 42, 526 ), parentState )
 	def push( self, clickKey ):
 		if "up" in clickKey:
 			if self.parentState.startButtonIndex - self.parentState.pageLength >= 0 and self.parentState.pageLength != 0:
@@ -34,7 +34,7 @@ class ScrollBackButton( Button ):
 
 class ScrollNextButton( Button ):
 	def __init__( self, parentState=None ):
-		Button.__init__( self, loadImage( "forwardarrow.png" ), ( 670, 526 ), parentState )
+		Button.__init__( self, loadImage( "forwardarrow.png", 2 ), ( 670, 526 ), parentState )
 	def push( self, clickKey ):
 		if "up" in clickKey:
 			if self.parentState.startButtonIndex + self.parentState.pageLength < len( self.parentState.allTheFiles ) - 1:
@@ -44,7 +44,7 @@ class ScrollNextButton( Button ):
 class FileDialogState( MenuState ):
 	"""A file browser."""
 	def __init__( self, menu, buttonType, sprites=[] ):
-		self.panelImage = loadImage( "filebrowserbackground.png" )
+		self.panelImage = loadImage( "filebrowserbackground.png", 2 )
 		self.panel = StaticImage( self.panelImage, ( 10, 10 ) )
 		sprites.append( self.panel )
 		self.backButton = ScrollBackButton( self )

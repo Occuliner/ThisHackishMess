@@ -26,6 +26,7 @@ from maskfromimage import *
 import math
 
 class GenericBlock( Entity ):
+	scale = 2
 	width = 32
 	height = 32
 	bWidth = width
@@ -41,7 +42,7 @@ class GenericBlock( Entity ):
 	setName = "genericstuff"
 
 	sheetFileName = "block.png"
-	sheet = loadImage( sheetFileName )
+	sheet = loadImage( sheetFileName, scale )
 
 	collideMaskMaster = booleanGridFromAlpha( sheet )
 	specialCollision = None

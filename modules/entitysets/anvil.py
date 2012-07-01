@@ -33,7 +33,7 @@ class Anvil( Entity ):
 	setName = "genericstuff"
 
 	sheetFileName = "anvil.png"
-	sheet = loadImage( sheetFileName )
+	sheet = loadImage( sheetFileName, 2 )
 
 	collideMaskMaster = booleanGridFromAlpha( sheet )
 	specialCollision = None
@@ -43,6 +43,7 @@ class Anvil( Entity ):
 	collidable = True
 	solid = True
 	mass = 2000000000
+	scale = 2
 	
 	def __init__( self, pos = [0,0], vel = [0,0], group=None ):
 		Entity.__init__( self, pos, [0,0], None, group, pygame.Rect( 0, 0, self.width, self.height ), animated=False )

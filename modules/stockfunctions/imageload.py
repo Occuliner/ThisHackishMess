@@ -21,12 +21,12 @@ from pygame.locals import *
 
 from scale import *
 
-def loadImage( fileName ):
-	image = scaleSurface( pygame.image.load( os.path.join( "data", "graphics", fileName ) ).convert_alpha(), 2 )
+def loadImage( fileName, scale=1 ):
+	image = scaleSurface( pygame.image.load( os.path.join( "data", "graphics", fileName ) ).convert_alpha(), scale )
         #image = pygame.transform.scale( image, ( image.get_width()*2, image.get_height()*2 ) )
 	return image
 
-def loadImageNoAlpha( fileName ):
-	image = scaleSurface( pygame.image.load( os.path.join( "data", "graphics", fileName ) ).convert(), 2 )
+def loadImageNoAlpha( fileName, scale=1 ):
+	image = scaleSurface( pygame.image.load( os.path.join( "data", "graphics", fileName ) ).convert(), scale )
         #image = pygame.transform.scale( image, ( image.get_width()*2, image.get_height()*2 ) )
 	return image
