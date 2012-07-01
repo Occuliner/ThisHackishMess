@@ -43,8 +43,10 @@ class EntButton( Button ):
 	"""It is used in EntityEditState to create buttons to pick which entity type to\n""" \
 	"""place."""
 	def __init__( self, entity, entNum, pos, parentState=None ):
-		
-		firstFrame = entity.sheet.subsurface( pygame.Rect( 0, 0, entity.width, entity.height ) )
+		if entity.bWidth is not None:
+			firstFrame = entity.sheet.subsurface( pygame.Rect( entity.bdx, entity.bdy, entity.bWidth, entity.bHeight ) )
+		else:
+			firstFrame = entity.sheet.subsurface( pygame.Rect( 0, 0, entity.width, entity.height ) )
 		Button.__init__( self, scaleSurface( firstFrame, 0.5 ), pos, parentState )
 
 		self.entNum = entNum
