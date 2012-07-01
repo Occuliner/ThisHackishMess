@@ -66,8 +66,8 @@ class Entity( pygame.sprite.DirtySprite ):
 	#Width and Height are for the frames, bWidth and bHeight for sensor boxes, wbWidth and wbHeight for "physics" boxes.
 	width, height, bWidth, bHeight, wbWidth, wbHeight = None, None, None, None, None, None
 	bdx, bdy = 0, 0
-	
-	def __init__( self, pos, vel, image=None, group=None, rect=None, animated=None, collidable=None, collideByPixels=None, collideId=None, collideWith=None, collideMaskMaster=None, mass=None, specialCollision=None, solid=None ):
+	pureSensor = False
+	def __init__( self, pos, vel, image=None, group=None, rect=None, animated=None, collidable=None, collideId=None, collideWith=None, mass=None, specialCollision=None, solid=None, pureSensor=False ):
 		pygame.sprite.DirtySprite.__init__( self )
 		
 		#All of these are purely so that instances CAN have their own unique one of each of these variables, but if one isn't specified, it'll use its Class's one.
@@ -79,14 +79,10 @@ class Entity( pygame.sprite.DirtySprite ):
 			self.animated = animated
 		if collidable is not None:
 			self.collidable = collidable
-		if collideByPixels is not None:
-			self.collideByPixels = collideByPixels
 		if collideId is not None:
 			self.collideId = collideId
 		if collideWith is not None:
 			self.collideWith = collideWith
-		if collideMaskMaster is not None:
-			self.collideMaskMaster = collideMaskMaster
 		if mass is not None:
 			self.mass = mass
 		#SpecialCollision is a function that defines a unique collision callback for objects with special collision behaviour.
@@ -95,6 +91,8 @@ class Entity( pygame.sprite.DirtySprite ):
 			self.specialCollision = specialCollision
 		if solid is not None:
 			self.solid = solid
+		if pureSensor is not None:
+			self.pureSensor = pureSensor
 
 		if self.collidable:
 			self.body = pymunk.Body( self.mass, 1e100 )
@@ -139,42 +137,17 @@ class Entity( pygame.sprite.DirtySprite ):
 			self.bodyId = id( self.body )
 			self.shapeId = id( self.shape )
 		
-		#self.position = pos
-		#self.pushed = [0, 0]
-		#self.velocity = [0, 0]
-		#self.acceleration = [0, 0]
-		#self.accelerationBarrier = { '-x':False, 'x':False, '-y':False, 'y':False }
-		#self.lastAcceleration = [0, 0]
-
-		#self.maxVel = 500
-
-		#Idle deceleration will stop an object moving at it's maxVel in 0.2 seconds.
-		#self.decelRatio = 5
-		#self.idleDeceleration = self.maxVel*self.decelRatio
 		self.idle = [False, False]
 		
 		self.animated = animated
 		self.animations = {'idle':{ 'fps':8, 'frames':[0] }}
 		self.frames = []
-		self.collideFrames = []
 		self.curAnimation = self.animations['idle']
-
+		
 		self.createFrames()
-		#if self.animated:
-		#	tmpRect = self.rect.copy()
-		#	tmpRect.topleft = ( 0, 0 )
-		#	for y in xrange( 0, self.sheet.get_height(), self.rect.h ):
-		#		for x in xrange( 0, self.sheet.get_width(), self.rect.w ):
-		#			tmpRect.topleft = (x, y)
-		#			self.frames.append( self.sheet.subsurface( tmpRect ) )
-		#			self.collideFrames.append( self.collideMaskMaster.getGridFromRect( tmpRect ) ) 
-		#else:
-		#	self.frames = [ self.sheet ]
-		#	self.collideFrames = [ self.collideMaskMaster ]
 
 		self.frame = 0
 		self.image = self.frames[0]
-		self.collideMask = self.collideFrames[0]
 		self.maxFrameTime = 1.000/self.curAnimation['fps']
 		self.frameTime = self.maxFrameTime
 
@@ -231,7 +204,6 @@ class Entity( pygame.sprite.DirtySprite ):
 
 	def createFrames( self ):
 		#if self.animated:
-			
 		tmpRect = self.rect.copy()
 		tmpRect.topleft = ( 0, 0 )
 		for y in xrange( 0, self.sheet.get_height(), self.rect.h ):
@@ -240,69 +212,6 @@ class Entity( pygame.sprite.DirtySprite ):
 					if x + self.width <= self.sheet.get_width():
 						tmpRect.topleft = (x, y)
 						self.frames.append( self.sheet.subsurface( tmpRect ) )
-						self.collideFrames.append( self.collideMaskMaster.getGridFromRect( tmpRect ) ) 
-			#for y in xrange( 0, self.sheet.get_height(), self.rect.h ):
-			#	for x in xrange( 0, self.sheet.get_width(), self.rect.w ):
-			#		tmpRect.topleft = (x, y)
-			#		self.frames.append( self.sheet.subsurface( tmpRect ) )
-			#		self.collideFrames.append( self.collideMaskMaster.getGridFromRect( tmpRect ) )
-		#else:
-			#self.frames = [ self.sheet ]
-			#self.collideFrames = [ self.collideMaskMaster ]
-
-	def collideWithEnt( self, otherEnt ):
-		clippedArea = otherEnt.rect.clip( self.rect )
-		#Is there any overlap?
-		if clippedArea.w != 0 and clippedArea.h != 0 and otherEnt.collideId in self.collideWith:
-			#No pixel-collision?
-			if ( not self.collideByPixels ) and ( not otherEnt.collideByPixels ):
-				return [True, clippedArea]
-			
-			#Both pixel-collison?
-			elif otherEnt.collideByPixels and self.collideByPixels:
-				intersectGrid = self.collideMask.getGridFromRect( clippedArea ).mergeWith( otherEnt.collideMask.getGridFromRet( clippedArea ), 'and' )
-
-			#One but not the other?
-			elif otherEnt.collideByPixels:
-				intersectGrid = otherEnt.collideMask.getGridFromRect( clippedArea )
-
-			else:
-			#In effect: elif self.collideByPixels:
-				intersectGrid = self.collideMask.getGridFromRect( clippedArea )
-			truthArea = intersectGrid.getTrueBox()
-
-			#TruthBox of any size?
-			if truthArea[2] <= 0 or truthArea[3] <= 0:
-				return [False, None]
-			
-			truthRect = pygame.Rect( truthArea[0], truthArea[1], truthArea[2], truthArea[3] )
-			return [True, truthRect]
-			
-			
-		else:
-			return [False, None]
-
-	#
-	#	pos in CollideWithBooleanGrid represents the position of the boolean grid from the origin.
-	# 
-	def collideWithBooleanGrid( self, booleanGrid, pos=(0,0) ):
-		clippedArea = self.rect.clip( pygame.Rect( pos[0], pos[1], booleanGrid.width, booleanGrid.height ) )
-		if clippedArea.w == 0 or clippedArea.h == 0:
-			return [False, None]
-		if self.collideByPixels:
-			intersectGrid = self.collideMask.getGridFromRect( clippedArea ).mergeWith( booleanGrid.getGridFromRect( clippedArea ), 'and' )
-		else:
-			intersectGrid = booleanGrid.getGridFromRect( clippedArea )
-
-		truthArea = intersectGrid.getTrueBox()
-
-		#TruthBox of any size?
-		if truthArea[2] <= 0 or truthArea[3] <= 0:
-			return [False, None]
-			
-		truthRect = pygame.Rect( truthArea[0], truthArea[1], truthArea[2], truthArea[3] )
-		return [True, truthRect]
-
 
 	def setVisible( self, theBool ):
 		if theBool:
@@ -315,8 +224,6 @@ class Entity( pygame.sprite.DirtySprite ):
 		if self.frame > len(self.curAnimation['frames']) - 1:
 			self.frame = 0
 		self.image = self.frames[ self.curAnimation['frames'][self.frame] ]
-		if self.collideByPixels:
-			self.collideMask = self.collideFrames[ self.curAnimation['frames'][self.frame] ]
 
 	def changeAnimation( self, name ):
 		newAnim = self.animations[name]
@@ -384,23 +291,12 @@ class Entity( pygame.sprite.DirtySprite ):
 		#Check if class has been updated.
 		if self.classUpdated:
 			self.frames = []
-			self.collideFrames = []
 
 			self.rect.w = self.width
 			self.rect.h = self.height
 			
 
 			self.createFrames()
-			#tmpRect = self.rect.copy()
-			
-			#tmpRect.topleft = ( 0, 0 )
-			#for y in xrange( 0, self.sheet.get_height(), self.rect.h ):
-			#	if y + self.height <= self.sheet.get_height():
-			#		for x in xrange( 0, self.sheet.get_width(), self.rect.w ):
-			#			if x + self.width <= self.sheet.get_width():
-			#				tmpRect.topleft = (x, y)
-			#				self.frames.append( self.sheet.subsurface( tmpRect ) )
-			#				self.collideFrames.append( self.collideMaskMaster.getGridFromRect( tmpRect ) ) 
 			self.classUpdated = False
 
 		if len( self.groups() ) > 1:
