@@ -117,8 +117,12 @@ class EntityEditState( MenuState ):
 			position = ( self.xPos + 21, self.yPos + 30 )
 			self.addButton( EntButton( eachEnt, self.curEntNum, position, self ) )
 			self.processedEnts.append( eachEnt )
-			self.xPos += (eachEnt.width/2 + 10)
-			self.tallest = max( self.tallest, eachEnt.height )
+			if eachEnt.bWidth is not None:
+				self.xPos += (eachEnt.bWidth/2 + 10)
+				self.tallest = max( self.tallest, eachEnt.bHeight )
+			else:
+				self.xPos += (eachEnt.width/2 + 10)
+				self.tallest = max( self.tallest, eachEnt.height )
 			if self.xPos > 108:
 				self.xPos = 0
 				self.yPos += self.tallest
