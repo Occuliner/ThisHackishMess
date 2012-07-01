@@ -32,12 +32,12 @@ class LineVisualiser:
 		self.forceNoRender = False
 		self.oldRects = []
 
-	def drawLinesWithPoints( self, surface, listOfPoints, pointRender=False ):
+	def drawLinesWithPoints( self, surface, listOfPoints, pointRender=False, lineColour=red, pointColour=blue ):
 		updateRects = []
-		updateRects.append( pygame.draw.lines( surface, red, True, listOfPoints ) )
+		updateRects.append( pygame.draw.lines( surface, lineColour, True, listOfPoints ) )
 		if pointRender:
 			for eachPoint in listOfPoints:
-				updateRects.append( pygame.draw.rect( surface, blue, pygame.Rect( eachPoint[0]-2, eachPoint[1]-2, 4, 4 ) ) )
+				updateRects.append( pygame.draw.rect( surface, pointColour, pygame.Rect( eachPoint[0]-2, eachPoint[1]-2, 4, 4 ) ) )
 		return updateRects
 
 	def draw( self, surface ):
@@ -49,7 +49,10 @@ class LineVisualiser:
 			if self.renderPhysicsLines:
 				for eachShape in self.playState.space.shapes + self.playState.space.static_shapes:
 					if type( eachShape ) == pymunk.Poly:
-						updateRects.extend( self.drawLinesWithPoints( surface, eachShape.get_points(), True ) )
+						if eachShape.entity.pureSensor:
+							updateRects.extend( self.drawLinesWithPoints( surface, eachShape.get_points(), True, blue, red ) )
+						else:
+							updateRects.extend( self.drawLinesWithPoints( surface, eachShape.get_points(), True ) )
 					elif type( eachShape ) == pymunk.Segment:
 						#updateRects.append( pygame.draw.line( surface, red, eachShape.a, eachShape.b ) )
 						updateRects.extend( self.drawLinesWithPoints( surface, [ eachShape.a, eachShape.b ], True ) )
