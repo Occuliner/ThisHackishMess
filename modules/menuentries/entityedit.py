@@ -134,8 +134,12 @@ class EntityEditState( MenuState ):
 		escape = False
 		for eachSpriteList in ( eachGroup.sprites() for eachGroup in self.menu.playState.groups ):
 			for eachSprite in [ sprite for sprite in eachSpriteList if not sprite.notDirectlyRemovable]:
-				if eachSprite.rect.collidepoint( point ):
-					#self.curGrabbedEnt = eachSprite
+				if eachSprite.bWidth is not None:
+					start = eachSprite.rect.topleft
+					givenRect = pygame.Rect( (start[0] + eachSprite.bdx, start[1] + eachSprite.bdy), (eachSprite.bWidth, eachSprite.bHeight) )
+				else:
+					givenRect = eachSprite.rect
+				if givenRect.collidepoint( point ):
 					return eachSprite
 
 	def update( self, dt, click, clickKey, curMousePos=None ):

@@ -176,7 +176,12 @@ class TagEditState( MenuState ):
 		"""See which ent is at this point"""
 		for eachSpriteList in ( eachGroup.sprites() for eachGroup in self.menu.playState.groups ):
 			for eachSprite in eachSpriteList:
-				if eachSprite.rect.collidepoint( point ):
+				if eachSprite.bWidth is not None:
+					start = eachSprite.rect.topleft
+					givenRect = pygame.Rect( (start[0] + eachSprite.bdx, start[1] + eachSprite.bdy), (eachSprite.bWidth, eachSprite.bHeight) )
+				else:
+					givenRect = eachSprite.rect
+				if givenRect.collidepoint( point ):
 					return eachSprite
 
 	def getDictionaryFromTags( self ):
