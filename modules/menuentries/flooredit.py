@@ -64,7 +64,6 @@ class TileButton( Button ):
 		self.tileNum = tileNum
 	def push( self, clickKey ):
 		"""Sets the parentState (Should be FloorEditState) to start using this given Tile."""
-		print self.parentState.tileNum, self.tileNum
 		if clickKey is 'mouse1up' and self.parentState.tileNum is not self.tileNum:
 			self.parentState.tileNum = self.tileNum
 			self.parentState.removeSprite( self.parentState.tileSelectionBox )
