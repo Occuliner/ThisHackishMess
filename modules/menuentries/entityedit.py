@@ -65,6 +65,22 @@ class EntButton( Button ):
 			self.parentState.addSprite( self.parentState.entSelectionBox )
 			self.parentState.menu.loadMenuState( self.parentState )
 		
+class ScrollBackButton( Button ):
+	def __init__( self, parentState=None ):
+		Button.__init__( self, loadImage( "backarrowsmall.png", 2 ), ( 24, 380 ), parentState )
+	def push( self, clickKey ):
+		if "up" in clickKey:
+			if self.parentState.curPage > 0:
+				self.parentState.repage( self.parentState.curPage - 1 )
+
+class ScrollNextButton( Button ):
+	def __init__( self, parentState=None ):
+		Button.__init__( self, loadImage( "forwardarrowsmall.png", 2 ), ( 116, 380 ), parentState )
+	def push( self, clickKey ):
+		if "up" in clickKey:
+			if self.parentState.curPage < max( self.parentState.pages.keys() ):
+				self.parentState.repage( self.parentState.curPage + 1 )
+
 class EntityEditState( MenuState ):
 	"""EntityEditState is a MenuState class that creates Entity-placing functionality,\n""" \
 	"""to put dynamic objects into the game's playState.\n""" \
@@ -78,6 +94,12 @@ class EntityEditState( MenuState ):
 
 		self.panel = StaticImage(loadImage("devmenu.png", 2), (10, 10))
 		self.addSprite( self.panel )
+
+		self.scrollNextButton = ScrollNextButton( self )
+		self.addButton( self.scrollNextButton )
+
+		self.scrollBackButton = ScrollBackButton( self )
+		self.addButton( self.scrollBackButton )
 		
 		self.curEntNum = 0
 		self.xPos = 0
@@ -85,9 +107,12 @@ class EntityEditState( MenuState ):
 		self.tallest = 0
 		self.processedEnts = []
 
+		self.pages = {0:[]}
+		self.curPage = 0
+		self.maxPage = 0
 		self.generateButtons()
 
-		self.selectedButton = self.buttons[self.entNum]
+		self.selectedButton = self.buttons[self.entNum+2]
 		self.entSelectionBox = SelectionBox( self.selectedButton.rect, self )
 		self.addSprite( self.entSelectionBox )
 
@@ -115,8 +140,13 @@ class EntityEditState( MenuState ):
 		for eachEnt in [ each for each in newEnts if each not in self.processedEnts ]:
 		#for eachEnt in newEnts:
 			position = ( self.xPos + 21, self.yPos + 30 )
-			self.addButton( EntButton( eachEnt, self.curEntNum, position, self ) )
+			givenButton = EntButton( eachEnt, self.curEntNum, position, self )
+			#self.addButton( givenEnt )
 			self.processedEnts.append( eachEnt )
+			if self.pages.has_key( self.maxPage ):
+				self.pages[self.maxPage].append( givenButton )
+			else:
+				self.pages[self.maxPage] = [ givenButton ]
 			if eachEnt.bWidth is not None:
 				self.xPos += (eachEnt.bWidth/2 + 10)
 				self.tallest = max( self.tallest, eachEnt.bHeight )
@@ -126,7 +156,21 @@ class EntityEditState( MenuState ):
 			if self.xPos > 108:
 				self.xPos = 0
 				self.yPos += self.tallest
+			if self.yPos > 318:
+				self.yPos = 0
+				self.maxPage += 1
 			self.curEntNum += 1
+		map( self.addButton, self.pages[self.curPage] )
+		self.menu.loadMenuState( self )
+
+	def repage( self, newPageNum ):
+		map( self.removeButton, self.pages[self.curPage] )
+		self.curPage = newPageNum
+		map( self.addButton, self.pages[self.curPage] )
+		if self.entNum not in [ each.entNum for each in self.pages[self.curPage] ] and self.tileSelectionBox in self.sprites:
+			self.removeSprite( self.tileSelectionBox )
+		elif self.entNum in [ each.entNum for each in self.pages[self.curPage] ] and self.tileSelectionBox not in self.sprites:
+			self.addSprite( self.tileSelectionBox )
 		self.menu.loadMenuState( self )
 
 	def getPressedEnt( self, point ):
