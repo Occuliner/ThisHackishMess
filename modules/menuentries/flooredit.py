@@ -73,21 +73,21 @@ class TileButton( Button ):
 
 class ScrollBackButton( Button ):
 	def __init__( self, parentState=None ):
-		Button.__init__( self, loadImage( "backarrow.png", 2 ), ( 42, 526 ), parentState )
+		Button.__init__( self, loadImage( "backarrowsmall.png", 2 ), ( 24, 380 ), parentState )
 	def push( self, clickKey ):
 		if "up" in clickKey:
-			if self.parentState.startButtonIndex - self.parentState.pageLength >= 0 and self.parentState.pageLength != 0:
-				self.parentState.forceUpdate = True
-				self.parentState.startButtonIndex -= self.parentState.pageLength
+			if self.parentState.curPage > 0:
+				self.parentState.repage( self.parentState.curPage - 1 )
 
 class ScrollNextButton( Button ):
 	def __init__( self, parentState=None ):
-		Button.__init__( self, loadImage( "forwardarrow.png", 2 ), ( 670, 526 ), parentState )
+		Button.__init__( self, loadImage( "forwardarrowsmall.png", 2 ), ( 116, 380 ), parentState )
 	def push( self, clickKey ):
 		if "up" in clickKey:
-			if self.parentState.startButtonIndex + self.parentState.pageLength < len( self.parentState.allTheFiles ) - 1:
-				self.parentState.forceUpdate = True
-				self.parentState.startButtonIndex += self.parentState.pageLength
+			if self.parentState.curPage < max( self.parentState.pages.keys() ):
+				self.parentState.repage( self.parentState.curPage + 1 )
+				
+				
 
 class FloorEditState( MenuState ):
 	"""The FloorEditState class, a MenuState for editing the current PlayState's Floor."""
@@ -111,32 +111,76 @@ class FloorEditState( MenuState ):
 
 		self.redoButton = RedoButton( self )
 		self.addButton( self.redoButton )
+
+		self.scrollNextButton = ScrollNextButton( self )
+		self.addButton( self.scrollNextButton )
+
+		self.scrollBackButton = ScrollBackButton( self )
+		self.addButton( self.scrollBackButton )
 		
 		#A local copy to prevent excessive look ups.
 		self.floor = self.menu.playState.floor
 
 		self.tileNum = 0
 
+		self.xPos = 0
+		self.yPos = 0
+		self.tallest = 0
+		self.pages = {0:[]}
+		self.curPage = 0
+		self.generateButtons()
 
 		#For the tile placing functionality.
 		self.startOfBlock = None
 		#self.endOfBlock = None
 
-		curTileNum = 0
-		row = 1
-		column = 0
-		for eachTile in self.floor.tileSet.getTiles():
-			position = ( column*eachTile.rect.w + 21, row*eachTile.rect.h + 30 )
-			self.addButton( TileButton( eachTile, curTileNum, position, self ) )
-			column += 1
-			if column > 3:
-				column = 0
-				row += 1
-			curTileNum += 1
+		#curTileNum = 0
+		#row = 1
+		#column = 0
+		#for eachTile in self.floor.tileSet.getTiles():
+		#	position = ( column*eachTile.rect.w + 21, row*eachTile.rect.h + 30 )
+		#	self.addButton( TileButton( eachTile, curTileNum, position, self ) )
+		#	column += 1
+		#	if column > 3:
+		#		column = 0
+		#		row += 1
+		#	curTileNum += 1
 
-		self.tileSelectionBox = SelectionBox( self.buttons[2].rect, self )
+		self.tileSelectionBox = SelectionBox( self.pages[self.curPage][0].rect, self )
 		self.addSprite( self.tileSelectionBox )
 
+	def generateButtons( self ):
+		curPageKey = max( self.pages.keys() )
+		curTileNum = 0
+		for eachTile in self.floor.tileSet.getTiles():
+			position = ( self.xPos + 21, self.yPos + 50 )
+			givenButton = TileButton( eachTile, curTileNum, position, self )
+			#self.addButton( givenButton )
+			if self.pages.has_key( curPageKey ):
+				self.pages[curPageKey].append( givenButton )
+			else:
+				self.pages[curPageKey] = [ givenButton ]
+			self.xPos += ( givenButton.rect.w )
+			self.tallest = max( self.tallest, givenButton.rect.h )
+			if self.xPos > 108:
+				self.xPos = 0
+				self.yPos += self.tallest
+			if self.yPos > 318:
+				self.yPos = 0
+				curPageKey += 1
+			curTileNum += 1
+		map( self.addButton, self.pages[self.curPage] )
+
+	def repage( self, newPageNum ):
+		map( self.removeButton, self.pages[self.curPage] )
+		self.curPage = newPageNum
+		map( self.addButton, self.pages[self.curPage] )
+		if self.tileNum not in [ each.tileNum for each in self.pages[self.curPage] ] and self.tileSelectionBox in self.sprites:
+			self.removeSprite( self.tileSelectionBox )
+		elif self.tileNum in [ each.tileNum for each in self.pages[self.curPage] ] and self.tileSelectionBox not in self.sprites:
+			self.addSprite( self.tileSelectionBox )
+		self.menu.loadMenuState( self )
+	
 	def update( self, dt, click, clickKey, curMousePos=None ):
 		"""Where the actual Tile placing on the Floor happens."""
 		if click is not None:
