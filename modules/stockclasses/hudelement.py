@@ -31,7 +31,7 @@ class HudElement:
 			self.rect = pygame.Rect( (0,0), frameSize )
 			self.rect.topleft = pos
 		else:
-			self.rect = self.image.get_rect()
+			self.rect = self.sheet.get_rect()
 			self.rect.topleft = pos
 		self.createFrames()
 		self.frame = 0
