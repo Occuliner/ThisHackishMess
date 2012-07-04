@@ -147,6 +147,9 @@ class PlayState:
 		
 		for eachGroup in self.groups:
 			eachGroup.update( dt )
+
+		for eachElement in self.hudList:
+			eachElement.update( dt )
 		#self.collideSystem( dt )
 		#print 1.0000/dt, len( self.sprites() )
 			
