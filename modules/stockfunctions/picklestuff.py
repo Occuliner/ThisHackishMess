@@ -18,7 +18,7 @@
 import cPickle, os, pygame, zlib, gzip
 #import msgpack
 
-from imageload import loadImage
+from imageload import loadImage, loadImageNoAlpha
 
 #This code is haunted by a SpaceGhost! D:
 from physicsserialize import SpaceGhost
@@ -94,7 +94,15 @@ def dumpPlayState( givenState, fileName ):
 	
 	givenState.soundManager.makePicklable()
 
+	allTheHudElementImages = {}
+	for each in givenState.hudList:
+		allTheHudElementImages[id(each)] = each.image
+		each.image = None
+
 	writeObjectToFile( givenState, fileName )
+
+	for each in givenState.hudList:
+		each.image = allTheHudElementImages[id(each)]
 
 	givenState.soundManager.makeUnpicklable()
 	
@@ -128,6 +136,19 @@ def loadPlayState( fileName, curTileSet ):
 
 	givenState.soundManager.makeUnpicklable()
 
+	for eachObj in givenState.hudList:
+		if eachObj.sheetFileName is not None:
+			if eachObj.alpha: 
+				eachObj.sheet = loadImage( eachObj.sheetFileName, eachObj.scale )
+			else:
+				eachObj.sheet = loadImageNoAlpha( eachObj.sheetFileName, eachObj.scale )
+			eachObj.sheet.set_colorkey( eachObj.colourKey )
+		else:
+			eachObj.sheet = pygame.Surface( ( 1, 1 ) ).convert_alpha()
+			eachObj.sheet.fill( pygame.Color( 0, 0, 0, 0 ) )		
+		eachObj.createFrames()
+		eachObj.image = eachObj.frames[eachObj.curAnimation['frames'][eachObj.frame]]
+
 	givenState.space, bodyDict, shapeDict = givenState.spaceGhost.resurrect()
 	givenState.spaceGhost = None
 	givenState.space.add_collision_handler( 1, 2, givenState.speshulCaller )
@@ -140,7 +161,11 @@ def loadPlayState( fileName, curTileSet ):
 
 	for eachSprite in givenState.sprites():
 		if eachSprite.sheetFileName is not None:
-			eachSprite.sheet = loadImage( eachSprite.sheetFileName, eachSprite.scale )
+			if eachSprite.alpha: 
+				eachSprite.sheet = loadImage( eachSprite.sheetFileName, eachSprite.scale )
+			else:
+				eachSprite.sheet = loadImageNoAlpha( eachSprite.sheetFileName, eachSprite.scale )
+			eachSprite.sheet.set_colorkey( eachSprite.colourKey )
 		else:
 			eachSprite.sheet = pygame.Surface( ( 1, 1 ) ).convert_alpha()
 			eachSprite.sheet.fill( pygame.Color( 0, 0, 0, 0 ) )		

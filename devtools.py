@@ -136,7 +136,7 @@ class DevMenu( pygame.sprite.OrderedUpdates ):
 			
 			classUpdateInPlace( self.menuState, globals(), locals() )
 
-			classUpdateInPlace( self.playState, globals(), locals() )
+			#classUpdateInPlace( self.playState, globals(), locals() )
 
 			#ISOLATED CODE 1
 			map(lambda eachSprite:classUpdateInPlace(eachSprite, globals(), locals()), self.playState.sprites())
@@ -145,7 +145,7 @@ class DevMenu( pygame.sprite.OrderedUpdates ):
 			self.masterEntSet.updateEnts()
 		if self.playState.forceUpdateEverything:
 			map(lambda eachSprite:classUpdateInPlace(eachSprite, globals(), locals()), self.sprites())
-			classUpdateInPlace( self.playState, globals(), locals() )
+			#classUpdateInPlace( self.playState, globals(), locals() )
 			self.playState.forceUpdateEverything = False
 		return True
 		#print dt

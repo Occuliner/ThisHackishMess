@@ -19,20 +19,23 @@ import pygame
 from pygame.locals import *
 
 class HudElement:
+	colourKey = None
+	alpha = True
+	scale = 1
 	def __init__( self, playState, pos, sheet=None, animated=False, frameSize=None ):
 		if sheet is not None:
 			self.sheet = sheet
+		self.animated = animated
+		self.playState = playState
 		if animated:
 			self.rect = pygame.Rect( (0,0), frameSize )
-			self.createFrames()
-			self.image = self.frames[0]
 			self.rect.topleft = pos
 		else:
-			self.image = sheet
 			self.rect = self.image.get_rect()
 			self.rect.topleft = pos
-			self.frames = [ self.image ]
+		self.createFrames()
 		self.frame = 0
+		self.image = self.frames[self.frame]
 		self.defaultAnim = {'fps':1, 'frames':[0]}
 		self.curAnimation = self.defaultAnim
 		self.maxFrameTime = 1.000/self.curAnimation['fps']
@@ -45,6 +48,9 @@ class HudElement:
 		self.image = self.frames[ self.curAnimation['frames'][self.frame] ]
 	
 	def createFrames( self ):
+		if not self.animated:
+			self.frames = [self.sheet]
+			return None
 		tmpRect = self.rect.copy()
 		tmpRect.topleft = ( 0, 0 )
 		for y in xrange( 0, self.sheet.get_height(), self.rect.h ):
