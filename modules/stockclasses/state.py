@@ -77,6 +77,8 @@ class PlayState:
 
 		self.soundManager = SoundManager()
 
+		self.hudList = []
+		
 		self.fileName = "Untitled"
 
 	def addBoundary( self, point1, point2 ):
@@ -265,6 +267,11 @@ class PlayState:
 		del tmpDrawGroup
 		
 		changeRects.extend( self.lineVisualiser.draw( surface ) )
+
+		for eachElement in self.hudList:
+			eachElement.draw( surface )
+
+		changeRects.extend( [ each.rect for each in self.hudList ] )
 		
 		if self.rerenderEverything:
 			changeRects.extend( [ pygame.Rect( 0, 0, 800, 600 ) ] )
