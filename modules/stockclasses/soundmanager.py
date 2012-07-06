@@ -25,7 +25,12 @@ class Sound( pygame.mixer.Sound ):
 		pygame.mixer.Sound.__init__( self, fileName )
 		self.soundManagerRef = weakref.ref( soundMgr )
 		self.priority = priority
-		
+		self.volume = self.get_volume()
+
+	def set_volume( self, value ):
+		self.volume = value
+		pygame.mixer.Sound.set_volume( self, value )
+
 	def play( self, loops=0, maxtime=0, fade_ms=0 ):
 		sndMgr = self.soundManagerRef()
 		destChannel, channelId = sndMgr.getChannel( self.priority )
@@ -43,7 +48,7 @@ class Sound( pygame.mixer.Sound ):
 	def makeUnpickable( self, sndMgr ):
 		self.soundManagerRef = weakref.ref( sndMgr )
 		pygame.mixer.Sound.__init__( self, self.fileName )
-
+		pygame.mixer.Sound.set_volume( self, self.volume )
 class SoundManager:
 	def __init__( self ):
 		self.sounds = {}
