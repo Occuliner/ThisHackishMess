@@ -51,6 +51,7 @@ class HudElement:
 		if not self.animated:
 			self.frames = [self.sheet]
 			return None
+		self.frames = []
 		tmpRect = self.rect.copy()
 		tmpRect.topleft = ( 0, 0 )
 		for y in xrange( 0, self.sheet.get_height(), self.rect.h ):
