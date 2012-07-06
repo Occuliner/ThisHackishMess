@@ -126,6 +126,8 @@ def dumpPlayState( givenState, fileName ):
 	givenState.floor.image = floorImage
 	givenState.floor.changes, givenState.floor.undoneChanges, givenState.floor.tileSet = backupChanges, backupUndoneChanges, backUpTileSet
 
+	givenState.floor.imageStringBuffer = None
+
 def loadPlayState( fileName, curTileSet ):
 	givenState = loadObjectFromFile( fileName )
 	if givenState is None:
