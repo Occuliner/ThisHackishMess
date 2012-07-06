@@ -54,9 +54,9 @@ class HudElement:
 		tmpRect = self.rect.copy()
 		tmpRect.topleft = ( 0, 0 )
 		for y in xrange( 0, self.sheet.get_height(), self.rect.h ):
-			if y + self.height <= self.sheet.get_height():
+			if y + self.rect.h <= self.sheet.get_height():
 				for x in xrange( 0, self.sheet.get_width(), self.rect.w ):
-					if x + self.width <= self.sheet.get_width():
+					if x + self.rect.w <= self.sheet.get_width():
 						tmpRect.topleft = (x, y)
 						self.frames.append( self.sheet.subsurface( tmpRect ) )
 
