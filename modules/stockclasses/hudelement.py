@@ -59,7 +59,9 @@ class HudElement:
 				for x in xrange( 0, self.sheet.get_width(), self.rect.w ):
 					if x + self.rect.w <= self.sheet.get_width():
 						tmpRect.topleft = (x, y)
-						self.frames.append( self.sheet.subsurface( tmpRect ) )
+						tmpSurface = self.sheet.subsurface( tmpRect )
+						tmpSurface.set_colorkey( self.colourKey )
+						self.frames.append( tmpSurface )
 
 	def draw( self, surface ):
 		surface.blit( self.image, self.rect )

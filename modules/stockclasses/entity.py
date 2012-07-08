@@ -218,7 +218,9 @@ class Entity( pygame.sprite.DirtySprite ):
 				for x in xrange( 0, self.sheet.get_width(), self.rect.w ):
 					if x + self.width <= self.sheet.get_width():
 						tmpRect.topleft = (x, y)
-						self.frames.append( self.sheet.subsurface( tmpRect ) )
+						tmpSurface = self.sheet.subsurface( tmpRect )
+						tmpSurface.set_colorkey( self.colourKey )
+						self.frames.append( tmpSurface )
 		if len( self.frames ) is 0:
 			self.frames = [self.sheet]
 
