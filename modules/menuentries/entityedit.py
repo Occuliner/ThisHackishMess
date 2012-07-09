@@ -160,7 +160,7 @@ class EntityEditState( MenuState ):
 				self.yPos = 0
 				self.maxPage += 1
 			self.curEntNum += 1
-		map( self.addButton, self.pages[self.curPage] )
+		[ self.addButton( each ) for each in self.pages[self.curPage] if each not in self.buttons ] 
 		self.menu.loadMenuState( self )
 
 	def repage( self, newPageNum ):
