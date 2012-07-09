@@ -214,8 +214,12 @@ class EntityEditState( MenuState ):
 		elif curMousePos is not None:
 			deltaPos = curMousePos[0] - self.lastMouseSpot[0], curMousePos[1] - self.lastMouseSpot[1]
 			if self.curGrabbedEnt is not None:
-				self.curGrabbedEnt.body.position[0] += deltaPos[0]
-				self.curGrabbedEnt.body.position[1] += deltaPos[1]
+				if self.curGrabbedEnt.collidable:
+					self.curGrabbedEnt.body.position[0] += deltaPos[0]
+					self.curGrabbedEnt.body.position[1] += deltaPos[1]
+				else:
+					self.curGrabbedEnt.rect.x += deltaPos[0]
+					self.curGrabbedEnt.rect.y += deltaPos[1]
 			self.lastMouseSpot = curMousePos
 				
 				
