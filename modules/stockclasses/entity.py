@@ -143,6 +143,8 @@ class Entity( pygame.sprite.DirtySprite ):
 
 			self.bodyId = id( self.body )
 			self.shapeId = id( self.shape )
+		else:
+			self.rect.topleft = pos
 		
 		self.idle = [False, False]
 		
