@@ -294,8 +294,8 @@ class Entity( pygame.sprite.DirtySprite ):
 		
 		if self.collidable:
 			self.rect.topleft = self.body.position.x, self.body.position.y
-		else:
-			self.rect.topleft = int( round( self.position[0] ) ), int( round( self.position[1] ) )
+		#else:
+		#	self.rect.topleft = int( round( self.position[0] ) ), int( round( self.position[1] ) )
 #		#Assume idle at end of frame
 		self.idle = [True, True]
 
