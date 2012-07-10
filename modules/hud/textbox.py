@@ -63,7 +63,29 @@ class TextBox( HudElement ):
 		img.blit( self.originFrames[2], (box.w-32, 0) )
 		img.blit( self.originFrames[6], (0, box.h-32) )
 		img.blit( self.originFrames[8], (box.w-32, box.h-32) )
-		
+
+		wLimit = box.w-64
+
+		subStrings = []
+		lastIndex = 0
+		for eachIndex in range( len( text ) ):
+			eachSub = text[lastIndex:eachIndex]
+			if self.font.size( eachSub )[0] > wLimit:
+				subStrings.append( eachSub[:-1] )
+				lastIndex = eachIndex - 1
+			if eachIndex == ( len( text ) - 1 ):
+				subStrings.append( eachSub )
+		if len( subStrings ) is  0:
+			subStrings = [ text ]
+
+		curIndex = 0
+		curY = 32
+		while curY < box.h-32 and curIndex < len( subStrings ):
+			eachImg = self.font.render( subStrings[curIndex], True, pygame.Color( 0, 0, 0 ) )
+			img.blit( eachImg, ( 32, curY ) )
+			curY += eachImg.get_height()
+			curIndex += 1
+
 		HudElement.__init__( self, playState, box.topleft, img, False )
 		self.image.set_colorkey( self.colourKey )
 		
