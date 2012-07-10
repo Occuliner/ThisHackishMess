@@ -34,7 +34,6 @@ def splitFrames( image, size ):
 	return frames
 
 class TextBox( HudElement ):
-	pos = (0,0)
 	alpha = False
 	sheetFileName = "textboxsheet.png"
 	colourKey = pygame.Color( 255, 0, 255 )
@@ -43,28 +42,30 @@ class TextBox( HudElement ):
 		sheet = loadImageNoAlpha( self.sheetFileName )
 		self.originFrames = splitFrames( sheet, (32, 32) )
 		if box is None:
-			box = pygame.Rect( (10, 450), (590, 790 ) )
+			box = pygame.Rect( (0, 350), (800, 250 ) )
 		
 		img = pygame.Surface( (box.w, box.h) ).convert()
-		
-		for x in range( box.x+32, box.w+box.x, 32 ):
-			img.blit( self.originFrames[1], (x, box.y) )
-			img.blit( self.originFrames[7], (x, box.y+box.h-32) )
+		#img.fill( pygame.Color( 0, 0, 0, 0 ) )
 
-		for y in range( box.y+32, box.h+box.y, 32 ):
-			img.blit( self.originFrames[3], (box.x, y) )
-			img.blit( self.originFrames[5], (box.x+box.w-32, y) )
+		for x in range( 32, box.w, 32 ):
+			img.blit( self.originFrames[1], (x, 0) )
+			img.blit( self.originFrames[7], (x, box.h-32) )
+
+		for y in range( 32, box.h, 32 ):
+			img.blit( self.originFrames[3], (0, y) )
+			img.blit( self.originFrames[5], (box.w-32, y) )
 
 		for x in range( box.x+32, box.w+box.x-32, 32 ):
-			for y in range( box.y+32, box.h+box.y-32, 32 ):
+			for y in range( 32, box.h-32, 32 ):
 				img.blit( self.originFrames[4], (x,y) )
 		
-		img.blit( self.originFrames[0], box )
-		img.blit( self.originFrames[2], (box.x+box.w-32, box.y) )
-		img.blit( self.originFrames[6], (box.x, box.y+box.h-32) )
-		img.blit( self.originFrames[8], (box.x+box.w-32, box.y+box.h-32) )
+		img.blit( self.originFrames[0], ( 0, 0 ) )
+		img.blit( self.originFrames[2], (box.w-32, 0) )
+		img.blit( self.originFrames[6], (0, box.h-32) )
+		img.blit( self.originFrames[8], (box.w-32, box.h-32) )
 		
-		HudElement.__init__( self, playState, self.pos, img, False )
+		HudElement.__init__( self, playState, box.topleft, img, False )
+		self.image.set_colorkey( self.colourKey )
 		
 	def update( self, dt ):
 		HudElement.update( self, dt )
