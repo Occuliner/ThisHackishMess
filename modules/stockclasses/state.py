@@ -178,7 +178,7 @@ class PlayState:
 	def draw( self, surface ):
 		"""Draw all the child entity groups in PlayState, returning changed area rects"""
 		changeRects = []
-		self.floor.draw( surface )
+		self.floor.draw( surface, ( self.panX, self.panY ) )
 		#for eachVal in self.drawOrder:
 		#	changeRects.extend( self.groups[eachVal].draw( surface ) )
 		

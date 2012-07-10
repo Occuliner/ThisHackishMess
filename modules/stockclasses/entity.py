@@ -173,6 +173,8 @@ class Entity( pygame.sprite.DirtySprite ):
 		self.children = []
 		self.classUpdated = False
 
+		self.oldPan = group.playState.panX, group.playState.panY
+
 	def addToGroup( self, *groups ):
 		if self.collidable:
 			for group in groups:
@@ -296,6 +298,17 @@ class Entity( pygame.sprite.DirtySprite ):
 		
 		if self.collidable:
 			self.rect.topleft = self.body.position.x, self.body.position.y
+
+		npx = self.groups()[0].playState.panX
+		npy = self.groups()[0].playState.panY
+		pdx = npx - self.oldPan[0]
+		pdy = npy - self.oldPan[1]
+
+		self.rect.x += pdx
+		self.rect.y += pdy
+
+		self.oldPan = npx, npy
+
 		#else:
 		#	self.rect.topleft = int( round( self.position[0] ) ), int( round( self.position[1] ) )
 #		#Assume idle at end of frame

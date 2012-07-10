@@ -253,6 +253,6 @@ class Floor:
 		self.addUndo( self.createChange( ( theTile.rect.w, theTile.rect.h ), pos, theTile.kickUp, theTile.solid ) )
 		self.write( theTile.image, pos, theTile.kickUp, theTile.solid )
 
-	def draw( self, surface ):
+	def draw( self, surface, destPoint=( 0, 0 ) ):
 		"""Blit the Floor's image to a given surface, at (0,0)."""
-		surface.blit( self.image, ( 0, 0 ) )
+		surface.blit( self.image, destPoint )
