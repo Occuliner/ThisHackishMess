@@ -26,6 +26,8 @@ import pygame, sys#, objgraph
 
 from pygame.locals import *
 
+pygame.init()
+
 #Apparently all the scripts ran by extention of this have this in their paths, huh.
 sys.path.extend( ["modules/stockfunctions", "modules/stockclasses"] )
 
@@ -39,7 +41,6 @@ from state import PlayState
 
 #from modules import *
 
-pygame.init()
 timer = pygame.time.Clock()
 
 screen = pygame.display.set_mode( (800, 600) )
