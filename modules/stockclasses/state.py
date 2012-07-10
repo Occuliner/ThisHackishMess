@@ -83,6 +83,8 @@ class PlayState:
 
 		self.hardBlockInput = False
 
+		self.panX, self.panY = 0, 0
+
 	def addBoundary( self, point1, point2 ):
 		newSeg = pymunk.Segment( self.boundaryBody, point1, point2, 1 )
 		self.boundaries.append( newSeg )
