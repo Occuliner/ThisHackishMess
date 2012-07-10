@@ -189,7 +189,7 @@ class PlayState:
 		tmpDrawGroup.empty()
 		del tmpDrawGroup
 		
-		changeRects.extend( self.lineVisualiser.draw( surface ) )
+		changeRects.extend( self.lineVisualiser.draw( surface, (self.panX, self.panY) ) )
 
 		for eachElement in self.hudList:
 			eachElement.draw( surface )

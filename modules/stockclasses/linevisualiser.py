@@ -32,7 +32,8 @@ class LineVisualiser:
 		self.forceNoRender = False
 		self.oldRects = []
 
-	def drawLinesWithPoints( self, surface, listOfPoints, pointRender=False, lineColour=red, pointColour=blue ):
+	def drawLinesWithPoints( self, surface, listOfPoints, pointRender=False, lineColour=red, pointColour=blue, dest=(0, 0) ):
+		listOfPoints = [ ( each[0]+dest[0], each[1]+dest[1] ) for each in listOfPoints ]
 		updateRects = []
 		updateRects.append( pygame.draw.lines( surface, lineColour, True, listOfPoints ) )
 		if pointRender:
@@ -40,7 +41,7 @@ class LineVisualiser:
 				updateRects.append( pygame.draw.rect( surface, pointColour, pygame.Rect( eachPoint[0]-2, eachPoint[1]-2, 4, 4 ) ) )
 		return updateRects
 
-	def draw( self, surface ):
+	def draw( self, surface, destPoint=(0, 0) ):
 		updateRects = []
 		if self.renderLines:
 			for eachGroup in self.devMenuLineGroups:
@@ -50,12 +51,12 @@ class LineVisualiser:
 				for eachShape in self.playState.space.shapes + self.playState.space.static_shapes:
 					if type( eachShape ) == pymunk.Poly:
 						if eachShape.entity.pureSensor:
-							updateRects.extend( self.drawLinesWithPoints( surface, eachShape.get_points(), True, blue, red ) )
+							updateRects.extend( self.drawLinesWithPoints( surface, eachShape.get_points(), True, blue, red, destPoint ) )
 						else:
-							updateRects.extend( self.drawLinesWithPoints( surface, eachShape.get_points(), True ) )
+							updateRects.extend( self.drawLinesWithPoints( surface, eachShape.get_points(), True, dest=destPoint ) )
 					elif type( eachShape ) == pymunk.Segment:
 						#updateRects.append( pygame.draw.line( surface, red, eachShape.a, eachShape.b ) )
-						updateRects.extend( self.drawLinesWithPoints( surface, [ eachShape.a, eachShape.b ], True ) )
+						updateRects.extend( self.drawLinesWithPoints( surface, [ eachShape.a, eachShape.b ], True, dest=destPoint ) )
 					else:
 						print "LineVisualiser doesn't render type: " + eachShape.__class__.__name__
 		#Empty self.devMenuLineGroups at the end of the frame.
