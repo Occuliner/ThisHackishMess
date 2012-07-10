@@ -81,6 +81,8 @@ class PlayState:
 		
 		self.fileName = "Untitled"
 
+		self.hardBlockInput = False
+
 	def addBoundary( self, point1, point2 ):
 		newSeg = pymunk.Segment( self.boundaryBody, point1, point2, 1 )
 		self.boundaries.append( newSeg )
@@ -131,10 +133,12 @@ class PlayState:
 		"""A generic update function.
 		Sends input dictionaries to playerGroups.
 		Updates all the child groups, runs the collision system."""
-		if self.playersGroup is not None and len( self.curInputDict ) > 0:
-			for eachPlayer in self.playersGroup.sprites():
-				eachPlayer.sendInput( self.curInputDict )
-			self.curInputDict = {}
+		
+		if not self.hardBlockInput:
+			if self.playersGroup is not None and len( self.curInputDict ) > 0:
+				for eachPlayer in self.playersGroup.sprites():
+					eachPlayer.sendInput( self.curInputDict )
+		self.curInputDict = {}
 		
 		#for eachGroup in self.groups:
 		#	eachGroup.readyAccel( dt )
@@ -159,92 +163,6 @@ class PlayState:
 		"""Simply sets PlayState.curInputDict to a given input dictionary, 
 		for use in PlayState.update()"""
 		self.curInputDict = inputDict
-
-	def collideSystem( self, dt ):
-		"""
-		collideSystem( self )
-
-		Returns NoneType
-		
-		This function is the function called by the PlayState to run collision on every sprite with every other sprite in the PlayState.
-		
-		First the function takes all the sprites in the PlayState and makes a list with all that are set to be collidable.
-
-		Then the function iterates over each sprite. First creating the list of sprites it can collide with ( is in its collideWith list ) that haven't been checked yet.
-		Then colliding the current sprite with everyother sprite, and getting the result.  The system can then do something as a response based off what the two sprites are.
-
-		If objects collide, the system adds then to a solidCollisionPair list, which is then iterating over by descending-stability order.
-
-		The function then removes the checked sprite from the list of those not checked yet, to improve performance.
-		"""
-
-		collidableSprites = [each for each in self.sprites() if each.collidable]
-		#print len(collidableSprites)
-		spritesNotCheckedYet = list( collidableSprites )
-		removeFromTheList = spritesNotCheckedYet.remove
-		
-		theNewCollisionState = CollisionState()
-		for eachSprite in collidableSprites:
-
-			removeFromTheList( eachSprite )
-			checkThese = (each for each in spritesNotCheckedYet if each.collideId in eachSprite.collideWith)
-			
-			esCollideWithEntLocal = eachSprite.collideWithEnt
-			esSpecialCollision = eachSprite.specialCollision is not None
-			
-			#Non loop-unrolled version.
-			#for otherSprite in checkThese:
-			#	resultOfSpriteCollide = esCollideWithEntLocal( otherSprite )
-			#	if resultOfSpriteCollide[0]:
-			#		#if eachSprite.specialCollision is not None:
-			#		if esSpecialCollision:
-			#			eachSprite.specialCollision( eachSprite, otherSprite )
-			#		if otherSprite.specialCollision is not None:
-			#			otherSprite.specialCollision( otherSprite, eachSprite )
-			#		if eachSprite.solid and otherSprite.solid:
-			#			momentumCollideRects( eachSprite, otherSprite, resultOfSpriteCollide[1] )	
-			
-			if eachSprite.solid and esSpecialCollision:
-				for otherSprite in checkThese:
-					resultOfSpriteCollide = esCollideWithEntLocal( otherSprite )
-					if resultOfSpriteCollide[0]:
-						#if eachSprite.specialCollision is not None:
-						eachSprite.specialCollision( otherSprite, dt )
-						if otherSprite.specialCollision is not None:
-							otherSprite.specialCollision( eachSprite, dt )
-						if otherSprite.solid:
-							#momentumCollideRects( eachSprite, otherSprite, resultOfSpriteCollide[1], dt )
-							theNewCollisionState.addCollision( eachSprite, otherSprite, resultOfSpriteCollide[1] )
-			elif eachSprite.solid:
-				for otherSprite in checkThese:
-					resultOfSpriteCollide = esCollideWithEntLocal( otherSprite )
-					if resultOfSpriteCollide[0]:
-						if otherSprite.specialCollision is not None:
-							otherSprite.specialCollision( eachSprite, dt )
-						if otherSprite.solid:
-							#momentumCollideRects( eachSprite, otherSprite, resultOfSpriteCollide[1], dt )
-							theNewCollisionState.addCollision( eachSprite, otherSprite, resultOfSpriteCollide[1] )
-			elif esSpecialCollision:
-				for otherSprite in checkThese:
-					resultOfSpriteCollide = esCollideWithEntLocal( otherSprite )
-					if resultOfSpriteCollide[0]:
-						if eachSprite.specialCollision is not None:
-							eachSprite.specialCollision( otherSprite, dt )
-						#if otherSprite.specialCollision is not None:
-						#	otherSprite.specialCollision( eachSprite, dt )
-		#print theNewCollisionState.collisionXObjects, theNewCollisionState.collisionYObjects
-		theNewCollisionState.applyCollisions()
-		for eachSprite in ( each for each in collidableSprites if each.solid ):
-			resultOfSolid = eachSprite.collideWithBooleanGrid(self.floor.solidMap, pos=(0,0))
-			if resultOfSolid[0]:
-				#inelasticCollideOneRect( eachSprite, resultOfSolidMapCollide[1] )
-				pass
-			
-			
-
-		
-
-		#print "STUB! make PlayState.collideSystem() collide eachEnt with the PlayState's solidMap"
 
 	def sprites( self ):
 		"""Returns a list of all the sprites in all the entity groups in the PlayState."""
