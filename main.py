@@ -185,13 +185,13 @@ while not done:
 					if someChr.isalnum() or someChr == ":":
 						theDevMenu.menuState.keyboardInput( someChr )
 
-			elif event.key == K_w and shiftHeld and theDevMenu.open:
+			elif event.key == K_w:
 				panU = False
-			elif event.key == K_a and shiftHeld and theDevMenu.open:
+			elif event.key == K_a:
 				panL = False
-			elif event.key == K_d and shiftHeld and theDevMenu.open:
+			elif event.key == K_d:
 				panR = False
-			elif event.key == K_s and shiftHeld and theDevMenu.open:
+			elif event.key == K_s:
 				panD = False
 			
 		elif event.type == MOUSEBUTTONDOWN:
