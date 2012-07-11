@@ -203,7 +203,7 @@ class EntityEditState( MenuState ):
 					#classDef = self.menu.masterEntSet.getEnts()[self.entNum]
 					classDef = self.processedEnts[self.entNum]
 					destGroup = getattr( self.menu.playState, classDef.playStateGroup )
-					dest = click[0]+self.menu.playState.panX, click[1]+self.menu.playState.panY
+					dest = click[0]-self.menu.playState.panX, click[1]-self.menu.playState.panY
 					classDef( dest, vel=[0,0], group=destGroup )
 				self.curGrabbedEnt = None
 			
