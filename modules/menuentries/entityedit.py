@@ -156,6 +156,7 @@ class EntityEditState( MenuState ):
 			if self.xPos > 108:
 				self.xPos = 0
 				self.yPos += self.tallest
+				self.tallest = 0
 			if self.yPos > 318:
 				self.yPos = 0
 				self.maxPage += 1
@@ -196,11 +197,6 @@ class EntityEditState( MenuState ):
 
 			elif clickKey is 'mouse1up':
 				if self.getPressedEnt( click ) == None and self.curGrabbedEnt == None:
-					#print self.entNum
-					#theClass = self.menu.masterEntSet.getEnts()[self.entNum]( list( click ), vel=[0,0], group=self.menu.playState.playersGroup )
-					#HOLY DAMN HELL CONNOR MAKE IT GET THE CORRECT GROUP TO ADD TO, POSSIB. USE A DICTIONARY AND A STRING IN EACH CLASS DEF
-				
-					#classDef = self.menu.masterEntSet.getEnts()[self.entNum]
 					classDef = self.processedEnts[self.entNum]
 					destGroup = getattr( self.menu.playState, classDef.playStateGroup )
 					dest = click[0]-self.menu.playState.panX, click[1]-self.menu.playState.panY
