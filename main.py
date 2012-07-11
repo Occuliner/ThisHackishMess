@@ -110,6 +110,9 @@ shiftHeld = False
 timeTillFpsPrint = 2.0
 
 updatedArea = [ pygame.Rect( 0, 0, 800, 600 ) ]
+
+panU, panD, panL, panR = False, False, False, False
+
 timer.tick( 60 )
 while not done:
 
@@ -147,6 +150,14 @@ while not done:
 
 			elif event.key in [ K_LSHIFT, K_RSHIFT ]:
 				shiftHeld = True
+			elif event.key == K_w and shiftHeld and theDevMenu.open:
+				panU = True
+			elif event.key == K_a and shiftHeld and theDevMenu.open:
+				panL = True
+			elif event.key == K_d and shiftHeld and theDevMenu.open:
+				panR = True
+			elif event.key == K_s and shiftHeld and theDevMenu.open:
+				panD = True
 			
 		elif event.type == KEYUP:
 			if event.key == K_LEFT:
@@ -173,6 +184,15 @@ while not done:
 						someChr = chr( event.key )
 					if someChr.isalnum() or someChr == ":":
 						theDevMenu.menuState.keyboardInput( someChr )
+
+			elif event.key == K_w and shiftHeld and theDevMenu.open:
+				panU = False
+			elif event.key == K_a and shiftHeld and theDevMenu.open:
+				panL = False
+			elif event.key == K_d and shiftHeld and theDevMenu.open:
+				panR = False
+			elif event.key == K_s and shiftHeld and theDevMenu.open:
+				panD = False
 			
 		elif event.type == MOUSEBUTTONDOWN:
 			curMousePos = event.pos[0] + currentState.panX, event.pos[1] + currentState.panY
@@ -198,6 +218,15 @@ while not done:
 	
 	inputDict = {}
 	
+	if panU:
+		currentState.panY -= 1
+	if panD:
+		currentState.panY += 1
+	if panR:
+		currentState.panX += 1
+	if panL:
+		currentState.panX -= 1
+
 	pygame.display.update( updatedArea )
 	#pygame.display.update( )
 
