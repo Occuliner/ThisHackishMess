@@ -70,6 +70,7 @@ class Entity( pygame.sprite.DirtySprite ):
 	scale = 1
 	colourKey = None
 	alpha = True
+	forceUseRect = False
 	def __init__( self, pos, vel, image=None, group=None, rect=None, animated=None, collidable=None, collideId=None, collideWith=None, mass=None, specialCollision=None, solid=None, pureSensor=None ):
 		pygame.sprite.DirtySprite.__init__( self )
 		
