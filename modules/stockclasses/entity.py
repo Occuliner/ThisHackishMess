@@ -296,16 +296,17 @@ class Entity( pygame.sprite.DirtySprite ):
 				self.nextFrame()
 				self.frameTime = self.maxFrameTime
 		
+		self.rect.x -= self.oldPan[0]
+		self.rect.y -= self.oldPan[1]
+
 		if self.collidable:
 			self.rect.topleft = self.body.position.x, self.body.position.y
 
 		npx = self.groups()[0].playState.panX
 		npy = self.groups()[0].playState.panY
-		pdx = npx - self.oldPan[0]
-		pdy = npy - self.oldPan[1]
 
-		self.rect.x += pdx
-		self.rect.y += pdy
+		self.rect.x += npx
+		self.rect.y += npy
 
 		self.oldPan = npx, npy
 
