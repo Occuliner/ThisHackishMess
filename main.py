@@ -197,22 +197,22 @@ while not done:
 		elif event.type == MOUSEBUTTONDOWN:
 			curMousePos = event.pos[0] + currentState.panX, event.pos[1] + currentState.panY
 			if event.button == 1 and theDevMenu.open:
-				theDevMenu.clicks['mouse1down'].append( curMousePos )
+				theDevMenu.clicks['mouse1down'].append( event.pos )
 			elif event.button == 2 and theDevMenu.open:
-				theDevMenu.clicks['mouse2down'].append( curMousePos )
+				theDevMenu.clicks['mouse2down'].append( event.pos )
 			elif event.button == 3 and theDevMenu.open:
-				theDevMenu.clicks['mouse3down'].append( curMousePos )
+				theDevMenu.clicks['mouse3down'].append( event.pos )
 		
 		elif event.type == MOUSEBUTTONUP:
 			theDevMenu.draggingMenu = False
 			theDevMenu.draggedSpot = [0,0]
 			curMousePos = event.pos[0] + currentState.panX, event.pos[1] + currentState.panY
 			if event.button == 1 and theDevMenu.open:
-				theDevMenu.clicks['mouse1up'].append( curMousePos )
+				theDevMenu.clicks['mouse1up'].append( event.pos )
 			elif event.button == 2 and theDevMenu.open:
-				theDevMenu.clicks['mouse2up'].append( curMousePos )
+				theDevMenu.clicks['mouse2up'].append( event.pos )
 			elif event.button == 3 and theDevMenu.open:
-				theDevMenu.clicks['mouse3up'].append( curMousePos )
+				theDevMenu.clicks['mouse3up'].append( event.pos )
 
 	currentState.sendInput( inputDict )
 	
