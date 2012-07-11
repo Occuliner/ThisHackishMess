@@ -173,8 +173,7 @@ class Entity( pygame.sprite.DirtySprite ):
 		self.children = []
 		self.classUpdated = False
 
-		#self.oldPan = group.playState.panX, group.playState.panY
-		self.oldPan = 0, 0
+		self.oldPan = group.playState.panX, group.playState.panY
 
 	def addToGroup( self, *groups ):
 		if self.collidable:
