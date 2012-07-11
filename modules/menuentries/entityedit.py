@@ -149,10 +149,13 @@ class EntityEditState( MenuState ):
 				self.pages[self.maxPage] = [ givenButton ]
 			if eachEnt.bWidth is not None:
 				self.xPos += (eachEnt.bWidth/2 + 10)
-				self.tallest = max( self.tallest, eachEnt.bHeight )
+				self.tallest = max( self.tallest, eachEnt.bHeight*0.5*eachEnt.scale )
+			elif eachEnt.wbWidth is not None:
+				self.xPos += (eachEnt.wbWidth/2 + 10)
+				self.tallest = max( self.tallest, eachEnt.wbHeight*0.5*eachEnt.scale )
 			else:
 				self.xPos += (eachEnt.width/2 + 10)
-				self.tallest = max( self.tallest, eachEnt.height )
+				self.tallest = max( self.tallest, eachEnt.height*0.5*eachEnt.scale )
 			if self.xPos > 108:
 				self.xPos = 0
 				self.yPos += self.tallest
