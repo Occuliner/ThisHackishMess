@@ -219,13 +219,13 @@ while not done:
 	inputDict = {}
 	
 	if panU:
-		currentState.panY -= 1
+		currentState.panY += 2
 	if panD:
-		currentState.panY += 1
+		currentState.panY -= 2
 	if panR:
-		currentState.panX += 1
+		currentState.panX -= 2
 	if panL:
-		currentState.panX -= 1
+		currentState.panX += 2
 
 	pygame.display.update( updatedArea )
 	#pygame.display.update( )
