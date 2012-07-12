@@ -140,6 +140,9 @@ class PlayState:
 			if self.playersGroup is not None and len( self.curInputDict ) > 0:
 				for eachPlayer in self.playersGroup.sprites():
 					eachPlayer.sendInput( self.curInputDict )
+			
+			for eachElement in self.hudList:
+				eachElement.sendInput( self.curInputDict )
 		self.curInputDict = {}
 		
 		#for eachGroup in self.groups:

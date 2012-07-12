@@ -66,6 +66,9 @@ class HudElement:
 	def draw( self, surface ):
 		surface.blit( self.image, self.rect )
 
+	def sendInput( self, inputDict ):
+		pass
+
 	def update( self, dt ):
 		if self.animated:
 			self.frameTime -= dt
