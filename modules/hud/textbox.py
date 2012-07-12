@@ -89,5 +89,11 @@ class TextBox( HudElement ):
 		HudElement.__init__( self, playState, box.topleft, img, False )
 		self.image.set_colorkey( self.colourKey )
 		
+	def sendInput( self, inputDict ):
+		for eachKey, eachVal in inputDict.items():
+			if eachKey in ( 'K_c', 'K_x', 'K_z' ):
+				if eachVal is 'up':
+					self.playState.hudList.remove( self )
+
 	def update( self, dt ):
 		HudElement.update( self, dt )
