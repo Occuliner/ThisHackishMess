@@ -303,9 +303,12 @@ class Entity( pygame.sprite.DirtySprite ):
 		if self.collidable:
 			self.rect.topleft = self.body.position.x, self.body.position.y
 
-		npx = self.groups()[0].playState.panX
-		npy = self.groups()[0].playState.panY
-
+		listOfGroups = self.groups()
+		if len( listOfGroups ) > 0:
+			npx = listOfGroups.playState.panX
+			npy = listOfGroups.playState.panY
+		else:
+			npx, npy = 0, 0
 		self.rect.x += npx
 		self.rect.y += npy
 
