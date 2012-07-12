@@ -108,7 +108,7 @@ class TextBox( HudElement ):
 		HudElement.update( self, dt )
 		if self.dying:
 			#self.image.set_alpha( int( 255*( 1.0-( self.removeTimer/self.removeTime) ) ) )
-			ratio = 1.0-( ( ( self.removeTimer-self.removeTime )**2 )/(self.removeTime**2) )
+			ratio = ( ( ( self.removeTimer-self.removeTime )**2 )/(self.removeTime**2) )
 			self.image.set_alpha( int( 255*ratio ) )
 			self.removeTimer += dt
 			if self.removeTimer > self.removeTime:
