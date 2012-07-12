@@ -88,12 +88,25 @@ class TextBox( HudElement ):
 
 		HudElement.__init__( self, playState, box.topleft, img, False )
 		self.image.set_colorkey( self.colourKey )
+
+		self.dying = False
+		self.removed = False
+		self.removeTime = 0.5
+		self.removeTimer = 0.0
 		
 	def sendInput( self, inputDict ):
 		for eachKey, eachVal in inputDict.items():
 			if eachKey in ( 'K_c', 'K_x', 'K_z' ):
 				if eachVal is 'up':
-					self.playState.hudList.remove( self )
+					self.dying = True
 
 	def update( self, dt ):
 		HudElement.update( self, dt )
+		if self.dying:
+			self.image.set_alpha( int( 255*(self.removeTimer/self.removeTime) ) )
+			self.removeTimer += dt
+			if self.removeTimer > self.removeTime:
+				self.playState.hudList.remove( self )
+				self.removed = True
+				self.dying = False
+				self.removeTimer = 0.0
