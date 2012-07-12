@@ -74,7 +74,7 @@ class TextBox( HudElement ):
 				subStrings.append( eachSub[:-1] )
 				lastIndex = eachIndex - 1
 			if eachIndex == ( len( text ) - 1 ):
-				subStrings.append( eachSub )
+				subStrings.append( eachSub+text[-1] )
 		if len( subStrings ) is  0:
 			subStrings = [ text ]
 
