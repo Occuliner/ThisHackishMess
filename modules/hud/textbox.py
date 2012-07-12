@@ -93,6 +93,10 @@ class TextBox( HudElement ):
 		self.removed = False
 		self.removeTime = 0.5
 		self.removeTimer = 0.0
+
+		self.borning = True
+		self.bornTime = 0.25
+		self.bornTimer = 0.0
 		
 	def sendInput( self, inputDict ):
 		for eachKey, eachVal in inputDict.items():
@@ -103,10 +107,19 @@ class TextBox( HudElement ):
 	def update( self, dt ):
 		HudElement.update( self, dt )
 		if self.dying:
-			self.image.set_alpha( int( 255*( 1.0-( self.removeTimer/self.removeTime) ) ) )
+			#self.image.set_alpha( int( 255*( 1.0-( self.removeTimer/self.removeTime) ) ) )
+			ratio = 1.0-( ( ( self.removeTimer-self.removeTime )**2 )/(self.removeTime**2) )
+			self.image.set_alpha( int( 255*ratio ) )
 			self.removeTimer += dt
 			if self.removeTimer > self.removeTime:
 				self.playState.hudList.remove( self )
 				self.removed = True
 				self.dying = False
 				self.removeTimer = 0.0
+		elif self.borning:
+			ratio = ( ( ( self.bornTimer-self.bornTime )**2 )/(self.bornTime**2) )
+			self.image.set_alpha( int( 255*ratio ) )
+			self.bornTimer += dt
+			if self.bornTimer > self.bornTime:
+				self.borning = False
+				self.bornTimer = 0.0
