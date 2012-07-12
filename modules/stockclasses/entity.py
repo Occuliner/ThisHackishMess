@@ -305,8 +305,8 @@ class Entity( pygame.sprite.DirtySprite ):
 
 		listOfGroups = self.groups()
 		if len( listOfGroups ) > 0:
-			npx = listOfGroups.playState.panX
-			npy = listOfGroups.playState.panY
+			npx = listOfGroups[0].playState.panX
+			npy = listOfGroups[0].playState.panY
 		else:
 			npx, npy = 0, 0
 		self.rect.x += npx
