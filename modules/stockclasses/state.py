@@ -98,6 +98,8 @@ class PlayState:
 		self.__dict__ = newState.__dict__
 		for eachGroup in self.groups:
 			eachGroup.playState = self
+		for eachKey, eachVal in self.namedGroups.items():
+			setattr( self, eachKey, eachVal )
 		gc.collect()
 		#Pymunk is leaky for me.
 		for obj in gc.garbage:
