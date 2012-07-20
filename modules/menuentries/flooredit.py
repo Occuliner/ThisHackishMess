@@ -194,7 +194,7 @@ class FloorEditState( MenuState ):
 			elif clickKey is 'mouse1up':
 				if self.startOfBlock != None:
 					#curTile = self.floor.tileSet.getTiles()[self.tileNum]
-					curTile = self.floor.processedTiles[self.tileNum]
+					curTile = self.processedTiles[self.tileNum]
 					
 					height = curTile.rect.h
 					width = curTile.rect.w
