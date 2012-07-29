@@ -129,7 +129,7 @@ class FloorEditState( MenuState ):
 		self.tallest = 0
 		self.pages = {0:[]}
 		self.curPage = 0
-		self.processedTiles = set([])
+		self.processedTiles = []
 		self.generateButtons()
 
 		#For the tile placing functionality.
@@ -157,7 +157,8 @@ class FloorEditState( MenuState ):
 		for eachTile in self.floor.tileSet.getTiles():
 			position = ( self.xPos + 21, self.yPos + 50 )
 			givenButton = TileButton( eachTile, curTileNum, position, self )
-			self.processedTiles.add( eachTile )
+			if eachTile not in self.processedTiles:
+				self.processedTiles.append( eachTile )
 			#self.addButton( givenButton )
 			if self.pages.has_key( curPageKey ):
 				self.pages[curPageKey].append( givenButton )
