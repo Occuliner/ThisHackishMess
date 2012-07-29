@@ -66,7 +66,7 @@ class TileButton( Button ):
 		"""Sets the parentState (Should be FloorEditState) to start using this given Tile."""
 		if clickKey is 'mouse1up' and self.parentState.tileNum is not self.tileNum:
 			self.parentState.tileNum = self.tileNum
-			if self.paretnState.tileSelectionBox in self.parentState.sprites:
+			if self.parentState.tileSelectionBox in self.parentState.sprites:
 				self.parentState.removeSprite( self.parentState.tileSelectionBox )
 			self.parentState.tileSelectionBox = SelectionBox( self.rect, self.parentState )
 			self.parentState.addSprite( self.parentState.tileSelectionBox )
