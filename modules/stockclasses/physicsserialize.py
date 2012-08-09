@@ -127,7 +127,7 @@ class SpaceGhost:
 				print "Consider implementing a Ghost class for it."
 	def resurrect( self ):
 		newSpace = pymunk.Space()
-		newSpace.graivty = self.gravity
+		newSpace.gravity = self.gravity
 		newSpace.damping = self.damping
 		newBodyDict = {}
 		newShapeDict = {}
