@@ -127,6 +127,7 @@ class PlayState:
 			self.drawOrder.insert( indexValue, newIndex )
 		
 		if isPlayerGroupBool:
+			self.namedGroups['playersGroup'] = group
 			self.playersGroup = group
 		
 		if name is not None:

@@ -55,6 +55,7 @@ def dumpPlayState( givenState, fileName ):
 	
 	#Remove all Surfaces from the playState, for ents, remove them and use the sheetFileName property to reload it later.
 	#For the Floor, convert it to a stringbuffer, and make it a property of the floor, and reload it later.
+
 	allTheImages = {}
 	allTheEntBodies = {}
 	allTheEntShapes = {}
@@ -192,6 +193,7 @@ def loadPlayState( fileName, curTileSet ):
 
 	givenState.floor.imageStringBuffer = None
 	
+
 	#objgraph.show_most_common_types()
 	#obj = objgraph.by_type('list')[-1]
 	#objgraph.show_backrefs([obj], max_depth=10)
