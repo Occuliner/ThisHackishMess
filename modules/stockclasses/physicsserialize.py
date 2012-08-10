@@ -106,7 +106,8 @@ class SpaceGhost:
 		self.damping = givenSpace.damping
 		self.shapes = []
 		self.staticShapes = []
-		self.bodies = { id(boundaryBody):BodyGhost( boundaryBody ) }	
+		self.bodies = { id(boundaryBody):BodyGhost( boundaryBody ) }
+		self.boundaryId = id(boundaryBody)
 		for eachBody in givenSpace.bodies:
 			self.bodies[id(eachBody)] = BodyGhost( eachBody )
 		for eachShape in givenSpace.shapes:
@@ -133,7 +134,7 @@ class SpaceGhost:
 		newShapeDict = {}
 		for key, val in self.bodies.items():
 			newBodyDict[key] = val.resurrect()
-		newSpace.add( newBodyDict.values() )
+		newSpace.add( [ eachVal for eachKey, eachVal in newBodyDict.items() if eachKey != self.boundaryId ] )
 		for eachShape in self.shapes:
 			newShape = eachShape.resurrect( newBodyDict )
 			newSpace.add( newShape )
