@@ -320,7 +320,7 @@ class Entity( pygame.sprite.DirtySprite ):
 			self.rect.topleft = self.body.position.x, self.body.position.y
 			#Behold, a cheap hack to fix circular objects physics and visuals not lining up.
 			if self.circular:
-				self.rect.topleft -= self.radius
+				self.rect.y -= self.radius
 
 		listOfGroups = self.groups()
 		if len( listOfGroups ) > 0:
