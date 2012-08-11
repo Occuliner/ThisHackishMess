@@ -143,7 +143,7 @@ class Entity( pygame.sprite.DirtySprite ):
 					self.shape = pymunk.Poly( self.body, map( pymunk.vec2d.Vec2d, [ (self.rect.w, 0), (self.rect.w, self.rect.h), (0, self.rect.h), (0, 0) ] ) )
 	
 			else:
-				self.shape = pymunk.Circle( self.body, self.radius, (0.0, -self.radius) )
+				self.shape = pymunk.Circle( self.body, self.radius )
 
 			self.physicsObjects.append( self.shape )
 			self.shape.sensor = not self.solid
@@ -307,7 +307,6 @@ class Entity( pygame.sprite.DirtySprite ):
 		
 
 	def update( self, dt ):
-		#I'm adding a new premise to the physics system, acceleration is reset at the end of each tick.
 		if self.animated:
 			self.frameTime -= dt
 			if self.frameTime <= 0:
@@ -319,6 +318,9 @@ class Entity( pygame.sprite.DirtySprite ):
 
 		if self.collidable:
 			self.rect.topleft = self.body.position.x, self.body.position.y
+			#Behold, a cheap hack to fix circular objects physics and visuals not lining up.
+			if self.circular:
+				self.rect.topleft -= self.radius
 
 		listOfGroups = self.groups()
 		if len( listOfGroups ) > 0:
