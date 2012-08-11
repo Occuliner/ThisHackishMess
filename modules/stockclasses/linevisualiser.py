@@ -65,7 +65,7 @@ class LineVisualiser:
 					
 					elif type( eachShape ) == pymunk.Circle:
 						bodyLoc = eachShape.body.position.x, eachShape.body.position.y
-						updateRects.extend( self.drawCircle( surface, eachShape.radius, [bodyLoc+eachShape.radius, bodyLoc+eachSHape.radius], dest=destPoint ) )
+						updateRects.extend( self.drawCircle( surface, eachShape.radius, [bodyLoc[0]+eachShape.radius, bodyLoc[1]+eachShape.radius], dest=destPoint ) )
 					else:
 						print "LineVisualiser doesn't render type: " + eachShape.__class__.__name__
 		#Empty self.devMenuLineGroups at the end of the frame.
