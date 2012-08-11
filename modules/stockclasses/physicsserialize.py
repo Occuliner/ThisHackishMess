@@ -99,6 +99,17 @@ class SegmentGhost( ShapeGhost ):
 		self.resurrectOntoGiven( newSegment )
 		return newSegment
 
+class CircleGhost( ShapeGhost ):
+	"""Ghost class for Pymunk's Circle class."""
+	def __init__( self, givenCircle ):
+		ShapeGhost.__init__( self, givenCircle )
+		self.radius  = givenSegment.radius
+	def resurrect( self, bodyDict ):
+		newBody = bodyDict[self.bodyId]
+		newCircle = pymunk.Circle( newBody, self.radius )
+		self.resurrectOntoGiven( newCircle )
+		return newCircle
+
 class SpaceGhost:
 	"""I can't believe I have a class called this."""
 	def __init__( self, givenSpace, boundaryBody ):
@@ -115,17 +126,21 @@ class SpaceGhost:
 				self.shapes.append( PolyGhost( eachShape ) )
 			elif type( eachShape ) == pymunk.Segment:
 				self.shapes.append( SegmentGhost( eachShape ) )
+			elif type( eachShape ) == pymunk.Circle:
+				self.shapes.append( CircleGhost( eachShape ) )
 			else:
 				print "SpaceGhost doesn't store type: " + eachShape.__class__.__name__,
-				print "Consider implementing a Ghost class for it."
+				print ". Consider implementing a Ghost class for it."
 		for eachShape in givenSpace.static_shapes:
 			if type( eachShape ) == pymunk.Poly:
 				self.staticShapes.append( PolyGhost( eachShape ) )
 			elif type( eachShape ) == pymunk.Segment:
 				self.staticShapes.append( SegmentGhost( eachShape ) )
+			elif type( eachShape ) == pymunk.Circle:
+				self.shape.append( CircleGhost( eachShape ) )
 			else:
 				print "SpaceGhost doesn't store type: " + eachShape.__class__.__name__,
-				print "Consider implementing a Ghost class for it."
+				print ". Consider implementing a Ghost class for it."
 	def resurrect( self ):
 		newSpace = pymunk.Space()
 		newSpace.gravity = self.gravity

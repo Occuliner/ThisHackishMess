@@ -71,7 +71,10 @@ class Entity( pygame.sprite.DirtySprite ):
 	colourKey = None
 	alpha = True
 	forceUseRect = False
-	def __init__( self, pos, vel, image=None, group=None, rect=None, animated=None, collidable=None, collideId=None, collideWith=None, mass=None, specialCollision=None, solid=None, pureSensor=None ):
+
+	circular = False
+	radius = 1
+	def __init__( self, pos, vel, image=None, group=None, rect=None, animated=None, collidable=None, collideId=None, collideWith=None, mass=None, specialCollision=None, solid=None, pureSensor=None, circular=None, radius=None ):
 		pygame.sprite.DirtySprite.__init__( self )
 		
 		#All of these are purely so that instances CAN have their own unique one of each of these variables, but if one isn't specified, it'll use its Class's one.
@@ -101,9 +104,16 @@ class Entity( pygame.sprite.DirtySprite ):
 			self.width = self.rect.w
 		if self.height is None:
 			self.height = self.rect.h
+		if circular is not None:
+			self.circular = circular
+		if radius is not None:
+			self.radius = radius
 
 		if self.collidable:
-			self.body = pymunk.Body( self.mass, 1e100 )
+			if not self.circular:
+				self.body = pymunk.Body( self.mass, 1e100 )
+			else:
+				self.body = pymunk.Body( self.mass, pymunk.moment_for_circle(self.mass, 0.0, self.radius ) )
 			#self.body.position = pymunk.vec2d.Vec2d( pos )
 			self.body.velocity_limit = 200
 			self.body.angular_velocity_limit = 0
@@ -115,19 +125,23 @@ class Entity( pygame.sprite.DirtySprite ):
 			width, height = self.rect.width, self.rect.height
 			self.physicsObjects = [self.body]
 
-			if self.bHeight is not None and self.bWidth is not None:
-				self.sensorBox = pymunk.Poly( self.body, map( pymunk.vec2d.Vec2d, [ (self.bWidth+self.bdx, 0+self.bdy), (self.bWidth+self.bdx, self.bHeight+self.bdy), (0+self.bdx, self.bHeight+self.bdy), (0+self.bdx, 0+self.bdy) ] ) )
-				self.sensorBox.sensor = True
-				self.sensorBox.collision_type = 2
-				self.sensorBox.entity = self
-				self.sensorId = id( self.sensorBox )
-				self.physicsObjects.append( self.sensorBox )
-			if self.wbHeight is not None and self.wbWidth is not None:
-				self.shape = pymunk.Poly( self.body, map( pymunk.vec2d.Vec2d, [ (self.wbWidth+self.wbdx, 0+self.wbdy), (self.wbWidth+self.wbdx, self.wbHeight+self.wbdy), (0+self.wbdx, self.wbHeight+self.wbdy), (0+self.wbdx, 0+self.wbdy) ] ) )
-			elif height is not None and width is not None:
-				self.shape = pymunk.Poly( self.body, map( pymunk.vec2d.Vec2d, [ (width, 0), (width, height), (0, height), (0, 0) ] ) )
+			if not self.circular:
+				if self.bHeight is not None and self.bWidth is not None:
+					self.sensorBox = pymunk.Poly( self.body, map( pymunk.vec2d.Vec2d, [ (self.bWidth+self.bdx, 0+self.bdy), (self.bWidth+self.bdx, self.bHeight+self.bdy), (0+self.bdx, self.bHeight+self.bdy), (0+self.bdx, 0+self.bdy) ] ) )
+					self.sensorBox.sensor = True
+					self.sensorBox.collision_type = 2
+					self.sensorBox.entity = self
+					self.sensorId = id( self.sensorBox )
+					self.physicsObjects.append( self.sensorBox )
+				if self.wbHeight is not None and self.wbWidth is not None:
+					self.shape = pymunk.Poly( self.body, map( pymunk.vec2d.Vec2d, [ (self.wbWidth+self.wbdx, 0+self.wbdy), (self.wbWidth+self.wbdx, self.wbHeight+self.wbdy), (0+self.wbdx, self.wbHeight+self.wbdy), (0+self.wbdx, 0+self.wbdy) ] ) )
+				elif height is not None and width is not None:
+					self.shape = pymunk.Poly( self.body, map( pymunk.vec2d.Vec2d, [ (width, 0), (width, height), (0, height), (0, 0) ] ) )
+				else:
+					self.shape = pymunk.Poly( self.body, map( pymunk.vec2d.Vec2d, [ (self.rect.w, 0), (self.rect.w, self.rect.h), (0, self.rect.h), (0, 0) ] ) )
+	
 			else:
-				self.shape = pymunk.Poly( self.body, map( pymunk.vec2d.Vec2d, [ (self.rect.w, 0), (self.rect.w, self.rect.h), (0, self.rect.h), (0, 0) ] ) )
+				self.shape = pymunk.Circle( self.body, self.radius )
 			self.physicsObjects.append( self.shape )
 			self.shape.sensor = not self.solid
 			self.shape.elasticity = 0.0
