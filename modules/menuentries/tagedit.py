@@ -81,6 +81,7 @@ class TagButton( Button ):
 			self.parentState.curTag = None
 			self.selected = False
 			self.renderImage()
+			self.parentState.curEnt.tags = self.parentState.getDictionaryFromTags()
 		else:
 			self.parentState.curTag = self
 			self.selected = True
@@ -202,7 +203,7 @@ class TagEditState( MenuState ):
 			if self.curTag.text != oldText:
 				self.curTag.createText()
 		else:
-			if self.curEnt is not None:
-				self.curEnt.tags = self.getDictionaryFromTags()
+			#if self.curEnt is not None:
+			#	self.curEnt.tags = self.getDictionaryFromTags()
 			#Clear keyboard input if no tag selected.
 			self.getKeyboardInput()
