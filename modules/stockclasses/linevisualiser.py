@@ -41,6 +41,11 @@ class LineVisualiser:
 				updateRects.append( pygame.draw.rect( surface, pointColour, pygame.Rect( eachPoint[0]-2, eachPoint[1]-2, 4, 4 ) ) )
 		return updateRects
 
+	def drawCircle( self, surface, radius, center, lineColour=red, dest=(0, 0) ):
+		updateRects = []
+		updateRects.append( pygame.draw.circle(surface, lineColour, [center[0]+dest[0], center[1]+dest[1]], radius, width=1 ) )
+		return updateRects
+
 	def draw( self, surface, destPoint=(0, 0) ):
 		updateRects = []
 		if self.renderLines:
@@ -57,6 +62,10 @@ class LineVisualiser:
 					elif type( eachShape ) == pymunk.Segment:
 						#updateRects.append( pygame.draw.line( surface, red, eachShape.a, eachShape.b ) )
 						updateRects.extend( self.drawLinesWithPoints( surface, [ eachShape.a, eachShape.b ], True, dest=destPoint ) )
+					
+					elif type( eachShape ) == pymunk.Circle:
+						bodyLoc = eachShape.body.position.x, eachShape.body.position.y
+						updateRects.extend( self.drawCircle( surface, eachShape.radius, [bodyLoc+eachShape.radius, bodyLoc+eachSHape.radius], dest=destPoint ) )
 					else:
 						print "LineVisualiser doesn't render type: " + eachShape.__class__.__name__
 		#Empty self.devMenuLineGroups at the end of the frame.
