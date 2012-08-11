@@ -43,7 +43,7 @@ class LineVisualiser:
 
 	def drawCircle( self, surface, radius, center, lineColour=red, dest=(0, 0) ):
 		updateRects = []
-		updateRects.append( pygame.draw.circle(surface, lineColour, [center[0]+dest[0], center[1]+dest[1]], radius, width=1 ) )
+		updateRects.append( pygame.draw.circle(surface, lineColour, [center[0]+dest[0], center[1]+dest[1]], radius, 1) )
 		return updateRects
 
 	def draw( self, surface, destPoint=(0, 0) ):
