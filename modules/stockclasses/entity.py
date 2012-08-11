@@ -143,8 +143,7 @@ class Entity( pygame.sprite.DirtySprite ):
 					self.shape = pymunk.Poly( self.body, map( pymunk.vec2d.Vec2d, [ (self.rect.w, 0), (self.rect.w, self.rect.h), (0, self.rect.h), (0, 0) ] ) )
 	
 			else:
-				self.shape = pymunk.Circle( self.body, self.radius )
-				self.offset = -self.radius
+				self.shape = pymunk.Circle( self.body, self.radius, (radius, radius) )
 
 			self.physicsObjects.append( self.shape )
 			self.shape.sensor = not self.solid
