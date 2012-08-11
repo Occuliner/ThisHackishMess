@@ -125,14 +125,16 @@ class Entity( pygame.sprite.DirtySprite ):
 			width, height = self.rect.width, self.rect.height
 			self.physicsObjects = [self.body]
 
-			if not self.circular:
-				if self.bHeight is not None and self.bWidth is not None:
+
+			if self.bHeight is not None and self.bWidth is not None:
 					self.sensorBox = pymunk.Poly( self.body, map( pymunk.vec2d.Vec2d, [ (self.bWidth+self.bdx, 0+self.bdy), (self.bWidth+self.bdx, self.bHeight+self.bdy), (0+self.bdx, self.bHeight+self.bdy), (0+self.bdx, 0+self.bdy) ] ) )
 					self.sensorBox.sensor = True
 					self.sensorBox.collision_type = 2
 					self.sensorBox.entity = self
 					self.sensorId = id( self.sensorBox )
 					self.physicsObjects.append( self.sensorBox )
+
+			if not self.circular:
 				if self.wbHeight is not None and self.wbWidth is not None:
 					self.shape = pymunk.Poly( self.body, map( pymunk.vec2d.Vec2d, [ (self.wbWidth+self.wbdx, 0+self.wbdy), (self.wbWidth+self.wbdx, self.wbHeight+self.wbdy), (0+self.wbdx, self.wbHeight+self.wbdy), (0+self.wbdx, 0+self.wbdy) ] ) )
 				elif height is not None and width is not None:
@@ -142,6 +144,8 @@ class Entity( pygame.sprite.DirtySprite ):
 	
 			else:
 				self.shape = pymunk.Circle( self.body, self.radius )
+				self.offset = -self.radius
+
 			self.physicsObjects.append( self.shape )
 			self.shape.sensor = not self.solid
 			self.shape.elasticity = 0.0
