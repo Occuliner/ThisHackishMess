@@ -103,7 +103,7 @@ class CircleGhost( ShapeGhost ):
 	"""Ghost class for Pymunk's Circle class."""
 	def __init__( self, givenCircle ):
 		ShapeGhost.__init__( self, givenCircle )
-		self.radius  = givenSegment.radius
+		self.radius  = givenCircle.radius
 	def resurrect( self, bodyDict ):
 		newBody = bodyDict[self.bodyId]
 		newCircle = pymunk.Circle( newBody, self.radius )
