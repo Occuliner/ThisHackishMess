@@ -61,19 +61,36 @@ def idleCentricVelocityUpdate( body, gravity, damping, dt ):
 		pymunk.Body.update_velocity( body, gravity, 1.0, dt )
 
 class Entity( pygame.sprite.DirtySprite ):
-
+	
+	#If this is true on an entity, then the Entity cannot be removed from the Entity Edit Menu.
 	notDirectlyRemovable = False
+	
 	mass = 1
+	
 	#Width and Height are for the frames, bWidth and bHeight for sensor boxes, wbWidth and wbHeight for "physics" boxes.
 	width, height, bWidth, bHeight, wbWidth, wbHeight = None, None, None, None, None, None
 	bdx, bdy = 0, 0
+
+	#If something is only a sensor, ie, can ghost through objects.
 	pureSensor = False
+
+	#The scale of the sprite's sheet from it's default file.
 	scale = 1
+
+	#RGB colourKey. Look it up on Pygame.
 	colourKey = None
+
+	#Whether the sprite uses per-pixel alpha
 	alpha = True
+	
+	#Force Use Rect tells the EntityEdit menu to use the frame size for grabbing an image from the spritesheet to display, rather than BoundingBox or WalkBox, which the menu will generally prefer.
 	forceUseRect = False
+
 	#FrameRects are all the rect areas to cut for frames, in index order, if left as none, it auto-slices.
 	frameRects = None
+
+	#Frame Positions are the x-position and y-position of the each frame relative to the physics body, (0,0) is the uppleft corner is positioned on body location, this is the default and typical state.
+	framePositions = {}
 
 	circular = False
 	radius = 1
@@ -328,7 +345,8 @@ class Entity( pygame.sprite.DirtySprite ):
 		self.rect.y -= self.oldPan[1]
 
 		if self.collidable:
-			self.rect.topleft = self.body.position.x, self.body.position.y
+			framePosition = self.framePositions.get( self.frame, (0,0) )
+			self.rect.topleft = self.body.position.x+framePosition[0], self.body.position.y+framePosition[1]
 			#Behold, a cheap hack to fix circular objects physics and visuals not lining up.
 			if self.circular:
 				self.rect.y -= self.height/2

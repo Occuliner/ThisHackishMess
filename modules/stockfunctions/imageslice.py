@@ -50,7 +50,7 @@ def sliceImage( surface, tmpRect, start=0, finish=None, colourKey=None ):
 			frames.append( tmpSurface )
 			indexCount += 1
 
-	for y in xrange( startingY+rect.h, min( surface.get_height(), finishingY ), rect.h ):
+	for y in xrange( int( startingY+rect.h ), min( surface.get_height(), finishingY ), rect.h ):
 		if y + rect.h <= surface.get_height():
 			for x in xrange( 0, surface.get_width(), rect.w ):
 				if indexCount > finish-start:
