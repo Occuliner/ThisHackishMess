@@ -21,6 +21,7 @@ import pygame, pymunk
 
 #from maskcompare import *
 from imageload import loadImage, loadImageNoAlpha
+from imageslice import sliceImage
 
 class EntityGroup( pygame.sprite.LayeredDirty ):
 	def __init__( self, name="Unnamed" ):
@@ -71,6 +72,8 @@ class Entity( pygame.sprite.DirtySprite ):
 	colourKey = None
 	alpha = True
 	forceUseRect = False
+	#FrameRects are all the rect areas to cut for frames, in index order, if left as none, it auto-slices.
+	frameRects = None
 
 	circular = False
 	radius = 1
@@ -233,18 +236,26 @@ class Entity( pygame.sprite.DirtySprite ):
 
 	def createFrames( self ):
 		#if self.animated:
-		tmpRect = self.rect.copy()
-		tmpRect.topleft = ( 0, 0 )
-		for y in xrange( 0, self.sheet.get_height(), self.rect.h ):
-			if y + self.height <= self.sheet.get_height():
-				for x in xrange( 0, self.sheet.get_width(), self.rect.w ):
-					if x + self.width <= self.sheet.get_width():
-						tmpRect.topleft = (x, y)
-						tmpSurface = self.sheet.subsurface( tmpRect )
-						tmpSurface.set_colorkey( self.colourKey )
-						self.frames.append( tmpSurface )
-		if len( self.frames ) is 0:
-			self.frames = [self.sheet]
+		if self.frameRects is None:
+			tmpRect = self.rect.copy()
+			tmpRect.topleft = ( 0, 0 )
+			#for y in xrange( 0, self.sheet.get_height(), self.rect.h ):
+			#	if y + self.height <= self.sheet.get_height():
+			#		for x in xrange( 0, self.sheet.get_width(), self.rect.w ):
+			#			if x + self.width <= self.sheet.get_width():
+			#				tmpRect.topleft = (x, y)
+			#				tmpSurface = self.sheet.subsurface( tmpRect )
+			#				tmpSurface.set_colorkey( self.colourKey )
+			#				self.frames.append( tmpSurface )
+			self.frames = sliceImage( self.sheet, tmpRect, colourKey=self.colourKey )
+			if len( self.frames ) is 0:
+				self.frames = [self.sheet]
+		else:
+			for eachFrame in self.frameRects:
+				img = self.sheet.subsurface( eachFrame )
+				img.set_colorkey( self.colourKey )
+				self.frames.append( img )
+		
 
 	def setVisible( self, theBool ):
 		if theBool:
