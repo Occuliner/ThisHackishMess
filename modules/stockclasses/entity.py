@@ -285,6 +285,7 @@ class Entity( pygame.sprite.DirtySprite ):
 		if self.frame > len(self.curAnimation['frames']) - 1:
 			self.frame = 0
 		self.image = self.frames[ self.curAnimation['frames'][self.frame] ]
+		self.frameTime = self.maxFrameTime
 
 	def changeAnimation( self, name ):
 		newAnim = self.animations[name]
@@ -294,6 +295,7 @@ class Entity( pygame.sprite.DirtySprite ):
 		self.maxFrameTime = 1.000/self.curAnimation['fps']
 		self.frame = -1
 		self.nextFrame()
+		
 
 	#This function changes to a new animation, but keeps the same PERCENTAGE completion of animation, (eg, if one animation playing and is half way through, a swapped in animation will start at halfway )
 	def swapAnimation( self, name ):
@@ -339,7 +341,7 @@ class Entity( pygame.sprite.DirtySprite ):
 			self.frameTime -= dt
 			if self.frameTime <= 0:
 				self.nextFrame()
-				self.frameTime = self.maxFrameTime
+				#self.frameTime = self.maxFrameTime
 		
 		self.rect.x -= self.oldPan[0]
 		self.rect.y -= self.oldPan[1]
