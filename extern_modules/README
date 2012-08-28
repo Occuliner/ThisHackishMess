@@ -1,0 +1,6 @@
+This folder is for copies of external modules that ThisHackishMess comes with.
+
+Currently, this includes:
+	-asyncore
+	-importlib backport
+	-pygnetic
