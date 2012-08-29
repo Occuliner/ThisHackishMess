@@ -17,6 +17,8 @@
 
 import extern_modules.pygnetic as pygnetic
 
+pygnetic.init( logging_lvl=None )
+
 #Register all the messages types in this file, to make sure they're in the correct order for both client and host.
 
 #This message is sent on connect, and is more or less just a way for a client to express interest in joining.
@@ -51,9 +53,6 @@ pygnetic.register( 'changeAnim', ('id', 'newAnimation') )
 
 #This message is to send that a certain entity is swapping animation.
 pygnetic.register( 'swapAnim', ('id', 'newAnimation') )
-
-#This message is sent to buffer a certain sound.
-pygnetic.register( 'loadSound', ('soundfilename', 'priority') )
 
 #This message is sent to play a certain sound.
 pygnetic.register( 'playSound', ('soundname' ) )
