@@ -45,19 +45,3 @@ class MasterEntitySet:
 			self.addEnt( eachClass )
 			self.entsToLoad.remove( eachClass )
 
-	#entsToLoad = []
-	
-	#def __init__( self ):
-	#	self.individualSets = {}
-	#	self.ents = []
-
-	#def addEnt( self, ent ):
-	#	selection = range( len( self.ents ), len( entSet.tiles) + len( self.ents ) - 1 )
-	#	self.individualSets[ entSet.name ] = selection
-	#	self.ents.extend( entSet.ents )
-
-	#def updateSets( self ):
-	#	for eachClass in self.entsToLoad:
-	#		self.addEnt( eachClass )
-	#		self.entsToLoad.remove( eachClass )
-	#		#print "Yay"

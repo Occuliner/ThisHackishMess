@@ -17,8 +17,6 @@
 
 import pygame, pymunk, sys, gc
 #from pygame.locals import *
-from booleangrid import BooleanGrid
-from collisionstate import CollisionState
 from linevisualiser import LineVisualiser
 from soundmanager import SoundManager
 
@@ -148,22 +146,17 @@ class PlayState:
 				eachElement.sendInput( self.curInputDict )
 		self.curInputDict = {}
 		
-		#for eachGroup in self.groups:
-		#	eachGroup.readyAccel( dt )
 		
 		self.space.step( 1.0/60.0 )
 		for eachTriplet in self.postStepQueue:
 			eachTriplet[0]( eachTriplet[1], eachTriplet[2] )
 		self.postStepQueue = []
-		#self.collideSystem( dt )
 		
 		for eachGroup in self.groups:
 			eachGroup.update( dt )
 
 		for eachElement in self.hudList:
 			eachElement.update( dt )
-		#self.collideSystem( dt )
-		#print 1.0000/dt, len( self.sprites() )
 			
 		
 
@@ -174,10 +167,8 @@ class PlayState:
 
 	def sprites( self ):
 		"""Returns a list of all the sprites in all the entity groups in the PlayState."""
-		#sumList = set([])
 		sumList = []
 		for eachSpriteList in [ someGroup.sprites() for someGroup in self.groups ]:
-			#sumList = sumList.union( eachSpriteList )
 			sumList.extend( eachSpriteList )
 		return sumList
 

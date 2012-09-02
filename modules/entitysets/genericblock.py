@@ -21,8 +21,6 @@ from pygame.locals import *
 
 from masterentityset import *
 
-from maskfromimage import *
-
 import math
 
 class GenericBlock( Entity ):
@@ -44,32 +42,15 @@ class GenericBlock( Entity ):
 	sheetFileName = "block.png"
 	sheet = loadImage( sheetFileName, scale )
 
-	collideMaskMaster = booleanGridFromAlpha( sheet )
 	specialCollision = None
-	collideId = 2
-	collideWith = set([1,2])
-	collideByPixels = False
 	collidable = True
 	solid = True
 	mass = 20
 	
 	def __init__( self, pos = [0,0], vel = [0,0], group=None ):
 		Entity.__init__( self, pos, [0,0], None, group, pygame.Rect( 0, 0, self.width, self.height ), animated=False )
-		#self.time = 0
-		#self.idleDeceleration = 1000
 	
 	def update( self, dt ):
-		#self.acceleration[0] = -2000
-		#print self.idleDeceleration		
-		#if self.acceleration[0] != 0.0 or self.acceleration[1] != 0.0:
-		#	print self.acceleration
-		#self.body.velocity.x = 0
 		Entity.update( self, dt )
-		#self.time = 0
-		#self.time += dt
-		#print self.velocity, self.acceleration
-		#self.velocity[0] = 500*math.sin( self.time*math.pi )
-		#self.velocity[1] = 500*math.cos( self.time*math.pi )
-		
 
 MasterEntitySet.entsToLoad.append( GenericBlock )

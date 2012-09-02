@@ -21,8 +21,6 @@ from pygame.locals import *
 from tint import tint
 
 from masterentityset import *
-
-from maskfromimage import *
 	
 class KickUp( Entity ):
 	width = 16
@@ -30,10 +28,6 @@ class KickUp( Entity ):
 	sheetFileName = "kickup.png"
 	sheet = loadImage( sheetFileName, 2 )
 
-	collideMaskMaster = booleanGridFromAlpha( sheet )
-	collideId = 0
-	collideWith = set([])
-	collideByPixels = False
 	collidable = False
 	solid = False
 
@@ -104,10 +98,6 @@ class YasbClass( Entity ):
 	wbdx = 2
 	wbdy = 20
 
-	collideMaskMaster = booleanGridFromAlpha( sheet )
-	collideId = 1
-	collideWith = set([1,2])
-	collideByPixels = False
 	collidable = True
 	mass = 70
 	specialCollision = None
@@ -118,8 +108,8 @@ class YasbClass( Entity ):
 		
 		#self.acceleration[1] = 384
 		
-		#self.randomSound = group.playState.soundManager.getSound( "sfx_step_grass-CCBY.wav", 0 )
-		#self.randomSound.set_volume( 0.5 )
+		self.randomSound = group.playState.soundManager.getSound( "sfx_step_grass-CCBY.wav", 0 )
+		self.randomSound.set_volume( 0.5 )
 		
 		self.stepsPlaying = False
 		self.stepsId = None
