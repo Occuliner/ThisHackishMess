@@ -21,8 +21,6 @@ from pygame.locals import *
 
 from masterentityset import *
 
-from maskfromimage import *
-
 import math
 
 class Anvil( Entity ):
@@ -35,11 +33,7 @@ class Anvil( Entity ):
 	sheetFileName = "anvil.png"
 	sheet = loadImage( sheetFileName, 2 )
 
-	collideMaskMaster = booleanGridFromAlpha( sheet )
 	specialCollision = None
-	collideId = 2
-	collideWith = set([1,2])
-	collideByPixels = False
 	collidable = True
 	solid = True
 	mass = 2000000000
@@ -47,17 +41,9 @@ class Anvil( Entity ):
 	
 	def __init__( self, pos = [0,0], vel = [0,0], group=None ):
 		Entity.__init__( self, pos, [0,0], None, group, pygame.Rect( 0, 0, self.width, self.height ), animated=False )
-		self.time = 0
-		#self.idleDeceleration = 1000
 	
 	def update( self, dt ):
 		Entity.update( self, dt )
-		self.time += dt
-		#self.velocity[0] = 3000
-		#self.velocity[0] += 3000*dt
-		#print self.velocity, self.acceleration
-		#self.velocity[0] = 1000*math.sin( self.time*math.pi )
-		#self.velocity[1] = 1000*math.cos( self.time*math.pi )
 		
 
 MasterEntitySet.entsToLoad.append( Anvil )

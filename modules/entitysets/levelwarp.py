@@ -21,8 +21,6 @@ from pygame.locals import *
 
 from masterentityset import *
 
-from maskfromimage import *
-
 from picklestuff import *
 
 def levelWarpFunc( givenWarp, givenObject ):
@@ -70,11 +68,7 @@ class LevelWarp( Entity ):
 	sheetFileName = "block.png"
 	sheet = loadImage( sheetFileName, scale )
 
-	collideMaskMaster = booleanGridFromAlpha( sheet )
 	specialCollision = queueLoad
-	collideId = 2
-	collideWith = set([1])
-	collideByPixels = False
 	collidable = True
 	solid = False
 	mass = 20
