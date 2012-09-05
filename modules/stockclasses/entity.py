@@ -32,14 +32,26 @@ class EntityGroup( pygame.sprite.LayeredDirty ):
 		for sprite in sprites:
 			#if hasattr( sprite, "shape" ):
 			if sprite.collidable:
-				if hasattr( sprite, "sensorBox" ):
-					if sprite.sensorBox not in self.playState.space.shapes:
-						self.playState.space.add( sprite.sensorBox )
-				if sprite.shape not in self.playState.space.shapes:
-					self.playState.space.add( sprite.shape )
-				if sprite.body not in self.playState.space.bodies:
-					self.playState.space.add( sprite.body )
+				#if hasattr( sprite, "sensorBox" ):
+				#	if sprite.sensorBox not in self.playState.space.shapes:
+				#		self.playState.space.add( sprite.sensorBox )
+				#if sprite.shape not in self.playState.space.shapes:
+				#	self.playState.space.add( sprite.shape )
+				#if sprite.body not in self.playState.space.bodies:
+				#	self.playState.space.add( sprite.body )
+				self.playState.space.add( sprite.physicsObjects )
+			sprite.id = self.playState.idSource.getId()
+			
 		pygame.sprite.LayeredDirty.add( self, sprites, kwargs )
+		
+
+	def remove( self, *sprites, **kwargs ):
+		for sprite in sprites:
+			if sprite.collidable:
+				self.playState.space.remove( sprite.physicsObjects )
+			sprite.id = None
+			
+		pygame.sprite.LayeredDirty.remove( self, sprites, kwargs )
 
 	def update( self, dt ):
 		for each in iter( self ):
@@ -201,12 +213,11 @@ class Entity( pygame.sprite.DirtySprite ):
 		self.visible = 1
 		self.dirty = 2
 		
+		
 		if group != None:
-			self.id = len( group )
 			self.addToGroup( group )
 		else:
 			self.id = None
-
 		self.tags = {}
 		self.children = []
 		self.classUpdated = False
@@ -214,6 +225,7 @@ class Entity( pygame.sprite.DirtySprite ):
 		self.oldPan = group.playState.panX, group.playState.panY
 
 	def addToGroup( self, *groups ):
+		self.id = groups[0].playState.idSource.getId()
 		if self.collidable:
 			for group in groups:
 				group.playState.space.add( self.physicsObjects )
@@ -227,6 +239,7 @@ class Entity( pygame.sprite.DirtySprite ):
 		pygame.sprite.DirtySprite.add( self, groups )
 
 	def removeFromGroup( self, *groups ):
+		self.id = None
 		if self.collidable:
 			for group in groups:
 				group.playState.space.remove( self.physicsObjects )

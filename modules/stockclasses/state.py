@@ -19,6 +19,7 @@ import pygame, pymunk, sys, gc
 #from pygame.locals import *
 from linevisualiser import LineVisualiser
 from soundmanager import SoundManager
+from idsource import IdSource
 
 """This module defines the PlayState class."""
 
@@ -81,7 +82,11 @@ class PlayState:
 
 		self.hardBlockInput = False
 
+		#These to variables are the displacement from the state's (0,0) and the screen's (0,0), so they can be used for panning.
 		self.panX, self.panY = 0, 0
+
+		#This is the idSource, I use it for give ids to Entitys.
+		self.idSource = IdSource()
 
 	def addBoundary( self, point1, point2 ):
 		newSeg = pymunk.Segment( self.boundaryBody, point1, point2, 1 )
