@@ -32,13 +32,14 @@ class EntityGroup( pygame.sprite.LayeredDirty ):
 		for sprite in sprites:
 			#if hasattr( sprite, "shape" ):
 			if sprite.collidable:
-				if hasattr( sprite, "sensorBox" ):
-					if sprite.sensorBox not in self.playState.space.shapes:
-						self.playState.space.add( sprite.sensorBox )
-				if sprite.shape not in self.playState.space.shapes:
-					self.playState.space.add( sprite.shape )
-				if sprite.body not in self.playState.space.bodies:
-					self.playState.space.add( sprite.body )
+				#if hasattr( sprite, "sensorBox" ):
+				#	if sprite.sensorBox not in self.playState.space.shapes:
+				#		self.playState.space.add( sprite.sensorBox )
+				#if sprite.shape not in self.playState.space.shapes:
+				#	self.playState.space.add( sprite.shape )
+				#if sprite.body not in self.playState.space.bodies:
+				#	self.playState.space.add( sprite.body )
+				self.playState.space.add( sprite.physicsObjects )
 		pygame.sprite.LayeredDirty.add( self, sprites, kwargs )
 
 	def update( self, dt ):
