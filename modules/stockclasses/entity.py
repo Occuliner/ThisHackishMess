@@ -79,6 +79,9 @@ class Entity( pygame.sprite.DirtySprite ):
 	
 	mass = 1
 	
+	#Set this just so that everything has a sheetFileName attr, really each class should specify its own one.
+	sheetFileName = None
+
 	#Width and Height are for the frames, bWidth and bHeight for sensor boxes, wbWidth and wbHeight for "physics" boxes.
 	width, height, bWidth, bHeight, wbWidth, wbHeight = None, None, None, None, None, None
 	bdx, bdy = 0, 0
@@ -159,12 +162,12 @@ class Entity( pygame.sprite.DirtySprite ):
 
 
 			if self.bHeight is not None and self.bWidth is not None:
-					self.sensorBox = pymunk.Poly( self.body, map( pymunk.vec2d.Vec2d, [ (self.bWidth+self.bdx, 0+self.bdy), (self.bWidth+self.bdx, self.bHeight+self.bdy), (0+self.bdx, self.bHeight+self.bdy), (0+self.bdx, 0+self.bdy) ] ) )
-					self.sensorBox.sensor = True
-					self.sensorBox.collision_type = 2
-					self.sensorBox.entity = self
-					self.sensorId = id( self.sensorBox )
-					self.physicsObjects.append( self.sensorBox )
+				self.sensorBox = pymunk.Poly( self.body, map( pymunk.vec2d.Vec2d, [ (self.bWidth+self.bdx, 0+self.bdy), (self.bWidth+self.bdx, self.bHeight+self.bdy), (0+self.bdx, self.bHeight+self.bdy), (0+self.bdx, 0+self.bdy) ] ) )
+				self.sensorBox.sensor = True
+				self.sensorBox.collision_type = 2
+				self.sensorBox.entity = self
+				self.sensorId = id( self.sensorBox )
+				self.physicsObjects.append( self.sensorBox )
 
 			if not self.circular:
 				if self.wbHeight is not None and self.wbWidth is not None:
@@ -336,12 +339,7 @@ class Entity( pygame.sprite.DirtySprite ):
 		signX = cmp( self.acceleration[0], 0 )
 		signY = cmp( self.acceleration[1], 0 )
 		return ( self.acceleration[0] - signX*self.idleDeceleration, self.acceleration[1] - signY*self.idleDeceleration )
-	
-	def readyAccel( self, dt ):
-		"""
-		This method is a dummy method to be replaced by child classes.
-		Basically you call this for things that ONLY effect acceleration, before everything else in the frame starts."""
-		pass
+
 
 	def kill( self ):
 		if self.collidable:
