@@ -30,6 +30,6 @@ class PureSensor( Entity ):
 	sheet.fill( pygame.Color( 0, 0, 0, 0 ) )
 	sheetFileName = None
 	notDirectlyRemovable = True
-	def __init__( self, pos=[0,0], vel=[0,0], group=None, width=0, height=0 ):
-		Entity.__init__( self, pos, [0,0], None, group, pygame.Rect( 0, 0, width, height ), animated=False )
+	def __init__( self, pos=[0,0], vel=[0,0], group=None, width=0, height=0, **kwargs ):
+		Entity.__init__( self, pos, [0,0], None, group, pygame.Rect( 0, 0, width, height ), animated=False, **kwargs )
 		self.visible = 0

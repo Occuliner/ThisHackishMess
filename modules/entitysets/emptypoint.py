@@ -33,8 +33,8 @@ class EmptyPoint( Entity ):
 	sheet.fill( pygame.Color( 0, 0, 0, 0 ) )
 	sheetFileName = None
 	pygame.draw.rect( sheet, pygame.Color( 255, 0, 0, 255 ), pygame.Rect( 0, 0, width, height ), 2 )
-	def __init__( self, pos=[0,0], vel=[0,0], group=None ):
-		Entity.__init__( self, pos, [0,0], None, group, pygame.Rect( 0, 0, self.width, self.height ), animated=False )
+	def __init__( self, pos=[0,0], vel=[0,0], group=None, **kwargs ):
+		Entity.__init__( self, pos, [0,0], None, group, pygame.Rect( 0, 0, self.width, self.height ), animated=False, **kwargs )
 		self.visible = 0
 
 MasterEntitySet.entsToLoad.append( EmptyPoint )

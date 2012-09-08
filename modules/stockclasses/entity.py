@@ -86,8 +86,11 @@ class Entity( pygame.sprite.DirtySprite ):
 	width, height, bWidth, bHeight, wbWidth, wbHeight = None, None, None, None, None, None
 	bdx, bdy = 0, 0
 
-	#If something is only a sensor, ie, can ghost through objects.
+	#If something is only a sensor with no visual appearance.
 	pureSensor = False
+
+	#If something is only ever gong to a sensor, but can be visual.
+	neverCollides = False
 
 	#The scale of the sprite's sheet from it's default file.
 	scale = 1
@@ -149,7 +152,6 @@ class Entity( pygame.sprite.DirtySprite ):
 				self.body = pymunk.Body( self.mass, 1e100 )
 			else:
 				self.body = pymunk.Body( self.mass, pymunk.moment_for_circle(self.mass, 0.0, self.radius ) )
-			#self.body.position = pymunk.vec2d.Vec2d( pos )
 			self.body.velocity_limit = 200
 			self.body.angular_velocity_limit = 0
 			self.velocity_func = idleCentricVelocityUpdate
