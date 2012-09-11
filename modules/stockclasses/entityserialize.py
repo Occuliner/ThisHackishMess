@@ -80,7 +80,7 @@ class EntityGhost:
 		## CHILDREN STUFF
 
 		#Get the childrens' ids.
-		self.childrenIds = [ id( each ) for each in theEntity.children ]
+		self.childrenIds = [ each.id for each in theEntity.children ]
 
 
 		## INSTANCE SPECIFIC 
