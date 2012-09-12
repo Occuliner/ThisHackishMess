@@ -30,6 +30,12 @@ class PureSensor( Entity ):
 	sheet.fill( pygame.Color( 0, 0, 0, 0 ) )
 	sheetFileName = None
 	notDirectlyRemovable = True
+
+	instanceSpecificVars = None
 	def __init__( self, pos=[0,0], vel=[0,0], group=None, width=0, height=0, **kwargs ):
 		Entity.__init__( self, pos, [0,0], None, group, pygame.Rect( 0, 0, width, height ), animated=False, **kwargs )
 		self.visible = 0
+		if PureSensor.instanceSpecificVars is None:
+			attrList = list( self.__dict__.keys() )
+		if PureSensor.instanceSpecificVars is None:
+			PureSensor.instanceSpecificVars = dict( [ ( eachKey, eachVal ) for eachKey, eachVal in self.__dict__.items() if eachKey not in attrList ] )

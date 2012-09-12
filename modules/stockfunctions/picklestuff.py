@@ -15,14 +15,22 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import cPickle, os, pygame, zlib, gzip
+import cPickle, os, pygame, zlib, gzip, collections
 #import msgpack
 
 from imageload import loadImage, loadImageNoAlpha
 
+from entityserialize import EntityGhost
+
+from state import PlayState
+
 #This code is haunted by a SpaceGhost! D:
 from physicsserialize import SpaceGhost
 from linevisualiser import LineVisualiser
+
+StateStoreTuple = collections.namedtuple( "StateStoreTuple", [ "entityGhostList", "floorImageBuffer", "soundManager", "hudElements" ] )
+
+ImageBuffer = collections.namedtuple( "ImageBuffer", [ "size", "stringBuffer" ] )
 
 def writeObjectToFile( obj, fileName ):
 	destFile = gzip.open( fileName, 'wb' )
@@ -43,47 +51,49 @@ def loadObjectFromFile( fileName ):
 	
 
 def dumpPlayState( givenState, fileName ):
-	
-	#Remove all Surfaces from the playState, for ents, remove them and use the sheetFileName property to reload it later.
-	#For the Floor, convert it to a stringbuffer, and make it a property of the floor, and reload it later.
-
-	for eachSprite in givenState.sprites():
-		#Create EntityGhosts.
-		
-
 	#Create a compressed stringbuffer of the levels floor image.
 	floorImageStringBuffer = zlib.compress( pygame.image.tostring( givenState.floor.image, "RGB" ) )
+	#Store it
+	floorImageBuffer = ImageBuffer( givenState.floor.size, floorImageStringBuffer )
 
 
-	
-	print "Need some sort of sound saving."
-
-	print "HudElemnts still need serialization."
-	
-	writeObjectToFile( givenState, fileName )
-
-def loadPlayState( fileName, curTileSet ):
-	givenState = loadObjectFromFile( fileName )
-	if givenState is None:
-		print "Map: " + fileName + " does not appear to exist."
-		return None
-	givenState.forceUpdateEverything = True
-	givenState.floor.tileSet = curTileSet
-
-	
-
-	#Create SPACE!
-	givenState.space.add_collision_handler( 1, 2, givenState.speshulCaller )
-	givenState.space.add_collision_handler( 2, 2, givenState.speshulCaller )
-
-	#Create a boundary body and create the boundaries.
-
-	givenState.lineVisualiser = LineVisualiser( givenState )
+	#Create the StateStoreTuple, this will store all the data, and be serialized.
+	stateTuple = StateStoreTuple( [], floorImageBuffer, None, [] )
 
 	for eachSprite in givenState.sprites():
-		#Create entitys.
+		#Create EntityGhost.
+		ghost = EntityGhost( eachSprite )
+		#Add the the ghost list.
+		stateTuple.entityGhostList.append( ghost )
+		
+	print "Need some sort of sound saving."
 
-	givenState.floor.image = pygame.image.fromstring( zlib.decompress( imageStringBuffer ), givenState.floor.size, "RGB" ).convert()
+	print "HudElements still need serialization."
+	
+	writeObjectToFile( stateTuple, fileName )
+
+def loadPlayState( fileName, curTileSet, classDefs ):
+	#Create a new playState
+	givenState = PlayState()
+
+	#Give it the newer tileSet.
+	givenState.floor.tileSet = curTileSet
+
+	#Get the StateStoreTuple.
+	stateTuple = loadObjectFromFile( fileName )
+	if stateTuple is None:
+		print "No map called: " + fileName + " in the data/maps folder."
+		return None
+
+	#Generate class dict.
+	classDefsDict = dict( [ ( eachClass.__name__, eachClass ) for eachClass in classDefs ] )
+
+	#Add all ze entities.
+	for eachGhost in stateTuple.entityGhostList:
+		eachGhost.resurrect( classDefsDict, givenState )
+
+	#Replace the floorImage
+	givenState.floor.image = pygame.image.fromstring( zlib.decompress( stateTuple.floorImageBuffer.stringBuffer ), stateTuple.floorImageBuffer.size, "RGB" ).convert()
 
 	return givenState
 		

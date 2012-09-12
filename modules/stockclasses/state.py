@@ -52,6 +52,7 @@ class PlayState:
 
 		self.spaceGhost = None
 		
+		#If this is true, devtools will class update EVERYTHING.
 		self.forceUpdateEverything = False
 
 		self.boundaryBody = pymunk.Body()

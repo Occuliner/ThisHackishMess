@@ -19,7 +19,7 @@
 
 class IdSource( object ):
 	def __init__( self ):
-		self._currentNumber = 0
+		self.__dict__["_currentNumber"] = 0
 
 	def __setattr__( self, name, value ):
 		if name == "_currentNumber":

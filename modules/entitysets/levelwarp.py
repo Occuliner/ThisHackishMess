@@ -72,14 +72,22 @@ class LevelWarp( Entity ):
 	collidable = True
 	solid = False
 	mass = 20
+
+	instanceSpecificVars = None
 	
 	def __init__( self, pos = [0,0], vel = [0,0], group=None, **kwargs ):
 		Entity.__init__( self, pos, [0,0], None, group, pygame.Rect( 0, 0, self.width, self.height ), animated=False, **kwargs )
+		if LevelWarp.instanceSpecificVars is None:
+			attrList = list( self.__dict__.keys() )
+
 		#self.shape.collision_type = 1
 		self.tags["warpKey"] = "prime"
 		self.tags["warpDest"] = "testthingy"
 		self.ignore = set([])
 		self.collidedWith = set([])
+
+		if LevelWarp.instanceSpecificVars is None:
+			LevelWarp.instanceSpecificVars = dict( [ ( eachKey, eachVal ) for eachKey, eachVal in self.__dict__.items() if eachKey not in attrList ] )
 	
 	def update( self, dt ):
 		Entity.update( self, dt )

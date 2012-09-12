@@ -34,7 +34,7 @@ class FileLoadButton( Button ):
 		self.rect.topleft = pos
 	def push( self, clickKey ):
 		if "up" in clickKey:
-			self.parentState.menu.playState.swap( loadPlayState( os.path.join( "data", "maps", self.text ), self.parentState.menu.playState.floor.tileSet ) )
+			self.parentState.menu.playState.swap( loadPlayState( os.path.join( "data", "maps", self.text ), self.parentState.menu.playState.floor.tileSet, self.parentState.menu.masterEntSet.getEnts() ) )
 			self.parentState.menu.rerenderEverythingIn = 1
 			self.parentState.menu.backToDefault()
 		
