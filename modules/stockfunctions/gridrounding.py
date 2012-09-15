@@ -21,7 +21,7 @@ def gridRound( pos, w, h, roundToTopLeft=True, trueRounding=False ):
 	"""gridRound( pos, w, h, roundToTopLeft=True )\n""" \
 	"""This function rounds a given pos variable to the nearest lower or upper multiples \n""" \
 	""" of w and h in their respective directions. roundToTopLeft=True means it rounds towards the topleft. \n""" \
-	""" trueRounding means round to the closest corning, not topleft or bottomright."""
+	""" trueRounding means round to the closest corner, not topleft or bottomright."""
 
 	xRemainder, yRemainder = pos[0]%w, pos[1]%h
 	

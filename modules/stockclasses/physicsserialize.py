@@ -51,6 +51,15 @@ class BodyGhost:
 		#newBody.velocity_func = self.velocity_func
 		#newBody.position_func = self.position_func
 		return newBody
+	def resurrectOntoGiven( self, givenBody ):
+		givenBody.angle = self.angle
+		givenBody.torque = self.torque
+		givenBody.position = pymunk.vec2d.Vec2d( self.position )
+		givenBody.velocity = pymunk.vec2d.Vec2d( self.velocity )
+		givenBody.velocity_limit = self.velocity_limit
+		givenBody.angular_velocity = self.angular_velocity
+		givenBody.angular_velocity_limit = self.angular_velocity_limit
+		givenBody.force = pymunk.vec2d.Vec2d( self.force )
 
 class ShapeGhost:
 	"""Generic ghost class that all ShapeGhost types will extend."""

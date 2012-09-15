@@ -33,10 +33,14 @@ class KickUp( Entity ):
 
 	notDirectlyRemovable = True
 	scale = 2
+
+	instanceSpecificVars = None
 	
 	def __init__( self, group, host ):
 		Entity.__init__( self, [0,0], [0,0], None, group, pygame.Rect( 0, 0, self.width, self.height ), animated=True )
-		self.baseSheet = self.sheet.copy()
+		if KickUp.instanceSpecificVars is None:
+			attrList = list( self.__dict__.keys() )
+		#self.baseSheet = self.sheet.copy()
 		self.colour = None
 
 		self.animations['standard'] = { 'fps':8, 'frames':[0,1,2,3] }
@@ -45,8 +49,10 @@ class KickUp( Entity ):
 		#print len(self.frames)
 
 
-		self.host = host
-
+		#self.host = host
+		
+		if KickUp.instanceSpecificVars is None:
+			KickUp.instanceSpecificVars = dict( [ ( eachKey, eachVal ) for eachKey, eachVal in self.__dict__.items() if eachKey not in attrList ] )
 
 	def changeColour( self, colour ):
 		self.colour = colour
@@ -102,19 +108,23 @@ class YasbClass( Entity ):
 	mass = 70
 	specialCollision = None
 	solid = True
+
+	instanceSpecificVars = None
 	
 	def __init__( self, pos = [0,0], vel = [0,0], group=None ):
 		Entity.__init__( self, pos, vel, None, group, pygame.Rect( 0, 0, self.width, self.height ), animated=True )
+		if YasbClass.instanceSpecificVars is None:
+			attrList = list( self.__dict__.keys() )
 		
 		#self.acceleration[1] = 384
 		
-		self.randomSound = group.playState.soundManager.getSound( "sfx_step_grass-CCBY.wav", 0 )
-		self.randomSound.set_volume( 0.5 )
+		#self.randomSound = group.playState.soundManager.getSound( "sfx_step_grass-CCBY.wav", 0 )
+		#self.randomSound.set_volume( 0.5 )
 		
 		self.stepsPlaying = False
 		self.stepsId = None
 
-		self.baseSheet = self.sheet.copy()
+		#self.baseSheet = self.sheet.copy()
 		
 		self.colour = None
 
@@ -143,15 +153,16 @@ class YasbClass( Entity ):
 		setStandingAt( self )
 
 		#Assign the kickUp!
-		self.kickUp = KickUp( group, self )
+		#self.kickUp = KickUp( group, self )
 
-		self.children = [ self.kickUp ]
+		#self.children = [ self.kickUp ]
 
 		self.onKickUpArea = False
 
 		self.groups()[0].change_layer( self, 1 )
 		
-		#print 0
+		if YasbClass.instanceSpecificVars is None:
+			YasbClass.instanceSpecificVars = dict( [ ( eachKey, eachVal ) for eachKey, eachVal in self.__dict__.items() if eachKey not in attrList ] )
 
 	def sendInput( self, inputDict ):
 		for eachKey, eachVal in inputDict.items():
@@ -189,7 +200,7 @@ class YasbClass( Entity ):
 		#theYasb.sheet.fill( pygame.Color( 255, 0, 0 ), special_flags=BLEND_RGB_MULT )
 		
 	def kill( self ):
-		self.kickUp.specialKill()
+		#self.kickUp.specialKill()
 		Entity.kill( self )
 
 	def applyWalk( self ):
@@ -217,7 +228,7 @@ class YasbClass( Entity ):
 			#Set the kickup to appear infront of the player when the player is walking towards the top of the screen.
 			
 			#self.kickUp.groups()[0].change_layer( kickUp, 2 )
-			self.groups()[0].move_to_front( self.kickUp )
+			#self.groups()[0].move_to_front( self.kickUp )
 			
 		if self.walkingBackward:
 			walkingDirection += Vector( 0, 1 )
@@ -229,17 +240,18 @@ class YasbClass( Entity ):
 			#Set the kickup to appear behind the player when the player is walking towards the bottom of the screen.
 
 			#self.kickUp.groups()[0].change_layer( kickUp, 0 )
-			self.groups()[0].move_to_back( self.kickUp )
+			#self.groups()[0].move_to_back( self.kickUp )
 			
 		if self.walkingLeft or self.walkingRight or self.walkingForward or self.walkingBackward:
 			if self.onKickUpArea:
-				self.kickUp.setVisible( True )
+				pass
+				#self.kickUp.setVisible( True )
 			else:
-				#pass
-				self.kickUp.setVisible( False )
+				pass
+				#self.kickUp.setVisible( False )
 		else:
 			self.changeAnimation( 'idle' )
-			self.kickUp.setVisible( False )
+			#self.kickUp.setVisible( False )
 		
 
 		if walkingDirection.getSize() != 0:
@@ -252,32 +264,10 @@ class YasbClass( Entity ):
 		
 	def draw( self, surface ):
 		Entity.draw( self, surface )
-		
-	#def readyAccel( self, dt ):
-	#	walk = self.applyWalk()
-	#	
-	#	self.acceleration[0] += walk[0]
-	#	self.acceleration[1] += walk[1]
 
 	def update( self, dt ):
-		#if self.stepsPlaying and not any( [self.walkingLeft, self.walkingRight, self.walkingForward, self.walkingBackward] ):
-		#	self.stepsPlaying = False
-		#	self.randomSound.stop( self.stepsId )
-		#elif not self.stepsPlaying and any( [self.walkingLeft, self.walkingRight, self.walkingForward, self.walkingBackward] ):
-		#	#self.stepsId = self.randomSound.play( loops=-1 )
-		#	if self.stepsId is not None:
-		#		self.stepsPlaying = True
 			
 		self.body.reset_forces()
-		#walk = self.applyWalk()
-		
-		#self.velocity[0] += walk[0]
-		#self.velocity[1] += walk[1]
-		#self.acceleration[0] += walk[0]
-		#self.acceleration[1] += walk[1]
-		#if self.acceleration[0] != 0 or self.acceleration[1] != 0:
-		#	print self.acceleration
-			#pass
 
 		walk = self.applyWalk()
 		self.body.apply_force( ( walk[0]*10, walk[1]*10 ) )
@@ -291,23 +281,5 @@ class YasbClass( Entity ):
 
 		setStandingAt( self )
 
-		#KickUp stuff
-		if len( self.groups() ) >  0:
-			curState = self.groups()[0].playState
-			if curState != None:
-				
-				playerIsAt = map( int, self.standingAt )
-				#print playerIsAt
-				if playerIsAt[0] < curState.floor.size[0] and playerIsAt[1] < curState.floor.size[1]:
-					if curState.floor.kickUpMap[playerIsAt[0]][playerIsAt[1]] == True:
-						#print "Yay!"
-						#Generate kickup!
-						self.kickUp.changeColour( curState.floor.image.get_at( playerIsAt ) )
-						self.onKickUpArea = True
-					else:
-						#print "Nay!"
-						self.onKickUpArea = False
-		#self.velocity[0] -= walk[0]
-		#self.velocity[1] -= walk[1]
 
 MasterEntitySet.entsToLoad.append( YasbClass )
