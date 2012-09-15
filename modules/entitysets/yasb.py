@@ -153,9 +153,9 @@ class YasbClass( Entity ):
 		setStandingAt( self )
 
 		#Assign the kickUp!
-		self.kickUp = KickUp( group, self )
+		#self.kickUp = KickUp( group, self )
 
-		self.children = [ self.kickUp ]
+		#self.children = [ self.kickUp ]
 
 		self.onKickUpArea = False
 
@@ -200,7 +200,7 @@ class YasbClass( Entity ):
 		#theYasb.sheet.fill( pygame.Color( 255, 0, 0 ), special_flags=BLEND_RGB_MULT )
 		
 	def kill( self ):
-		self.kickUp.specialKill()
+		#self.kickUp.specialKill()
 		Entity.kill( self )
 
 	def applyWalk( self ):
@@ -228,7 +228,7 @@ class YasbClass( Entity ):
 			#Set the kickup to appear infront of the player when the player is walking towards the top of the screen.
 			
 			#self.kickUp.groups()[0].change_layer( kickUp, 2 )
-			self.groups()[0].move_to_front( self.kickUp )
+			#self.groups()[0].move_to_front( self.kickUp )
 			
 		if self.walkingBackward:
 			walkingDirection += Vector( 0, 1 )
@@ -240,17 +240,18 @@ class YasbClass( Entity ):
 			#Set the kickup to appear behind the player when the player is walking towards the bottom of the screen.
 
 			#self.kickUp.groups()[0].change_layer( kickUp, 0 )
-			self.groups()[0].move_to_back( self.kickUp )
+			#self.groups()[0].move_to_back( self.kickUp )
 			
 		if self.walkingLeft or self.walkingRight or self.walkingForward or self.walkingBackward:
 			if self.onKickUpArea:
-				self.kickUp.setVisible( True )
+				pass
+				#self.kickUp.setVisible( True )
 			else:
-				#pass
-				self.kickUp.setVisible( False )
+				pass
+				#self.kickUp.setVisible( False )
 		else:
 			self.changeAnimation( 'idle' )
-			self.kickUp.setVisible( False )
+			#self.kickUp.setVisible( False )
 		
 
 		if walkingDirection.getSize() != 0:
