@@ -24,6 +24,10 @@ from entityserialize import EntityGhost
 
 from state import PlayState
 
+from floor import Floor
+
+from entity import EntityGroup
+
 #This code is haunted by a SpaceGhost! D:
 from physicsserialize import SpaceGhost
 from linevisualiser import LineVisualiser
@@ -76,8 +80,13 @@ def loadPlayState( fileName, curTileSet, classDefs ):
 	#Create a new playState
 	givenState = PlayState()
 
-	#Give it the newer tileSet.
-	givenState.floor.tileSet = curTileSet
+	#Create the groups.
+	givenState.addGroup( EntityGroup(), name="levelWarpGroup" )
+	givenState.addGroup( EntityGroup(), isPlayerGroupBool=True )
+	givenState.addGroup( EntityGroup(), name="genericStuffGroup", indexValue=0 )
+
+	#Create it's floor
+	givenState.floor = Floor( curTileSet, ( 800, 608 ) )
 
 	#Get the StateStoreTuple.
 	stateTuple = loadObjectFromFile( fileName )

@@ -33,12 +33,14 @@ class KickUp( Entity ):
 
 	notDirectlyRemovable = True
 	scale = 2
+
+	instanceSpecificVars = None
 	
 	def __init__( self, group, host ):
 		Entity.__init__( self, [0,0], [0,0], None, group, pygame.Rect( 0, 0, self.width, self.height ), animated=True )
 		if KickUp.instanceSpecificVars is None:
 			attrList = list( self.__dict__.keys() )
-		self.baseSheet = self.sheet.copy()
+		#self.baseSheet = self.sheet.copy()
 		self.colour = None
 
 		self.animations['standard'] = { 'fps':8, 'frames':[0,1,2,3] }
@@ -47,7 +49,7 @@ class KickUp( Entity ):
 		#print len(self.frames)
 
 
-		self.host = host
+		#self.host = host
 		
 		if KickUp.instanceSpecificVars is None:
 			KickUp.instanceSpecificVars = dict( [ ( eachKey, eachVal ) for eachKey, eachVal in self.__dict__.items() if eachKey not in attrList ] )
@@ -107,7 +109,7 @@ class YasbClass( Entity ):
 	specialCollision = None
 	solid = True
 
-	instaceSpecificVars = None
+	instanceSpecificVars = None
 	
 	def __init__( self, pos = [0,0], vel = [0,0], group=None ):
 		Entity.__init__( self, pos, vel, None, group, pygame.Rect( 0, 0, self.width, self.height ), animated=True )
@@ -116,13 +118,13 @@ class YasbClass( Entity ):
 		
 		#self.acceleration[1] = 384
 		
-		self.randomSound = group.playState.soundManager.getSound( "sfx_step_grass-CCBY.wav", 0 )
-		self.randomSound.set_volume( 0.5 )
+		#self.randomSound = group.playState.soundManager.getSound( "sfx_step_grass-CCBY.wav", 0 )
+		#self.randomSound.set_volume( 0.5 )
 		
 		self.stepsPlaying = False
 		self.stepsId = None
 
-		self.baseSheet = self.sheet.copy()
+		#self.baseSheet = self.sheet.copy()
 		
 		self.colour = None
 

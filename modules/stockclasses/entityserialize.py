@@ -88,7 +88,7 @@ class EntityGhost:
 		#Create an empty dict to hold them all.
 		self.instanceSpecificVars = {}
 		#Iterate over the vars.
-		for eachKey, eachVal in theEntity.instanceSpecificVars:
+		for eachKey, eachVal in theEntity.instanceSpecificVars.items():
 			#Get the type string.
 			typeString = str( type(eachVal) )
 
@@ -145,7 +145,7 @@ class EntityGhost:
 		#Set the animation
 		theInst.curAnimation = theInst.animations[self.curAnimationName]
 		#Set one before the current frame.
-		theInst = self.frame - 1
+		theInst.frame = self.frame - 1
 		#Use nextFrame to get to the current frame, and a clean way to make sure the image updates.
 		theInst.nextFrame()
 		#Now set the correct frameTime.
@@ -153,7 +153,7 @@ class EntityGhost:
 
 
 		#Now set the instance specific vars.
-		for eachKey, eachVal in self.instanceSpecificVars:
+		for eachKey, eachVal in self.instanceSpecificVars.items():
 			setattr( theInst, eachKey, eachVal )
 
 		return theInst
