@@ -15,34 +15,39 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import cPickle, os, pygame, zlib, gzip
+import cPickle, os, pygame, zlib, gzip, collections
 #import msgpack
 
 from imageload import loadImage, loadImageNoAlpha
+
+from entityserialize import EntityGhost
+
+from state import PlayState
+
+from floor import Floor
+
+from entity import EntityGroup
 
 #This code is haunted by a SpaceGhost! D:
 from physicsserialize import SpaceGhost
 from linevisualiser import LineVisualiser
 
+StateStoreTuple = collections.namedtuple( "StateStoreTuple", [ "entityGhostList", "floorImageBuffer", "soundManager", "hudElements" ] )
+
+ImageBuffer = collections.namedtuple( "ImageBuffer", [ "size", "stringBuffer" ] )
+
 def writeObjectToFile( obj, fileName ):
 	destFile = gzip.open( fileName, 'wb' )
 	destFile.write( cPickle.dumps( obj, 2 ) )
-	#cPickle.dump( obj, file( fileName, "w" ), 2 )
-	#destFile = open( fileName, "wb" )
-	#destFile.write( zlib.compress( cPickle.dumps( obj, 2 ) ) )
 	#Msgpack version.
-	#destFile.write( zlib.compress( msgpack.packb( obj ) ) )
+	#destFile.write( msgpack.packb( obj ) )
 	destFile.close()
 	
 def loadObjectFromFile( fileName ):
 	if not os.path.isfile( fileName ):
 		return None
 	theFile = gzip.open( fileName, 'rb' )
-	loadString = theFile.read()	
-	#return cPickle.load( file( fileName, "r" ) )
-	#theFile = open( fileName, "rb" )
-	#Windows didn't like it without reading in in "rb" mode and replacing All "\r"
-	#loadString = theFile.read().replace( "\r\n", "\n" )
+	loadString = theFile.read()
 	theFile.close()
 	#Msgpack version.
 	#return msgpack.unpackb( zlib.decompress( loadString ) )
@@ -50,153 +55,54 @@ def loadObjectFromFile( fileName ):
 	
 
 def dumpPlayState( givenState, fileName ):
-	#objgraph.show_most_common_types(limit=20)
-	#statePickler = cPickle.Pickler( file( fileName, "w" ), 2 )
-	
-	#Remove all Surfaces from the playState, for ents, remove them and use the sheetFileName property to reload it later.
-	#For the Floor, convert it to a stringbuffer, and make it a property of the floor, and reload it later.
+	#Create a compressed stringbuffer of the levels floor image.
+	floorImageStringBuffer = zlib.compress( pygame.image.tostring( givenState.floor.image, "RGB" ) )
+	#Store it
+	floorImageBuffer = ImageBuffer( givenState.floor.size, floorImageStringBuffer )
 
-	allTheImages = {}
-	allTheEntBodies = {}
-	allTheEntShapes = {}
+
+	#Create the StateStoreTuple, this will store all the data, and be serialized.
+	stateTuple = StateStoreTuple( [], floorImageBuffer, None, [] )
+
 	for eachSprite in givenState.sprites():
-		allTheImages[id(eachSprite)] = [ eachSprite.sheet, eachSprite.image, eachSprite.frames ]
-		eachSprite.image = None
-		eachSprite.sheet = None
-		eachSprite.frames = []
-		if eachSprite.collidable:
-			allTheEntBodies[eachSprite.bodyId] = eachSprite.body
-			allTheEntShapes[eachSprite.shapeId] = eachSprite.shape
-			eachSprite.body = None
-			eachSprite.shape = None
-			eachSprite.physicsObjects = []
-			if hasattr( eachSprite, "sensorBox" ):
-				allTheEntShapes[eachSprite.sensorId] = eachSprite.sensorBox
-				eachSprite.sensorBox = None
+		#Create EntityGhost.
+		ghost = EntityGhost( eachSprite )
+		#Add the the ghost list.
+		stateTuple.entityGhostList.append( ghost )
 		
-	floorImage = givenState.floor.image
-	#givenState.floor.imageStringBuffer = pygame.image.tostring( givenState.floor.image, "RGB" )
-	givenState.floor.imageStringBuffer = zlib.compress( pygame.image.tostring( givenState.floor.image, "RGB" ) )
+	print "Need some sort of sound saving."
+
+	print "HudElements still need serialization."
 	
-	givenState.floor.image = None
+	writeObjectToFile( stateTuple, fileName )
 
-	backupChanges, backupUndoneChanges, backUpTileSet = givenState.floor.changes, givenState.floor.undoneChanges, givenState.floor.tileSet
-	givenState.floor.changes, givenState.floor.undoneChanges, givenState.floor.tileSet = [], [], None
+def loadPlayState( fileName, curTileSet, classDefs ):
+	#Create a new playState
+	givenState = PlayState()
 
-	oldSpace, oldVis, oldBoundaries, oldBoundaryBody = givenState.space, givenState.lineVisualiser, givenState.boundaries, givenState.boundaryBody
+	#Create the groups.
+	givenState.addGroup( EntityGroup(), name="levelWarpGroup" )
+	givenState.addGroup( EntityGroup(), isPlayerGroupBool=True )
+	givenState.addGroup( EntityGroup(), name="genericStuffGroup", indexValue=0 )
 
-	#damnVis = givenState.lineVisualiser
-	#oldRenderLines, oldRenderPhysicsLines, oldForceNoRender = damnVis.renderLines, damnVis.renderPhysicsLines, damnVis.forceNoRender
-	#givenState.lineVisualiser.renderLines, givenState.lineVisualiser.renderPhysicsLines, givenState.lineVisualiser.forceNoRender = False, False, False
+	#Create it's floor
+	givenState.floor = Floor( curTileSet, ( 800, 608 ) )
 
-	givenState.spaceGhost = SpaceGhost( givenState.space, givenState.boundaryBody )
-
-	givenState.space, givenState.lineVisualiser, givenState.boundaryBody, givenState.boundaries = None, None, id( givenState.boundaryBody ), [ id( each ) for each in givenState.boundaries ]
-	
-	givenState.soundManager.makePicklable()
-
-	allTheHudElementImages = {}
-	for each in givenState.hudList:
-		allTheHudElementImages[id(each)] = each.image
-		each.image = None
-
-	writeObjectToFile( givenState, fileName )
-
-	for each in givenState.hudList:
-		each.image = allTheHudElementImages[id(each)]
-
-	givenState.soundManager.makeUnpicklable()
-	
-	givenState.space, givenState.lineVisualiser, givenState.boundaries, givenState.boundaryBody = oldSpace, oldVis, oldBoundaries, oldBoundaryBody
-	#givenState.lineVisualiser.renderLines, givenState.lineVisualiser.renderPhysicsLines, givenState.lineVisualiser.forceNoRender = oldRenderLines, oldRenderPhysicsLines, oldForceNoRender
-
-	#print len( givenState.sprites() )
-	for eachSprite in givenState.sprites():
-		stuffList = allTheImages[id(eachSprite)]
-		eachSprite.sheet = stuffList[0]
-		eachSprite.image = stuffList[1]
-		eachSprite.frames = stuffList[2]
-		if eachSprite.collidable:
-			eachSprite.body = allTheEntBodies[eachSprite.bodyId]
-			eachSprite.shape = allTheEntShapes[eachSprite.shapeId]
-			eachSprite.physicsObjects = [ eachSprite.body, eachSprite.shape ]
-			if hasattr( eachSprite, "sensorBox" ):
-				eachSprite.sensorBox = allTheEntShapes[eachSprite.sensorId]
-				eachSprite.physicsObjects.append( eachSprite.sensorBox )
-
-	givenState.floor.image = floorImage
-	givenState.floor.changes, givenState.floor.undoneChanges, givenState.floor.tileSet = backupChanges, backupUndoneChanges, backUpTileSet
-
-	givenState.floor.imageStringBuffer = None
-
-def loadPlayState( fileName, curTileSet ):
-	givenState = loadObjectFromFile( fileName )
-	if givenState is None:
-		print "Map: " + fileName + " does not appear to exist."
+	#Get the StateStoreTuple.
+	stateTuple = loadObjectFromFile( fileName )
+	if stateTuple is None:
+		print "No map called: " + fileName + " in the data/maps folder."
 		return None
-	givenState.forceUpdateEverything = True
-	givenState.floor.tileSet = curTileSet
 
-	givenState.soundManager.makeUnpicklable()
+	#Generate class dict.
+	classDefsDict = dict( [ ( eachClass.__name__, eachClass ) for eachClass in classDefs ] )
 
-	for eachObj in givenState.hudList:
-		if eachObj.sheetFileName is not None:
-			if eachObj.alpha: 
-				eachObj.sheet = loadImage( eachObj.sheetFileName, eachObj.scale )
-			else:
-				eachObj.sheet = loadImageNoAlpha( eachObj.sheetFileName, eachObj.scale )
-			eachObj.sheet.set_colorkey( eachObj.colourKey )
-		else:
-			eachObj.sheet = pygame.Surface( ( 1, 1 ) ).convert_alpha()
-			eachObj.sheet.fill( pygame.Color( 0, 0, 0, 0 ) )		
-		eachObj.createFrames()
-		eachObj.image = eachObj.frames[eachObj.curAnimation['frames'][eachObj.frame]]
+	#Add all ze entities.
+	for eachGhost in stateTuple.entityGhostList:
+		eachGhost.resurrect( classDefsDict, givenState )
 
-	givenState.space, bodyDict, shapeDict = givenState.spaceGhost.resurrect()
-	givenState.spaceGhost = None
-	givenState.space.add_collision_handler( 1, 2, givenState.speshulCaller )
-	givenState.space.add_collision_handler( 2, 2, givenState.speshulCaller )
+	#Replace the floorImage
+	givenState.floor.image = pygame.image.fromstring( zlib.decompress( stateTuple.floorImageBuffer.stringBuffer ), stateTuple.floorImageBuffer.size, "RGB" ).convert()
 
-	givenState.boundaryBody = bodyDict[givenState.boundaryBody]
-	givenState.boundaries = [ shapeDict[each] for each in givenState.boundaries ]
-
-	givenState.lineVisualiser = LineVisualiser( givenState )
-
-	for eachSprite in givenState.sprites():
-		if eachSprite.sheetFileName is not None:
-			if eachSprite.alpha: 
-				eachSprite.sheet = loadImage( eachSprite.sheetFileName, eachSprite.scale )
-			else:
-				eachSprite.sheet = loadImageNoAlpha( eachSprite.sheetFileName, eachSprite.scale )
-			eachSprite.sheet.set_colorkey( eachSprite.colourKey )
-		else:
-			eachSprite.sheet = pygame.Surface( ( 1, 1 ) ).convert_alpha()
-			eachSprite.sheet.fill( pygame.Color( 0, 0, 0, 0 ) )		
-		eachSprite.createFrames()
-		eachSprite.image = eachSprite.frames[eachSprite.curAnimation['frames'][eachSprite.frame]]
-		if hasattr( eachSprite, "baseSheet" ):
-			eachSprite.baseSheet = eachSprite.sheet.copy()
-		if eachSprite.collidable:
-			eachSprite.body = bodyDict[eachSprite.bodyId]
-			eachSprite.shape = shapeDict[eachSprite.shapeId]
-			eachSprite.shape.entity = eachSprite
-			eachSprite.physicsObjects = [ eachSprite.body, eachSprite.shape ]
-			if hasattr( eachSprite, "sensorBox" ):
-				eachSprite.sensorBox = shapeDict[eachSprite.sensorId]
-				eachSprite.sensorBox.entity = eachSprite
-				eachSprite.physicsObjects.append( eachSprite.sensorBox )
-				eachSprite.sensorId = id( eachSprite.sensorBox )
-			eachSprite.body.velocity_func = eachSprite.velocity_func
-			eachSprite.bodyId, eachSprite.shapeId = id( eachSprite.body ), id( eachSprite.shape )
-	#givenState.floor.image = pygame.image.fromstring( givenState.floor.imageStringBuffer, givenState.floor.size, "RGB" )
-	givenState.floor.image = pygame.image.fromstring( zlib.decompress( givenState.floor.imageStringBuffer ), givenState.floor.size, "RGB" ).convert()
-
-	givenState.floor.imageStringBuffer = None
-	
-
-	#objgraph.show_most_common_types()
-	#obj = objgraph.by_type('list')[-1]
-	#objgraph.show_backrefs([obj], max_depth=10)
-	#objgraph.show_backrefs( objgraph.by_type('list')[-1] )
 	return givenState
 		

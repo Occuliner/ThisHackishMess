@@ -26,7 +26,7 @@ from picklestuff import *
 def levelWarpFunc( givenWarp, givenObject ):
 	curPlayState = givenObject.groups()[0].playState
 	if givenObject in curPlayState.playersGroup:
-		givenWarp.collidedWith.add( givenObject )
+		givenWarp.collidedWith.add( givenObject.id )
 		if givenObject not in givenWarp.ignore:
 			dest = loadPlayState( os.path.join( "data", "maps", givenWarp.tags["warpDest"] ), curPlayState.floor.tileSet )
 			if dest is None:
@@ -47,8 +47,8 @@ def levelWarpFunc( givenWarp, givenObject ):
 			givenObject.addToGroup( curPlayState.playersGroup )
 			for each in givenObject.children:
 				each.addToGroup( curPlayState.playersGroup )
-			targetWarp.ignore.add( givenObject )
-			targetWarp.collidedWith.add( givenObject )
+			targetWarp.ignore.add( givenObject.id )
+			targetWarp.collidedWith.add( givenObject.id )
 			curPlayState.rerenderEverything = True
 
 def queueLoad( givenWarp, givenObject ):
@@ -72,20 +72,28 @@ class LevelWarp( Entity ):
 	collidable = True
 	solid = False
 	mass = 20
+
+	instanceSpecificVars = None
 	
-	def __init__( self, pos = [0,0], vel = [0,0], group=None ):
-		Entity.__init__( self, pos, [0,0], None, group, pygame.Rect( 0, 0, self.width, self.height ), animated=False )
+	def __init__( self, pos = [0,0], vel = [0,0], group=None, **kwargs ):
+		Entity.__init__( self, pos, [0,0], None, group, pygame.Rect( 0, 0, self.width, self.height ), animated=False, **kwargs )
+		if LevelWarp.instanceSpecificVars is None:
+			attrList = list( self.__dict__.keys() )
+
 		#self.shape.collision_type = 1
 		self.tags["warpKey"] = "prime"
 		self.tags["warpDest"] = "testthingy"
 		self.ignore = set([])
 		self.collidedWith = set([])
+
+		if LevelWarp.instanceSpecificVars is None:
+			LevelWarp.instanceSpecificVars = dict( [ ( eachKey, eachVal ) for eachKey, eachVal in self.__dict__.items() if eachKey not in attrList ] )
 	
 	def update( self, dt ):
 		Entity.update( self, dt )
 		for each in self.groups()[0].playState.playersGroup:
-			if each not in self.collidedWith and each in self.ignore:
-				self.ignore.remove( each )
+			if each.id not in self.collidedWith and each.id in self.ignore:
+				self.ignore.remove( each.id )
 		self.collidedWith = set([])
 		
 
