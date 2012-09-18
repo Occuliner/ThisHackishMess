@@ -20,64 +20,27 @@ import extern_modules.pygnetic as pygnetic, networkmessages, weakref
 class ClientHandler(pygnetic.Handler):
 	def __init__( self, playState ):
 		self.playStateRef = weakref.ref( playState )
-	def net_joinLobby( self, message, **kwargs ):
-		pass
-	def net_joinGame( self, message, **kwargs ):
-		pass
+		#The tick that the handler is on, from its own perspective.
+		#Set to none by default, and then set it when you recieve your first update from the serv.
+		self.networkTick = None
 	def net_acceptPlayer( self, message, **kwargs ):
 		pass
 	def net_kickPlayer( self, message, **kwargs ):
 		pass
 	def net_chatToClient( self, message, **kwargs ):
 		pass
-	def net_chatToHost( self, message, **kwargs ):
-		pass
-	def net_createEnt( self, message, **kwargs ):
-		pass
-	def net_removeEnt( self, message, **kwargs ):
-		pass
-	def net_entityPositionUpdate( self, message, **kwargs ):
-		pass
-	def net_changeAnim( self, message, **kwargs ):
-		pass
-	def net_swapAnim( self, message, **kwargs ):
-		pass
-	def net_loadSound( self, message, **kwargs ):
-		pass
-	def net_playSound( self, message, **kwargs ):
-		pass
-	def net_stopSound( self, message, **kwargs ):
+	def net_updateEvent( self, message, **kwargs ):
 		pass
 
 class ServerHandler(pygnetic.Handler):
 	def __init__( self, playState ):
 		self.playStateRef = weakref.ref( playState )
+		#The tick that the handler is on, from its own perspective.
+		self.networkTick = 0
 	def net_joinLobby( self, message, **kwargs ):
 		pass
 	def net_joinGame( self, message, **kwargs ):
 		pass
-	def net_acceptPlayer( self, message, **kwargs ):
-		pass
-	def net_kickPlayer( self, message, **kwargs ):
-		pass
-	def net_chatToClient( self, message, **kwargs ):
-		pass
 	def net_chatToHost( self, message, **kwargs ):
-		pass
-	def net_createEnt( self, message, **kwargs ):
-		pass
-	def net_removeEnt( self, message, **kwargs ):
-		pass
-	def net_entityPositionUpdate( self, message, **kwargs ):
-		pass
-	def net_changeAnim( self, message, **kwargs ):
-		pass
-	def net_swapAnim( self, message, **kwargs ):
-		pass
-	def net_loadSound( self, message, **kwargs ):
-		pass
-	def net_playSound( self, message, **kwargs ):
-		pass
-	def net_stopSound( self, message, **kwargs ):
 		pass
 
