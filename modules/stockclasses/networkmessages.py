@@ -39,23 +39,28 @@ pygnetic.register( 'chatToClient', ('name', 'message') )
 #This message is sent from the player to the host when they say a message, the groupId paramter is for team say, the server can use the id to determine which players get the message.
 pygnetic.register( 'chatToHost', ('name', 'message', 'groupId' ) )
 
-#This message is to create a network ent on the client side.
-pygnetic.register( 'createEnt', ('className', 'id', 'animation', 'frameNum') )
+#This message is sent from the host to the player every tick. Each parameter is a list of objects that describe some event that happened this tick.
+pygnetic.register( 'updateEvent', ('createEnts', 'removeEnts', 'updatePositions', 'startSounds', 'stopSounds', 'changeAnims', 'swapAnims') )
 
-#This message is sent to remove a network ent.
-pygnetic.register( 'removeEnt', ('id') )
 
-#This message is sent to update object locations,
-pygnetic.register( 'entityPositionUpdate', ('id', 'newPosition') )
-
-#This message is to send that a certain entity is changing animation.
-pygnetic.register( 'changeAnim', ('id', 'newAnimation') )
-
-#This message is to send that a certain entity is swapping animation.
-pygnetic.register( 'swapAnim', ('id', 'newAnimation') )
-
-#This message is sent to play a certain sound.
-pygnetic.register( 'playSound', ('soundname' ) )
-
-#This message is sent to stop a certain sound.
-pygnetic.register( 'stopSound', ('soundname') )
+###Merge these all into a single event, each being a sub-event. This is to make sure you receive whole updates. There is no interest in partial updates.
+##This message is to create a network ent on the client side.
+#pygnetic.register( 'createEnt', ('className', 'id', 'animation', 'frameNum') )
+#
+##This message is sent to remove a network ent.
+#pygnetic.register( 'removeEnt', ('id') )
+#
+##This message is sent to update object locations,
+#pygnetic.register( 'entityPositionUpdate', ('id', 'newPosition') )
+#
+##This message is to send that a certain entity is changing animation.
+#pygnetic.register( 'changeAnim', ('id', 'newAnimation') )
+#
+##This message is to send that a certain entity is swapping animation.
+#pygnetic.register( 'swapAnim', ('id', 'newAnimation') )
+#
+##This message is sent to play a certain sound.
+#pygnetic.register( 'playSound', ('soundname' ) )
+#
+##This message is sent to stop a certain sound.
+#pygnetic.register( 'stopSound', ('soundname') )
