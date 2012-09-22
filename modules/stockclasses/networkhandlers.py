@@ -31,6 +31,8 @@ class ClientHandler(pygnetic.Handler):
 		pass
 	def net_updateEvent( self, message, **kwargs ):
 		pass
+	def on_disconnect( self ):
+		pass
 
 class ServerHandler(pygnetic.Handler):
 	def __init__( self, playState ):
@@ -42,5 +44,7 @@ class ServerHandler(pygnetic.Handler):
 	def net_joinGame( self, message, **kwargs ):
 		pass
 	def net_chatToHost( self, message, **kwargs ):
+		pass
+	def on_disconnect( self ):
 		pass
 

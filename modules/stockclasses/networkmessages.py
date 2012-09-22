@@ -40,7 +40,7 @@ pygnetic.register( 'chatToClient', ('name', 'message') )
 pygnetic.register( 'chatToHost', ('name', 'message', 'groupId' ) )
 
 #This message is sent from the host to the player every tick. Each parameter is a list of objects that describe some event that happened this tick.
-pygnetic.register( 'updateEvent', ('createEnts', 'removeEnts', 'updatePositions', 'startSounds', 'stopSounds', 'changeAnims', 'swapAnims') )
+pygnetic.register( 'updateEvent', ('tickNum', 'createEnts', 'removeEnts', 'updatePositions', 'startSounds', 'stopSounds', 'changeAnims', 'swapAnims') )
 
 
 ###Merge these all into a single event, each being a sub-event. This is to make sure you receive whole updates. There is no interest in partial updates.
