@@ -53,7 +53,7 @@ class LineVisualiser:
 				updateRects.extend( self.drawLinesWithPoints( surface, eachGroup, True ) )
 					
 			if self.renderPhysicsLines:
-				for eachShape in self.playState.space.shapes + self.playState.space.static_shapes:
+				for eachShape in self.playState.space.shapes:
 					if type( eachShape ) == pymunk.Poly:
 						if eachShape.entity.pureSensor:
 							updateRects.extend( self.drawLinesWithPoints( surface, eachShape.get_points(), True, blue, red, destPoint ) )
