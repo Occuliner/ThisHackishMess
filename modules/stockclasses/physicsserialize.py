@@ -125,7 +125,6 @@ class SpaceGhost:
 		self.gravity = vecToTuple( givenSpace.gravity )
 		self.damping = givenSpace.damping
 		self.shapes = []
-		self.staticShapes = []
 		self.bodies = { id(boundaryBody):BodyGhost( boundaryBody ) }
 		self.boundaryId = id(boundaryBody)
 		for eachBody in givenSpace.bodies:
@@ -140,16 +139,7 @@ class SpaceGhost:
 			else:
 				print "SpaceGhost doesn't store type: " + eachShape.__class__.__name__,
 				print ". Consider implementing a Ghost class for it."
-		for eachShape in givenSpace.static_shapes:
-			if type( eachShape ) == pymunk.Poly:
-				self.staticShapes.append( PolyGhost( eachShape ) )
-			elif type( eachShape ) == pymunk.Segment:
-				self.staticShapes.append( SegmentGhost( eachShape ) )
-			elif type( eachShape ) == pymunk.Circle:
-				self.shape.append( CircleGhost( eachShape ) )
-			else:
-				print "SpaceGhost doesn't store type: " + eachShape.__class__.__name__,
-				print ". Consider implementing a Ghost class for it."
+
 	def resurrect( self ):
 		newSpace = pymunk.Space()
 		newSpace.gravity = self.gravity
@@ -162,9 +152,5 @@ class SpaceGhost:
 		for eachShape in self.shapes:
 			newShape = eachShape.resurrect( newBodyDict )
 			newSpace.add( newShape )
-			newShapeDict[eachShape.id] = newShape
-		for eachShape in self.staticShapes:
-			newShape = eachShape.resurrect( newBodyDict )
-			newSpace.add_static( newShape )
 			newShapeDict[eachShape.id] = newShape
 		return newSpace, newBodyDict, newShapeDict

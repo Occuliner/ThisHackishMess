@@ -92,11 +92,11 @@ class PlayState:
 	def addBoundary( self, point1, point2 ):
 		newSeg = pymunk.Segment( self.boundaryBody, point1, point2, 1 )
 		self.boundaries.append( newSeg )
-		self.space.add_static( newSeg )
+		self.space.add( newSeg )
 
 	def removeBoundary( self, givenSeg ):
 		self.boundaries.remove( givenSeg )
-		self.space.remove_static( givenSeg )
+		self.space.remove( givenSeg )
 
 	def swap( self, newState ):
 		self.__dict__ = newState.__dict__
