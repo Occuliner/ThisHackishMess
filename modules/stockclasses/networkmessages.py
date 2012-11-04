@@ -21,8 +21,11 @@ pygnetic.init( logging_lvl=None )
 
 #Register all the messages types in this file, to make sure they're in the correct order for both client and host.
 
-#This message is sent on connect, and is more or less just a way for a client to express interest in joining.
-pygnetic.register( 'joinLobby', ('name') )
+#This message is sent when the host doesn't instant-kick the client
+pygnetic.register( 'requestInfo', ('iNeedAFieldForSomeReason') )
+
+#This message is sent on info request
+pyngetic.register( 'hereIsMyInfo', ('name') )
 
 #This message is sent when the player hits join game.
 pygnetic.register( 'joinGame', ('name') )
@@ -31,7 +34,7 @@ pygnetic.register( 'joinGame', ('name') )
 pygnetic.register( 'acceptPlayer', ('name') )
 
 #This message is sent when the host kicks a player.
-pygnetic.register( 'kickPlayer', ('name', 'duration', 'reason' ) )
+pygnetic.register( 'kickPlayer', ('duration', 'reason') )
 
 #This message is sent from the host to the player containing messages from other players.
 pygnetic.register( 'chatToClient', ('name', 'message') )

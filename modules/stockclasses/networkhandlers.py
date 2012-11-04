@@ -18,11 +18,17 @@
 import extern_modules.pygnetic as pygnetic, networkmessages, weakref
 
 class ClientHandler(pygnetic.Handler):
-	def __init__( self, playState ):
-		self.playStateRef = weakref.ref( playState )
+	def __init__( self, client ):
 		#The tick that the handler is on, from its own perspective.
 		#Set to none by default, and then set it when you recieve your first update from the serv.
 		self.networkTick = None
+
+		#A ref to the client itself.
+		self.client = weakref.ref( client )
+
+	def net_requestInfo( self, message, **kwargs ):
+		self.connection.net_hereIsMyInfo( self.client().name )
+
 	def net_acceptPlayer( self, message, **kwargs ):
 		pass
 	def net_kickPlayer( self, message, **kwargs ):
@@ -35,16 +41,22 @@ class ClientHandler(pygnetic.Handler):
 		pass
 
 class ServerHandler(pygnetic.Handler):
-	def __init__( self, playState ):
-		self.playStateRef = weakref.ref( playState )
-		#The tick that the handler is on, from its own perspective.
-		self.networkTick = 0
-	def net_joinLobby( self, message, **kwargs ):
-		pass
+	def on_connect( self ):
+		#Check this address isn't in the banlist.
+		for eachSet in self.server.ipBanList:
+			if eachSet[0] == self.connection.address:
+				self.connection.kick_player( eachSet[1], eachSet[2] )
+				self.connection.disconnect()
+				return None
+		self.connection.net_requestInfo( None )
+
+	def net_hereIsMyInfo( self, message, **kwargs ):
+		self.server.addClient( message, self.connection )
+
 	def net_joinGame( self, message, **kwargs ):
 		pass
 	def net_chatToHost( self, message, **kwargs ):
 		pass
 	def on_disconnect( self ):
-		pass
+		self.server.removeClientByConnection( self.connection )
 
