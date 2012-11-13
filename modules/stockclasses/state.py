@@ -163,6 +163,8 @@ class PlayState:
 
 		for eachElement in self.hudList:
 			eachElement.update( dt )
+
+		self.soundManager.update( dt )
 			
 		
 

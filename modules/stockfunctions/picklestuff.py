@@ -60,21 +60,24 @@ def dumpPlayState( givenState, fileName ):
 	#Store it
 	floorImageBuffer = ImageBuffer( givenState.floor.size, floorImageStringBuffer )
 
+	#Make the sound State picklable.
+	givenState.soundManager.makePicklable()
 
 	#Create the StateStoreTuple, this will store all the data, and be serialized.
-	stateTuple = StateStoreTuple( [], floorImageBuffer, None, [] )
+	stateTuple = StateStoreTuple( [], floorImageBuffer, givenState.soundManager, [] )
 
 	for eachSprite in givenState.sprites():
 		#Create EntityGhost.
 		ghost = EntityGhost( eachSprite )
 		#Add the the ghost list.
 		stateTuple.entityGhostList.append( ghost )
-		
-	print "Need some sort of sound saving."
 
 	print "HudElements still need serialization."
 	
 	writeObjectToFile( stateTuple, fileName )
+
+	#Make the soundState unpicklable
+	givenState.soundManager.makeUnpicklable()
 
 def loadPlayState( fileName, curTileSet, classDefs ):
 	#Create a new playState
@@ -103,6 +106,10 @@ def loadPlayState( fileName, curTileSet, classDefs ):
 
 	#Replace the floorImage
 	givenState.floor.image = pygame.image.fromstring( zlib.decompress( stateTuple.floorImageBuffer.stringBuffer ), stateTuple.floorImageBuffer.size, "RGB" ).convert()
+
+	#Replace the sound manager.
+	stateTuple.soundManager.makeUnpicklable()
+	givenState.soundManager = stateTuple.soundManager
 
 	return givenState
 		
