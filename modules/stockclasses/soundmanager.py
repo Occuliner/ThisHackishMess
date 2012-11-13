@@ -70,14 +70,14 @@ class PlayInstance:
 		self.attemptPlay( sound )
 		
 	def attemptPlay( self, sound ):
-		"""This method attempts to start the sound playing, and if successfuly adds it the in the list of playing PlayInstances"""
+		"""This method attempts to start the sound playing, and if successful adds it the in the list of playing PlayInstances"""
 		if not (self.channel is None):
 			pygame.mixer.Channel(self.channelId).play( sound, self.loops, self.maxtime, self.fade_ms )
 			self.soundManagerRef().playInstances.append( self )
 
 	def attemptRestart( self, sound ):
-		"""This method attempts to restart the sound playing after load, and if successfuly adds it the in the list of playing PlayInstances
-		currently it cheats and just restarts any looping sound from the nearest loop number"""
+		"""This method attempts to restart the sound playing after load, and if successful adds it the in the list of playing PlayInstances.
+		Currently it cheats and just restarts any looping sound from the nearest loop number"""
 		if not (self.channel is None):
 			if self.loops is 0:
 				#Create a version of the sound that starts at this moment.
