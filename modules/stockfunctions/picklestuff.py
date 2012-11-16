@@ -79,6 +79,9 @@ def dumpPlayState( givenState, fileName ):
 	#Make the soundState unpicklable
 	givenState.soundManager.makeUnpicklable()
 
+	#Set the filename property
+	givenState.fileName = fileName
+
 def loadPlayState( fileName, curTileSet, classDefs ):
 	#Create a new playState
 	givenState = PlayState()
@@ -110,6 +113,9 @@ def loadPlayState( fileName, curTileSet, classDefs ):
 	#Replace the sound manager.
 	stateTuple.soundManager.makeUnpicklable()
 	givenState.soundManager = stateTuple.soundManager
+
+	#Set the filename property.
+	givenState.fileName = fileName
 
 	return givenState
 		
