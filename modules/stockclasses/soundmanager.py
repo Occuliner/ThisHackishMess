@@ -115,7 +115,7 @@ class SoundManager:
 		self.channelCount = pygame.mixer.get_num_channels()
 		self.channels = [ pygame.mixer.Channel(idNum) for idNum in range( self.channelCount ) ]
 		self.playInstances = []
-		self.curTime = curTIme
+		self.curTime = curTime
 
 	def update( self, dt ):
 		"""Basically all this method does is remove playInstances that are no longer valid."""
