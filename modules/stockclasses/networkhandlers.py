@@ -54,9 +54,21 @@ class ServerHandler(pygnetic.Handler):
 		self.server.addClient( message, self.connection )
 
 	def net_joinGame( self, message, **kwargs ):
-		pass
+		client = self.server.getClientByConnection( self.connection )
+		self.connection.net_acceptPlayer( client.name )
+		self.server.addPlayer( client )
+
 	def net_chatToHost( self, message, **kwargs ):
 		pass
+
+	def net_inputEvent( self, message, **kwargs ):
+		client = self.server.getClientByConnection( self.connection )
+		
+		playerEntList = self.server.players[self.server.getPlayerKey( client )]
+
+		for each in playerEntList:
+			each.sendInput( message.inputDict )
+
 	def on_disconnect( self ):
 		self.server.removeClientByConnection( self.connection )
 

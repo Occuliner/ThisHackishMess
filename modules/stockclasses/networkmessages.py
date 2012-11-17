@@ -40,11 +40,13 @@ pygnetic.register( 'kickPlayer', ('duration', 'reason') )
 pygnetic.register( 'chatToClient', ('name', 'message') )
 
 #This message is sent from the player to the host when they say a message, the groupId paramter is for team say, the server can use the id to determine which players get the message.
-pygnetic.register( 'chatToHost', ('name', 'message', 'groupId' ) )
+pygnetic.register( 'chatToHost', ( 'message', 'groupId' ) )
 
 #This message is sent from the host to the player every tick. Each parameter is a list of objects that describe some event that happened this tick.
 pygnetic.register( 'updateEvent', ('tickNum', 'createEnts', 'removeEnts', 'updatePositions', 'startSounds', 'stopSounds', 'changeAnims', 'swapAnims') )
 
+#This message is sent from the player to the host containing the players input dicts.
+pygnetic.register( 'inputEvent', ('tickNum', 'inputDict') )
 
 ###Merge these all into a single event, each being a sub-event. This is to make sure you receive whole updates. There is no interest in partial updates.
 ##This message is to create a network ent on the client side.

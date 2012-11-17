@@ -15,7 +15,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import extern_modules.pygnetic as pygnetic, networkhandlers, weakref
+import extern_modules.pygnetic as pygnetic, networkhandlers, weakref, random, zlib
 from collections import namedtuple
 from networkupdateclasses import *
 
@@ -32,13 +32,17 @@ class NetworkServer( pygnetic.Server ):
 		self.playStateRef = weakref.ref(playState)
 
 		#List of addresses to auto-kick then disconnect. Should pull this from a file.
-		#It should be a list of 3 things, the address, the duration, the reason.
+		#It should be a tuple of 3 things, the address, the duration, the reason.
 		self.ipBanList = []
 
 		self.clients = []
 
 		self.createdEnts = []
 		self.removedEnts = []
+
+		#This is a dictionary of entities that different clients have permission to send inputDicts to.
+		#The key is the md5 sum created from throwing the md5StartString and the client name into md5.
+		self.players = {}
 
 	def addClient( self, info, connection ):
 		#First, checck to see if there's still a connection to the address.
@@ -56,6 +60,34 @@ class NetworkServer( pygnetic.Server ):
 		client = self.getClientByConnection( connection )
 		if client is not None:
 			self.clients.remove( client )
+			if client.isPlayer:
+				self.removePlayer( client )
+
+	def getPlayerKey( self, client ):
+		"""Return the adler32 digest of the client name"""
+		return zlib.alder32( client.name )
+
+	def addPlayer( self, client ):
+		#This can vary HUGELY. So it will do nothing by default.
+		#The idea is that you should probably create a player instance here.
+		#Below is a template for this method
+		
+		#if not client.isPlayer:
+		#	playerEntity = CREATIONHERE
+		#	self.players[self.getPlayerKey( client )] = [ playerEntity ]
+		#	client.isPlayer = True
+		pass
+
+	def removePlayer( self, client ):
+		#Again, this can vary a lot, so by default it does nothing.
+
+		#But what you want is probably something like this:
+		#playerKey = self.getPlayerKey( client )
+		#playerEntList = self.players[playerKey]
+		#del self.players[playerKey]
+		#for each in playerEntList:
+		#	each.kill()
+		pass
 
 	def update( self, timeout=0 ):
 		pygnetic.Sever.update( self, timeout )
