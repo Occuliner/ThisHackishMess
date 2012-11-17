@@ -71,7 +71,7 @@ class PlayInstance:
 		
 	def attemptPlay( self, sound ):
 		"""This method attempts to start the sound playing, and if successful adds it the in the list of playing PlayInstances"""
-		if not (self.channel is None):
+		if not (self.channelId is None):
 			pygame.mixer.Channel(self.channelId).play( sound, self.loops, self.maxtime, self.fade_ms )
 			self.soundManagerRef().playInstances.append( self )
 
@@ -134,7 +134,7 @@ class SoundManager:
 		if self.sounds.has_key( fileName ):
 			return self.sounds[key]()
 		tmpSound = Sound( os.path.join( self.path, fileName ), self )
-		self.sounds[key] = weakref.ref( tmpSound )
+		self.sounds[fileName] = weakref.ref( tmpSound )
 		return tmpSound
 
 	def makePicklable( self ):

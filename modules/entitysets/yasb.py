@@ -118,8 +118,8 @@ class YasbClass( Entity ):
 		
 		#self.acceleration[1] = 384
 		
-		#self.randomSound = group.playState.soundManager.getSound( "sfx_step_grass-CCBY.wav", 0 )
-		#self.randomSound.set_volume( 0.5 )
+		self.randomSound = group.playState.soundManager.getSound( "sfx_step_grass-CCBY.wav" )
+		self.randomSound.set_volume( 0.5 )
 		
 		self.stepsPlaying = False
 		self.stepsId = None
@@ -243,6 +243,8 @@ class YasbClass( Entity ):
 			#self.groups()[0].move_to_back( self.kickUp )
 			
 		if self.walkingLeft or self.walkingRight or self.walkingForward or self.walkingBackward:
+			if self.stepsId is None:
+				self.stepsId = self.randomSound.play(priority=1, loops=-1)
 			if self.onKickUpArea:
 				pass
 				#self.kickUp.setVisible( True )
@@ -250,6 +252,9 @@ class YasbClass( Entity ):
 				pass
 				#self.kickUp.setVisible( False )
 		else:
+			if self.stepsId is not None:
+				self.randomSound.stop(self.stepsId)
+				self.stepsId = None
 			self.changeAnimation( 'idle' )
 			#self.kickUp.setVisible( False )
 		
