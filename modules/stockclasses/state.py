@@ -163,6 +163,8 @@ class PlayState:
 
 		for eachElement in self.hudList:
 			eachElement.update( dt )
+
+		self.soundManager.update( dt )
 			
 	def sendInput( self, inputDict ):
 		"""Simply sets PlayState.curInputDict to a given input dictionary, 
