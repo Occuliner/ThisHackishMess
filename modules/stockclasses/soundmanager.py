@@ -38,7 +38,8 @@ class Sound( pygame.mixer.Sound ):
 		return None
 
 	def stop( self, channelId ):
-		pygame.mixer.Channel(channelId).stop()
+		#pygame.mixer.Channel(channelId).stop()
+		pass
 
 	def makePicklable( self ):
 		self.soundManagerRef = None
@@ -167,3 +168,9 @@ class SoundManager:
 				channel = pygame.mixer.Channel( eachInst.channelId )
 				channel.stop()
 				return eachInst.channelId
+
+	def stopSound( self, soundName, idNum ):
+		for each in self.playInstances[:]:
+			if each.channelId is idNum and each.soundFileName == soundName:
+				self.playInstances.remove( each )
+				break

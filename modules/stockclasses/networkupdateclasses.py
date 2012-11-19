@@ -18,7 +18,7 @@
 from collections import namedtuple
 
 #This object describes the event of an entity being created
-CreateEnt = namedtuple( 'CreatedEnt', ['entId', 'className', 'position', 'velocity'] )
+CreateEnt = namedtuple( 'CreateEnt', ['entId', 'className', 'position', 'velocity'] )
 
 #This object describes the event of removing an ent.
 RemoveEnt = namedtuple( 'RemoveEnt', ['entId'] )
@@ -27,10 +27,10 @@ RemoveEnt = namedtuple( 'RemoveEnt', ['entId'] )
 UpdatePosition = namedtuple( 'UpdatePosition', ['entId', 'newPosition'] )
 
 #This object describes the event of a sound starting.
-StartSound = namedtuple( 'StartSound', ['soundName', 'loops'] )
+StartSound = namedtuple( 'StartSound', ['soundName', 'priority', 'loops', 'maxtime', 'fade_ms'] )
 
 #This object describe the event of a sound ending.
-StopSound = namedtuple( 'StopSound', ['stopId'] )
+StopSound = namedtuple( 'StopSound', ['stopId', 'soundName'] )
 
 #This object describes the event of an ent swapping animation.
 SwapAnim = namedtuple( 'SwapAnim', ['entId', 'newAnimName'] )

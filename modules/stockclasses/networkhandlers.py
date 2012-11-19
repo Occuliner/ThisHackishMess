@@ -36,7 +36,17 @@ class ClientHandler(pygnetic.Handler):
 	def net_chatToClient( self, message, **kwargs ):
 		pass
 	def net_updateEvent( self, message, **kwargs ):
-		pass
+		client = self.client()
+
+		client.createEntities( message.createEnts )
+		client.removeEntities( message.removeEnts )
+		client.updatePositions( message.updatePositions )
+		client.startSounds( message.startSounds )
+		client.stopSounds( message.stopSounds )
+		client.swapAnims( message.swapAnims )
+		client.changeAnims( message.changeAnims )
+
+		client.networkTick = message.tickNum
 	def on_disconnect( self ):
 		pass
 
