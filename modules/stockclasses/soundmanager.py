@@ -19,16 +19,16 @@ import pygame, weakref, os
 
 pygame.mixer.init()
 
-class Sound( pygame.mixer.Sound ):
+class Sound:
 	def __init__( self, fileName, soundMgr ):
 		self.fileName = fileName
-		pygame.mixer.Sound.__init__( self, fileName )
+		self._pygameSound = pygame.mixer.Sound( os.path.join( soundMgr.path, fileName ) )
 		self.soundManagerRef = weakref.ref( soundMgr )
-		self.volume = self.get_volume()
+		self.volume = self._pygameSound.get_volume()
 
 	def set_volume( self, value ):
 		self.volume = value
-		pygame.mixer.Sound.set_volume( self, value )
+		self._pygameSound.set_volume( value )
 
 	def play( self, priority, loops=0, maxtime=0, fade_ms=0 ):
 		sndMgr = self.soundManagerRef()
@@ -38,15 +38,16 @@ class Sound( pygame.mixer.Sound ):
 		return None
 
 	def stop( self, channelId ):
-		pygame.mixer.Channel(channelId).stop()
+		self.soundManagerRef().stopSound( self.fileName, channelId )
 
 	def makePicklable( self ):
 		self.soundManagerRef = None
+		self._pygameSound = None
 
 	def makeUnpickable( self, sndMgr ):
 		self.soundManagerRef = weakref.ref( sndMgr )
-		pygame.mixer.Sound.__init__( self, self.fileName )
-		pygame.mixer.Sound.set_volume( self, self.volume )
+		self._pygameSound = pygame.mixer.Sound( os.path.join( sndMgr.path, self.fileName ) )
+		self._pygameSound.set_volume( self.volume )
 
 class PlayInstance:
 	"""So, this is a bit of an abstract class, basically the idea is that when a sound is played it creates a play instance.
@@ -58,7 +59,10 @@ class PlayInstance:
 	Upon saving, a list of the SoundManager's current playInstances will be dumped into the save. This can then be used to restore
 	the audio state after load."""
 	def __init__( self, sound, curTime, priority, loops, maxtime, fade_ms ):
-		self.endTime = sound.get_length()*(loops+1) + curTime
+		if loops != -1:
+			self.endTime = sound._pygameSound.get_length()*(loops+1) + curTime
+		else:
+			self.endTime = None
 		self.soundFileName = sound.fileName
 		self.soundManagerRef = sound.soundManagerRef
 
@@ -67,7 +71,9 @@ class PlayInstance:
 		self.fade_ms = fade_ms
 
 		self.channelId = self.soundManagerRef().getChannel( priority )
-		self.attemptPlay( sound )
+		self.attemptPlay( sound._pygameSound )
+
+		self.priority = priority
 		
 	def attemptPlay( self, sound ):
 		"""This method attempts to start the sound playing, and if successful adds it the in the list of playing PlayInstances"""
@@ -78,7 +84,7 @@ class PlayInstance:
 	def attemptRestart( self, sound ):
 		"""This method attempts to restart the sound playing after load, and if successful adds it the in the list of playing PlayInstances.
 		Currently it cheats and just restarts any looping sound from the nearest loop number"""
-		if not (self.channel is None):
+		if not (self.channelId is None):
 			if self.loops is 0:
 				#Create a version of the sound that starts at this moment.
 				tmpArray = pygame.sndarray.array( sound )
@@ -86,10 +92,14 @@ class PlayInstance:
 				splitSound = pygame.sndarray.make_sound( tmpArray[start:] )
 				
 				pygame.mixer.Channel(self.channelId).play( splitSound, 0, self.maxtime, self.fade_ms )
+			elif self.loops is -1:
+				pygame.mixer.Channel(self.channelId).play( sound, -1, self.maxtime, self.fade_ms )
 			else:
 				newLoopNum = (self.loops*(self.endTime - self.soundManagerRef().curTime))/sound.get_length()
 				pygame.mixer.Channel(self.channelId).play( sound, newLoopNum, self.maxtime, self.fade_ms )
-			self.soundManagerRef().playInstances.append( self )
+			playInsts = self.soundManagerRef().playInstances
+			if not ( self in playInsts):
+				playInsts.append( self )
 
 	def absent( self ):
 		"""This method returns true if the channel this instance is on is currently not busy"""
@@ -98,6 +108,8 @@ class PlayInstance:
 
 	def checkTime( self, curTime ):
 		"""This method merely returns True if the given curTime is greater than self.endTime"""
+		if self.endTime is None:
+			return False
 		return self.endTime<curTime
 
 	def makePicklable( self ):
@@ -105,8 +117,8 @@ class PlayInstance:
 
 	def makeUnpicklable( self, sndMgr ):
 		"""Called during loading process, this should restart all sounds"""
-		self.soundManagerRef = weakref.ref( sngMgr )
-		self.attemptRestart( self.soundManagerRef().getSound( self.soundFileName ) )
+		self.soundManagerRef = weakref.ref( sndMgr )
+		self.attemptRestart( self.soundManagerRef().getSound( self.soundFileName )._pygameSound )
 		
 class SoundManager:
 	def __init__( self, curTime=0.0 ):
@@ -123,17 +135,21 @@ class SoundManager:
 		
 		removeList = []
 		for eachInst in self.playInstances:
-			if eachInst.endTime < self.curTime:
+			if eachInst.checkTime( self.curTime ):
 				removeList.append( eachInst )
-			if eachInst.absent():
-				eachInst.attemptRestart()
+			elif eachInst.absent():
+				eachInst.attemptRestart( self.getSound( eachInst.soundFileName )._pygameSound )
 
 		[ self.playInstances.remove( each ) for each in removeList ]
 
 	def getSound( self, fileName ):
 		if self.sounds.has_key( fileName ):
-			return self.sounds[key]()
-		tmpSound = Sound( os.path.join( self.path, fileName ), self )
+			snd = self.sounds[fileName]()
+			if not (snd is None):
+				return snd
+			else:
+				print "Reference to None in soundManager.sounds?"
+		tmpSound = Sound( fileName, self )
 		self.sounds[fileName] = weakref.ref( tmpSound )
 		return tmpSound
 
@@ -154,7 +170,7 @@ class SoundManager:
 		for eachKey, eachVal in self.sounds.items():
 			self.sounds[eachKey] = weakref.ref( eachVal )
 		for eachInst in self.playInstances:
-			eachInst.makeUnpicklable()
+			eachInst.makeUnpicklable( self )
 
 	def getChannel( self, priority ):
 		usedChannelIds = [ each.channelId for each in self.playInstances ]
@@ -167,3 +183,10 @@ class SoundManager:
 				channel = pygame.mixer.Channel( eachInst.channelId )
 				channel.stop()
 				return eachInst.channelId
+
+	def stopSound( self, soundName, idNum ):
+		pygame.mixer.Channel(idNum).stop()
+		for each in self.playInstances[:]:
+			if each.channelId is idNum and each.soundFileName == soundName:
+				self.playInstances.remove( each )
+				break
