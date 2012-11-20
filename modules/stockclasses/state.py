@@ -20,6 +20,9 @@ import pygame, pymunk, sys, gc
 from linevisualiser import LineVisualiser
 from soundmanager import SoundManager
 from idsource import IdSource
+from networkserver import NetworkServer
+from networkclient import NetworkClient
+from modules.networkents.mindlessentholder import *
 
 """This module defines the PlayState class."""
 
@@ -88,6 +91,21 @@ class PlayState:
 
 		#This is the idSource, I use it for give ids to Entitys.
 		self.idSource = IdSource()
+
+	
+		self.isClient = False
+		self.isHost = False
+		self.networkNode = None
+		self.networkEntHolder = None
+
+	def hostGame( self ):
+		self.isHost = True
+		self.networkNode = NetworkServer( self )
+
+	def connectToGame( self ):
+		self.isClient = True
+		self.networkEntHolder = MindlessEntHolder()
+		self.networkNode = NetworkClient( self, self.networkEntHolder.dictOfEnts )
 
 	def addBoundary( self, point1, point2 ):
 		newSeg = pymunk.Segment( self.boundaryBody, point1, point2, 1 )
@@ -165,6 +183,9 @@ class PlayState:
 			eachElement.update( dt )
 
 		self.soundManager.update( dt )
+
+		if self.isHost:
+			self.networkNode.update()
 			
 	def sendInput( self, inputDict ):
 		"""Simply sets PlayState.curInputDict to a given input dictionary, 

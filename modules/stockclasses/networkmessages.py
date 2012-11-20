@@ -25,7 +25,7 @@ pygnetic.init( logging_lvl=None )
 pygnetic.register( 'requestInfo', ('iNeedAFieldForSomeReason') )
 
 #This message is sent on info request
-pyngetic.register( 'hereIsMyInfo', ('name') )
+pygnetic.register( 'hereIsMyInfo', ('name') )
 
 #This message is sent when the player hits join game.
 pygnetic.register( 'joinGame', ('name') )
