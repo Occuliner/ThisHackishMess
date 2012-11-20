@@ -20,11 +20,13 @@ class Client(object):
 
     def __new__(cls, *args, **kwargs):
         "Create instance of Client class depending on selected network adapter"
+	#del kwargs['playState']
+	#del kwargs['networkEntsClassDefs']
         b = cls.__bases__
-        if Client in b:  # creation by inheritance
+        if Client in b and not ( selected_adapter.Client in b ):  # creation by inheritance
             i = b.index(Client) + 1
             cls.__bases__ = b[:i] + (selected_adapter.Client,) + b[i:]
-            return super(cls, cls).__new__(cls, *args, **kwargs)
+            return super(Client, cls).__new__(cls, *args, **kwargs)
         else:  # direct object creation
             # can't assign to __bases__ - bugs.python.org/issue672115
             return selected_adapter.Client(*args, **kwargs)
@@ -35,8 +37,10 @@ class Server(object):
 
     def __new__(cls, *args, **kwargs):
         "Create instance of Server class depending on selected network adapter"
-        b = cls.__bases__
-        if Server in b:  # creation by inheritance
+        del kwargs['playState']
+
+	b = cls.__bases__
+        if Server in b and not ( selected_adapter.Server in b ):  # creation by inheritance
             i = b.index(Server) + 1
             cls.__bases__ = b[:i] + (selected_adapter.Server,) + b[i:]
             return super(Server, cls).__new__(cls, *args, **kwargs)

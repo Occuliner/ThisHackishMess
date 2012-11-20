@@ -4,7 +4,7 @@
 import logging
 import socket
 import struct
-import asyncore
+import localasyncore as asyncore
 from collections import deque
 from .. import connection, server, client
 

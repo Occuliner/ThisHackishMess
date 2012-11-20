@@ -18,7 +18,7 @@
 import extern_modules.pygnetic as pygnetic, networkhandlers, weakref
 
 class NetworkClient( pygnetic.Client ):
-	def __init__( self, playState, networkEntsClassDefs, conn_limit=1, *args, **kwargs ):
+	def __init__( self, playState=None, networkEntsClassDefs=None, conn_limit=1, *args, **kwargs ):
 		pygnetic.Client.__init__( self, conn_limit, *args, **kwargs )
 		
 		self.playStateRef = weakref.ref( playState )
@@ -28,7 +28,7 @@ class NetworkClient( pygnetic.Client ):
 		self.networkEntsClassDefs = networkEntsClassDefs
 
 	def connect( self, address, port, message_factory=pygnetic.message.message_factory, **kwargs ):
-		connection = pygnetic.Client.connect( address, port, message_factory, **kwargs )
+		connection = pygnetic.client.Client.connect( self, address, port, message_factory, **kwargs )
 		connection.add_handler( networkhandlers.ClientHandler( self ) )
 
 	def createEntities( self, createTuples ):

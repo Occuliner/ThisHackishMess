@@ -100,12 +100,15 @@ class PlayState:
 
 	def hostGame( self ):
 		self.isHost = True
-		self.networkNode = NetworkServer( self )
+		self.networkNode = NetworkServer( playState=self )
+		print "Beginning hosting..."
 
 	def connectToGame( self ):
 		self.isClient = True
 		self.networkEntHolder = MindlessEntHolder()
 		self.networkNode = NetworkClient( self, self.networkEntHolder.dictOfEnts )
+		self.networkNode.connect( "localhost", 1337 )
+		print "Connecting..."
 
 	def addBoundary( self, point1, point2 ):
 		newSeg = pymunk.Segment( self.boundaryBody, point1, point2, 1 )

@@ -47,7 +47,7 @@ sophisticated high-performance network servers and clients a snap.
 """
 
 import select
-import socket
+import localsocket as socket
 import sys
 import time
 import warnings
