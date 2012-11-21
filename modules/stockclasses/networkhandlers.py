@@ -31,8 +31,9 @@ class ClientHandler(pygnetic.Handler):
 	def net_requestInfo( self, message, **kwargs ):
 		playState = self.client().playStateRef()
 		playState.soundManager.idGen = IdSource()
-		for each in xrange( message.soundMgrCurPlayId+1 ):
-			playState.soundManager.idGen.getId()
+		if message.soundMgrCurPlayId != 0:
+			for each in xrange( message.soundMgrCurPlayId+1 ):
+				playState.soundManager.idGen.getId()
 		playState.soundManager.curPlayId = message.soundMgrCurPlayId
 		
 		self.connection.net_hereIsMyInfo( self.client().name )
