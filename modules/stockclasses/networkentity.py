@@ -61,6 +61,10 @@ class NetworkEntity( pygame.sprite.DirtySprite ):
 	#Frame Positions are the x-position and y-position of the each frame relative to the physics body, (0,0) is the uppleft corner is positioned on body location, this is the default and typical state.
 	framePositions = {}
 
+	collidable = False
+
+	specialCollision = None
+
 	circular = False
 	radius = 1
 	def __init__( self, pos, vel, image=None, group=None, rect=None, animated=None ):

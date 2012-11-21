@@ -29,6 +29,8 @@ class NetworkClient:
 
 		self.handler = None
 
+		self.name = "Banana"
+
 	def connect( self, address, port, message_factory=pygnetic.message.message_factory, **kwargs ):
 		connection = self._client.connect( address, port, message_factory, **kwargs )
 		self.handler = networkhandlers.ClientHandler( self )
@@ -36,14 +38,14 @@ class NetworkClient:
 
 	def createEntities( self, createTuples ):
 		for eachTuple in createTuples:
-			classDef = self.networkEntsClassDefs[eachTuple.className]
+			classDef = self.networkEntsClassDefs[eachTuple[1]+"Network"]
 			destGroup = getattr( self.playStateRef(), classDef.playStateGroup )
-			inst = classDef( pos=eachTuple.position, vel=eachTuple.velocity, group=destGroup )
-			inst.id = eachTuple.entId
+			inst = classDef( pos=eachTuple[2], vel=eachTuple[3], group=destGroup )
+			inst.id = eachTuple[0]
 
 	def removeEntities( self, removeTuples ):
 		playState = self.playStateRef()
-		for eachId in [ each.entId for each in removeTuples ]:
+		for eachId in [ each[0] for each in removeTuples ]:
 			matchFound = False
 			for eachEnt in playState.sprites():
 				if eachEnt.id == eachId:
@@ -56,46 +58,46 @@ class NetworkClient:
 	def updatePositions( self, positionTuples ):
 		playState = self.playStateRef()
 		for eachTuple in positionTuples:
-			eachId = eachTuple.entId
+			eachId = eachTuple[0]
 			matchFound = False
 			for eachEnt in playState.sprites():
 				if eachEnt.id == eachId:
 					matchFound = True
-					eachEnt.setPosition( eachTuple.newPosition )
+					eachEnt.setPosition( eachTuple[1] )
 			if not matchFound:
 				print "WAT. RECEIVED UPDATE REFERRING TO NON-EXISTANT ENTITY."
 
 	def startSounds( self, soundTuples ):
 		sndMgr = self.playStateRef().soundManager
 		for eachTuple in soundTuples:
-			sndMgr.getSound(eachTuple.soundName).play( eachTuple.priority, eachTuple.loops, eachTuple.maxtime, eachTuple.fade_ms )
+			sndMgr.getSound(eachTuple[0]).play( eachTuple[1], eachTuple[2], eachTuple[3], eachTuple[4] )
 
 	def stopSounds( self, soundTuples ):
 		sndMgr = self.playStateRef().soundManager
 		for eachTuple in soundTuples:
-			sndMgr.stopSound( eachTuple.soundName, eachTuple.stopId )
+			sndMgr.stopSound( eachTuple[1], eachTuple[0] )
 
 	def swapAnims( self, swapTuples ):
 		playState = self.playStateRef()
 		for eachTuple in swapTuples:
-			eachId = eachTuple.entId
+			eachId = eachTuple[0]
 			matchFound = False
 			for eachEnt in playState.sprites():
 				if eachEnt.id == eachId:
 					matchFound = True
-					eachEnt.swapAnimation( eachTuple.newAnimName )
+					eachEnt.swapAnimation( eachTuple[1] )
 			if not matchFound:
 				print "WAT. RECEIVED UPDATE REFERRING TO NON-EXISTANT ENTITY."
 
 	def changeAnims( self, changeTuples ):
 		playState = self.playStateRef()
 		for eachTuple in changeTuples:
-			eachId = eachTuple.entId
+			eachId = eachTuple[0]
 			matchFound = False
 			for eachEnt in playState.sprites():
 				if eachEnt.id == eachId:
 					matchFound = True
-					eachEnt.changeAnimation( eachTuple.newAnimName )
+					eachEnt.changeAnimation( eachTuple[1] )
 			if not matchFound:
 				print "WAT. RECEIVED UPDATE REFERRING TO NON-EXISTANT ENTITY."
 

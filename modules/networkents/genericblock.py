@@ -42,8 +42,6 @@ class GenericBlockNetwork( NetworkEntity ):
 	sheetFileName = "block.png"
 	sheet = loadImage( sheetFileName, scale )
 
-	specialCollision = None
-	collidable = True
 	solid = True
 	mass = 20
 	

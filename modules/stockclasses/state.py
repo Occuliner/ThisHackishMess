@@ -104,18 +104,27 @@ class PlayState:
 
 	def initNetworking( self ):
 		if not self.networkingStarted:
-			pygnetic.init(logging_lvl=logging.DEBUG)
+			#pygnetic.init(logging_lvl=logging.DEBUG)
+			pygnetic.init(logging_lvl=None)
 			self.networkingStarted = True
 
 	def hostGame( self ):
-		self.isHost = True
-		self.initNetworking()
+		if self.isHost:
+			del self.networkNode._server
+			gc.collect()
+		else:
+			self.isHost = True
+			self.initNetworking()
 		self.networkNode = NetworkServer( playState=self )
 
 	def connectToGame( self ):
-		self.isClient = True
+		if self.isClient:
+			del self.networkNode._client
+			gc.collect()
+		else:
+			self.isClient = True
+			self.initNetworking()
 		self.networkEntHolder = MindlessEntHolder()
-		self.initNetworking()
 		self.networkNode = NetworkClient( self, self.networkEntHolder.dictOfEnts )
 		self.networkNode.connect( "localhost", 1337 )
 

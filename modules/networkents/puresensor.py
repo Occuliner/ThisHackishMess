@@ -24,7 +24,6 @@ import pygame
 class PureSensorNetwork( NetworkEntity ):
 	setName = "pureSensors"
 	playStateGroup = "genericStuffGroup"
-	collidable = True
 	solid = False
 	mass = 20
 	pureSensor = True

@@ -36,8 +36,6 @@ class LevelWarpNetwork( NetworkEntity ):
 	sheetFileName = "block.png"
 	sheet = loadImage( sheetFileName, scale )
 
-	specialCollision = None
-	collidable = True
 	solid = False
 	mass = 20
 	

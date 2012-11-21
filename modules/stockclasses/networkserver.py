@@ -47,7 +47,7 @@ class NetworkServer:
 
 	def addCreateEnt( self, ent ):
 		if ent.collidable:
-			vel = ent.body.velocity
+			vel = [ent.body.velocity[0], ent.body.velocity[1]]
 		else:
 			vel = [0.0,0.0]
 		self.createdEnts.append( CreateEnt( ent.id, ent.__class__.__name__, ent.getPosition(), vel ) )
@@ -57,7 +57,7 @@ class NetworkServer:
 
 	def addClient( self, info, connection ):
 		#First, checck to see if there's still a connection to the address.
-		if not ( connection.address in [each.address for each in self.connections()] ):
+		if not ( connection.address in [each.address for each in self._server.connections()] ):
 			return None
 
 		self.clients.append( ClientTuple( info.name, connection, False ) )
@@ -105,13 +105,13 @@ class NetworkServer:
 		
 		#Create the network update.
 		updatedPositions = [ UpdatePosition( each.id, each.rect.topleft ) for each in self.playStateRef().sprites() ]
-		createEntUpdates = [ CreateEnt( each[0], each[1], each[2], each[3] ) for each in self.createdEnts ]
-		removeEntUpdates = [ RemoveEnt( each ) for each in self.removedEnts ]
+		createEntUpdates = list( self.createdEnts )
+		removeEntUpdates = list( self.removedEnts )
 
 		#Iterate over every client
 		for eachClient in self.clients:
 			#Send each a network update.
-			eachClient.connection.net_updateEvent( self.networkTick, createEntUpdates, removeEntUpdates, updatePositions, [], [], [], [] )
+			eachClient.connection.net_updateEvent( self.networkTick, createEntUpdates, removeEntUpdates, updatedPositions, [], [], [], [] )
 
 		#Clear for the next update
 		self.createdEnts = []

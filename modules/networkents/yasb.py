@@ -75,9 +75,7 @@ class YasbClassNetwork( NetworkEntity ):
 	wbdx = 2
 	wbdy = 20
 
-	collidable = True
 	mass = 70
-	specialCollision = None
 	solid = True
 
 	
@@ -118,7 +116,6 @@ class YasbClassNetwork( NetworkEntity ):
 		#self.animations['spin'] = { 'fps':8, 'frames':[4,1,5,1] }
 
 		self.standingAt = None
-		setStandingAt( self )
 
 		#Assign the kickUp!
 		#self.kickUp = KickUp( group, self )
@@ -210,15 +207,15 @@ class YasbClassNetwork( NetworkEntity ):
 
 	def update( self, dt ):
 			
-		self.body.reset_forces()
+		#self.body.reset_forces()
 
-		walk = self.applyWalk()
-		self.body.apply_force( ( walk[0]*10, walk[1]*10 ) )
+		#walk = self.applyWalk()
+		#self.body.apply_force( ( walk[0]*10, walk[1]*10 ) )
 
-		if any( [ self.walkingLeft, self.walkingRight ] ):
-			self.idle[0] = False
-		if any( [ self.walkingForward, self.walkingBackward ] ):
-			self.idle[1] = False
+		#if any( [ self.walkingLeft, self.walkingRight ] ):
+		#	self.idle[0] = False
+		#if any( [ self.walkingForward, self.walkingBackward ] ):
+		#	self.idle[1] = False
 		
 		NetworkEntity.update( self, dt )
 

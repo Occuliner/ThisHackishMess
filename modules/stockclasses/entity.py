@@ -261,7 +261,7 @@ class Entity( pygame.sprite.DirtySprite ):
 
 	def getPosition( self ):
 		if self.collidable:
-			return list( self.body.position )
+			return [self.body.position[0], self.body.position[1]]
 		else:
 			return list( self.position )
 

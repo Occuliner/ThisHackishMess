@@ -33,8 +33,7 @@ class AnvilNetwork( NetworkEntity ):
 	sheetFileName = "anvil.png"
 	sheet = loadImage( sheetFileName, 2 )
 
-	specialCollision = None
-	collidable = True
+
 	solid = True
 	mass = 2000000000
 	scale = 2
