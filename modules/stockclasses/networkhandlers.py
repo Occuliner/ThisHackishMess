@@ -27,7 +27,6 @@ class ClientHandler(pygnetic.Handler):
 		self.client = weakref.ref( client )
 
 	def net_requestInfo( self, message, **kwargs ):
-		print "Yay"
 		self.connection.net_hereIsMyInfo( self.client().name )
 
 	def net_acceptPlayer( self, message, **kwargs ):
