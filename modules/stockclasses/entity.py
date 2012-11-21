@@ -221,6 +221,8 @@ class Entity( pygame.sprite.DirtySprite ):
 		
 		if group != None:
 			self.addToGroup( group )
+			if group.playState.isHost:
+				group.playState.networkNode.addCreateEnt( self )
 		else:
 			self.id = None
 		self.tags = {}
@@ -259,7 +261,7 @@ class Entity( pygame.sprite.DirtySprite ):
 
 	def getPosition( self ):
 		if self.collidable:
-			return list( self.body.position[0], self.body.position[1] )
+			return list( self.body.position )
 		else:
 			return list( self.position )
 
@@ -344,8 +346,11 @@ class Entity( pygame.sprite.DirtySprite ):
 
 
 	def kill( self ):
+		playState = self.groups()[0].playState
 		if self.collidable:
-			self.groups()[0].playState.space.remove( self.physicsObjects )
+			playState.space.remove( self.physicsObjects )
+		if playState.isHost:
+			playState.networkNode.addRemoveEnt( self )
 		pygame.sprite.DirtySprite.kill( self )
 		
 

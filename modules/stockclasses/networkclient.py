@@ -19,7 +19,7 @@ import extern_modules.pygnetic as pygnetic, networkhandlers, weakref
 
 class NetworkClient:
 	def __init__( self, playState=None, networkEntsClassDefs=None, conn_limit=1, *args, **kwargs ):
-		self._server = pygnetic.Client( conn_limit, *args, **kwargs )
+		self._client = pygnetic.Client( conn_limit, *args, **kwargs )
 		
 		self.playStateRef = weakref.ref( playState )
 
@@ -27,9 +27,12 @@ class NetworkClient:
 
 		self.networkEntsClassDefs = networkEntsClassDefs
 
+		self.handler = None
+
 	def connect( self, address, port, message_factory=pygnetic.message.message_factory, **kwargs ):
-		connection = pygnetic.client.Client.connect( self._server, address, port, message_factory, **kwargs )
-		connection.add_handler( networkhandlers.ClientHandler( self ) )
+		connection = self._client.connect( address, port, message_factory, **kwargs )
+		self.handler = networkhandlers.ClientHandler( self )
+		connection.add_handler( self.handler )
 
 	def createEntities( self, createTuples ):
 		for eachTuple in createTuples:
@@ -95,3 +98,6 @@ class NetworkClient:
 					eachEnt.changeAnimation( eachTuple.newAnimName )
 			if not matchFound:
 				print "WAT. RECEIVED UPDATE REFERRING TO NON-EXISTANT ENTITY."
+
+	def update( self, timeout=0 ):
+		self._client.update( timeout )

@@ -25,6 +25,7 @@ class NetworkServer:
 	def __init__( self, playState=None, host="", port=1337, con_limit=4 ):
 		self._server = pygnetic.Server( host, port, con_limit )
 		self._server.handler = networkhandlers.ServerHandler
+		self._server.networkServerRef = weakref.ref( self )
 
 		#The tick that the server is on, from its own perspective.
 		self.networkTick = 0
@@ -43,6 +44,16 @@ class NetworkServer:
 		#This is a dictionary of entities that different clients have permission to send inputDicts to.
 		#The key is the md5 sum created from throwing the md5StartString and the client name into md5.
 		self.players = {}
+
+	def addCreateEnt( self, ent ):
+		if ent.collidable:
+			vel = ent.body.velocity
+		else:
+			vel = [0.0,0.0]
+		self.createdEnts.append( CreateEnt( ent.id, ent.__class__.__name__, ent.getPosition(), vel ) )
+
+	def addRemoveEnt( self, ent ):
+		self.removeEnts.append( RemoveEnt( ent.id ) )
 
 	def addClient( self, info, connection ):
 		#First, checck to see if there's still a connection to the address.
@@ -90,11 +101,11 @@ class NetworkServer:
 		pass
 
 	def update( self, timeout=0 ):
-		pygnetic.server.Server.update( self._server, timeout )
+		self._server.update( timeout )
 		
 		#Create the network update.
 		updatedPositions = [ UpdatePosition( each.id, each.rect.topleft ) for each in self.playStateRef().sprites() ]
-		createEntUpdates = [ CreateEnt( each[0], each[1], each[2] ) for each in self.createdEnts ]
+		createEntUpdates = [ CreateEnt( each[0], each[1], each[2], each[3] ) for each in self.createdEnts ]
 		removeEntUpdates = [ RemoveEnt( each ) for each in self.removedEnts ]
 
 		#Iterate over every client
@@ -105,3 +116,5 @@ class NetworkServer:
 		#Clear for the next update
 		self.createdEnts = []
 		self.removedEnts = []
+
+		self.networkTick += 1

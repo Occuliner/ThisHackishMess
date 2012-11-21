@@ -27,6 +27,7 @@ class ClientHandler(pygnetic.Handler):
 		self.client = weakref.ref( client )
 
 	def net_requestInfo( self, message, **kwargs ):
+		print "Yay"
 		self.connection.net_hereIsMyInfo( self.client().name )
 
 	def net_acceptPlayer( self, message, **kwargs ):
@@ -49,36 +50,43 @@ class ClientHandler(pygnetic.Handler):
 		client.networkTick = message.tickNum
 	def on_disconnect( self ):
 		pass
+	
+	def on_revice( self, message, **kwargs ):
+		print "Unrecognized message: ", message
 
 class ServerHandler(pygnetic.Handler):
 	def on_connect( self ):
 		#Check this address isn't in the banlist.
-		for eachSet in self.server.ipBanList:
+		for eachSet in self.server.networkServerRef().ipBanList:
 			if eachSet[0] == self.connection.address:
 				self.connection.kick_player( eachSet[1], eachSet[2] )
 				self.connection.disconnect()
 				return None
 		self.connection.net_requestInfo( None )
+		pygnetic.Handler.on_connect( self )
 
 	def net_hereIsMyInfo( self, message, **kwargs ):
-		self.server.addClient( message, self.connection )
+		self.server.networkServerRef().addClient( message, self.connection )
 
 	def net_joinGame( self, message, **kwargs ):
-		client = self.server.getClientByConnection( self.connection )
+		client = self.server.networkServerRef().getClientByConnection( self.connection )
 		self.connection.net_acceptPlayer( client.name )
-		self.server.addPlayer( client )
+		self.server.networkServerRef().addPlayer( client )
 
 	def net_chatToHost( self, message, **kwargs ):
 		pass
 
 	def net_inputEvent( self, message, **kwargs ):
-		client = self.server.getClientByConnection( self.connection )
+		client = self.server.networkServerRef().getClientByConnection( self.connection )
 		
-		playerEntList = self.server.players[self.server.getPlayerKey( client )]
+		playerEntList = self.server.networkServerRef().players[self.server.networkServerRef().getPlayerKey( client )]
 
 		for each in playerEntList:
 			each.sendInput( message.inputDict )
 
 	def on_disconnect( self ):
-		self.server.removeClientByConnection( self.connection )
+		self.server.networkServerRef().removeClientByConnection( self.connection )
+
+	def on_revice( self, message, **kwargs ):
+		print "Unrecognized message: ", message
 

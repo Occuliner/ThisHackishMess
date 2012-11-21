@@ -96,6 +96,8 @@ class PlayState:
 	
 		self.isClient = False
 		self.isHost = False
+		self.networkRate = 20.0
+		self.networkTicker = 0
 		self.networkNode = None
 		self.networkEntHolder = None
 		self.networkingStarted = False
@@ -107,9 +109,8 @@ class PlayState:
 
 	def hostGame( self ):
 		self.isHost = True
-		self.networkNode = NetworkServer( playState=self )
 		self.initNetworking()
-		print "Beginning hosting..."
+		self.networkNode = NetworkServer( playState=self )
 
 	def connectToGame( self ):
 		self.isClient = True
@@ -117,7 +118,6 @@ class PlayState:
 		self.initNetworking()
 		self.networkNode = NetworkClient( self, self.networkEntHolder.dictOfEnts )
 		self.networkNode.connect( "localhost", 1337 )
-		print "Connecting..."
 
 	def addBoundary( self, point1, point2 ):
 		newSeg = pymunk.Segment( self.boundaryBody, point1, point2, 1 )
@@ -196,9 +196,12 @@ class PlayState:
 
 		self.soundManager.update( dt )
 
-		if self.isHost:
-			self.networkNode.update()
-			
+		if self.isHost or self.isClient:
+			if self.networkTicker >= int(60.0/self.networkRate):
+				self.networkNode.update()
+				self.networkTicker = -1
+			self.networkTicker += 1
+
 	def sendInput( self, inputDict ):
 		"""Simply sets PlayState.curInputDict to a given input dictionary, 
 		for use in PlayState.update()"""
