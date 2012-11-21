@@ -50,7 +50,7 @@ class NetworkClient:
 			for eachEnt in playState.sprites():
 				if eachEnt.id == eachId:
 					matchFound = True
-					eachEnt.removeFromGroups( eachEnt.groups )
+					eachEnt.removeFromGroup( *eachEnt.groups() )
 					break
 			if not matchFound:		
 				print "WAT. RECEIVED UPDATE REFERRING TO NON-EXISTANT ENTITY."

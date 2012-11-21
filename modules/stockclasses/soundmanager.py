@@ -17,6 +17,8 @@
 
 import pygame, weakref, os
 
+from idsource import IdSource
+
 pygame.mixer.init()
 
 class Sound:
@@ -35,12 +37,14 @@ class Sound:
 		if sndMgr.playStateRef().isHost:
 			sndMgr.playStateRef().networkNode.addStartSound( self.fileName, priority, loops, maxtime, fade_ms )
 		inst = PlayInstance( self, sndMgr.curTime, priority, loops, maxtime, fade_ms )
+		sndMgr.curPlayId = inst.playId
 		if not (inst.channelId is None):
-			return inst.channelId
+			return inst.playId
+				
 		return None
 
-	def stop( self, channelId ):
-		self.soundManagerRef().stopSound( self.fileName, channelId )
+	def stop( self, playId ):
+		self.soundManagerRef().stopSound( self.fileName, playId )
 
 	def makePicklable( self ):
 		self.soundManagerRef = None
@@ -73,6 +77,7 @@ class PlayInstance:
 		self.fade_ms = fade_ms
 
 		self.channelId = self.soundManagerRef().getChannel( priority )
+		self.playId = self.soundManagerRef().idGen.getId()
 		self.attemptPlay( sound._pygameSound )
 
 		self.priority = priority
@@ -131,6 +136,8 @@ class SoundManager:
 		self.playInstances = []
 		self.curTime = curTime
 		self.playStateRef = weakref.ref( playState )
+		self.idGen = IdSource()
+		self.curPlayId = 0
 
 	def update( self, dt ):
 		"""Basically all this method does is remove playInstances that are no longer valid."""
@@ -190,8 +197,8 @@ class SoundManager:
 	def stopSound( self, soundName, idNum ):
 		if self.playStateRef().isHost:
 			self.playStateRef().networkNode.addStopSound( soundName, idNum )
-		pygame.mixer.Channel(idNum).stop()
 		for each in self.playInstances[:]:
-			if each.channelId is idNum and each.soundFileName == soundName:
+			if each.playId is idNum and each.soundFileName == soundName:
+				pygame.mixer.Channel(each.channelId).stop()
 				self.playInstances.remove( each )
 				break

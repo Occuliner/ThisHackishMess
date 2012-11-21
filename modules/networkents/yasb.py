@@ -136,7 +136,7 @@ class YasbClassNetwork( NetworkEntity ):
 		
 	def kill( self ):
 		#self.kickUp.specialKill()
-		Entity.kill( self )
+		NetworkEntity.kill( self )
 
 	def applyWalk( self ):
 		walkingDirection = Vector( 0, 0 )

@@ -92,7 +92,6 @@ class PlayState:
 
 		#This is the idSource, I use it for give ids to Entitys.
 		self.idSource = IdSource()
-
 	
 		self.isClient = False
 		self.isHost = False
@@ -116,6 +115,7 @@ class PlayState:
 			self.isHost = True
 			self.initNetworking()
 		self.networkNode = NetworkServer( playState=self )
+		print "Beginning hosting..."
 
 	def connectToGame( self ):
 		if self.isClient:
@@ -127,6 +127,7 @@ class PlayState:
 		self.networkEntHolder = MindlessEntHolder()
 		self.networkNode = NetworkClient( self, self.networkEntHolder.dictOfEnts )
 		self.networkNode.connect( "localhost", 1337 )
+		print "Connecting..."
 
 	def addBoundary( self, point1, point2 ):
 		newSeg = pymunk.Segment( self.boundaryBody, point1, point2, 1 )

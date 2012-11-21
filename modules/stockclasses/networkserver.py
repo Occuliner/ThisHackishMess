@@ -58,7 +58,7 @@ class NetworkServer:
 		self.createdEnts.append( CreateEnt( ent.id, ent.__class__.__name__, ent.rect.topleft, vel ) )
 
 	def addRemoveEnt( self, ent ):
-		self.removeEnts.append( RemoveEnt( ent.id ) )
+		self.removedEnts.append( RemoveEnt( ent.id ) )
 
 	def addSwapAnim( self, ent, animName ):
 		self.swapAnims.append( SwapAnim( ent.id, animName ) )

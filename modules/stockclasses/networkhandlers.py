@@ -17,6 +17,8 @@
 
 import extern_modules.pygnetic as pygnetic, networkmessages, weakref
 
+from idsource import IdSource
+
 class ClientHandler(pygnetic.Handler):
 	def __init__( self, client ):
 		#The tick that the handler is on, from its own perspective.
@@ -27,6 +29,12 @@ class ClientHandler(pygnetic.Handler):
 		self.client = weakref.ref( client )
 
 	def net_requestInfo( self, message, **kwargs ):
+		playState = self.client().playStateRef()
+		playState.soundManager.idGen = IdSource()
+		for each in xrange( message.soundMgrCurPlayId+1 ):
+			playState.soundManager.idGen.getId()
+		playState.soundManager.curPlayId = message.soundMgrCurPlayId
+		
 		self.connection.net_hereIsMyInfo( self.client().name )
 
 	def net_acceptPlayer( self, message, **kwargs ):
@@ -61,7 +69,8 @@ class ServerHandler(pygnetic.Handler):
 				self.connection.kick_player( eachSet[1], eachSet[2] )
 				self.connection.disconnect()
 				return None
-		self.connection.net_requestInfo( None )
+		playState = self.server.networkServerRef().playStateRef()
+		self.connection.net_requestInfo( playState.soundManager.curPlayId )
 		pygnetic.Handler.on_connect( self )
 
 	def net_hereIsMyInfo( self, message, **kwargs ):
