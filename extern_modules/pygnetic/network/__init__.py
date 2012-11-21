@@ -37,7 +37,7 @@ class Server(object):
 
     def __new__(cls, *args, **kwargs):
         "Create instance of Server class depending on selected network adapter"
-        del kwargs['playState']
+        #del kwargs['playState']
 
 	b = cls.__bases__
         if Server in b and not ( selected_adapter.Server in b ):  # creation by inheritance

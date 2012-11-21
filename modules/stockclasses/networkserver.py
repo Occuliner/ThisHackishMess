@@ -21,10 +21,10 @@ from networkupdateclasses import *
 
 ClientTuple = namedtuple( 'ClientTuple', ['name', 'connection', 'isPlayer'] )
 
-class NetworkServer( pygnetic.Server ):
+class NetworkServer:
 	def __init__( self, playState=None, host="", port=1337, con_limit=4 ):
-		pygnetic.Server.__init__( self, host, port, con_limit )
-		self.handler = networkhandlers.ServerHandler
+		self._server = pygnetic.Server( host, port, con_limit )
+		self._server.handler = networkhandlers.ServerHandler
 
 		#The tick that the server is on, from its own perspective.
 		self.networkTick = 0
@@ -90,7 +90,7 @@ class NetworkServer( pygnetic.Server ):
 		pass
 
 	def update( self, timeout=0 ):
-		pygnetic.server.Server.update( self, timeout )
+		pygnetic.server.Server.update( self._server, timeout )
 		
 		#Create the network update.
 		updatedPositions = [ UpdatePosition( each.id, each.rect.topleft ) for each in self.playStateRef().sprites() ]
