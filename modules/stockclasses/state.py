@@ -15,7 +15,8 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import pygame, pymunk, sys, gc
+import pygame, pymunk, sys, gc, logging
+import extern_modules.pygnetic as pygnetic
 #from pygame.locals import *
 from linevisualiser import LineVisualiser
 from soundmanager import SoundManager
@@ -97,15 +98,23 @@ class PlayState:
 		self.isHost = False
 		self.networkNode = None
 		self.networkEntHolder = None
+		self.networkingStarted = False
+
+	def initNetworking( self ):
+		if not self.networkingStarted:
+			pygnetic.init(logging_lvl=logging.DEBUG)
+			self.networkingStarted = True
 
 	def hostGame( self ):
 		self.isHost = True
 		self.networkNode = NetworkServer( playState=self )
+		self.initNetworking()
 		print "Beginning hosting..."
 
 	def connectToGame( self ):
 		self.isClient = True
 		self.networkEntHolder = MindlessEntHolder()
+		self.initNetworking()
 		self.networkNode = NetworkClient( self, self.networkEntHolder.dictOfEnts )
 		self.networkNode.connect( "localhost", 1337 )
 		print "Connecting..."
