@@ -263,13 +263,13 @@ class Entity( pygame.sprite.DirtySprite ):
 		if self.collidable:
 			return [self.body.position[0], self.body.position[1]]
 		else:
-			return list( self.position )
+			return [self.rect.topleft[0], self.rect.topleft[1]]
 
 	def setPosition( self, newPos ):
 		if self.collidable:
 			self.body.position = list( newPos )
 		else:
-			self.position = list( newPos )
+			self.rect.topleft = newPos[0], newPos[1]
 
 	def createFrames( self ):
 		#if self.animated:

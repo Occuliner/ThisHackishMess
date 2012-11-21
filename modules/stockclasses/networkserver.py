@@ -50,7 +50,8 @@ class NetworkServer:
 			vel = [ent.body.velocity[0], ent.body.velocity[1]]
 		else:
 			vel = [0.0,0.0]
-		self.createdEnts.append( CreateEnt( ent.id, ent.__class__.__name__, ent.getPosition(), vel ) )
+		#self.createdEnts.append( CreateEnt( ent.id, ent.__class__.__name__, ent.getPosition(), vel ) )
+		self.createdEnts.append( CreateEnt( ent.id, ent.__class__.__name__, ent.rect.topleft, vel ) )
 
 	def addRemoveEnt( self, ent ):
 		self.removeEnts.append( RemoveEnt( ent.id ) )

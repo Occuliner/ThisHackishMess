@@ -105,7 +105,7 @@ class PlayState:
 	def initNetworking( self ):
 		if not self.networkingStarted:
 			#pygnetic.init(logging_lvl=logging.DEBUG)
-			pygnetic.init(logging_lvl=None)
+			pygnetic.init(logging_lvl=logging.ERROR)
 			self.networkingStarted = True
 
 	def hostGame( self ):
