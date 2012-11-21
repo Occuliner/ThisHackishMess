@@ -40,6 +40,10 @@ class NetworkServer:
 
 		self.createdEnts = []
 		self.removedEnts = []
+		self.swapAnims = []
+		self.changeAnims = []
+		self.startSounds = []
+		self.stopSounds = []
 
 		#This is a dictionary of entities that different clients have permission to send inputDicts to.
 		#The key is the md5 sum created from throwing the md5StartString and the client name into md5.
@@ -55,6 +59,18 @@ class NetworkServer:
 
 	def addRemoveEnt( self, ent ):
 		self.removeEnts.append( RemoveEnt( ent.id ) )
+
+	def addSwapAnim( self, ent, animName ):
+		self.swapAnims.append( SwapAnim( ent.id, animName ) )
+
+	def addChangeAnim( self, ent, animName ):
+		self.changeAnims.append( ChangeAnim( ent.id, animName ) )
+
+	def addStartSound( self, soundName, priority, loops, maxtime, fade_ms ):
+		self.startSounds.append( StartSound( soundName, priority, loops, maxtime, fade_ms ) )
+
+	def addStopSound( self, soundName, stopId ):
+		self.stopSounds.append( StopSound( stopId, soundName ) )
 
 	def addClient( self, info, connection ):
 		#First, checck to see if there's still a connection to the address.
@@ -108,14 +124,22 @@ class NetworkServer:
 		updatedPositions = [ UpdatePosition( each.id, each.rect.topleft ) for each in self.playStateRef().sprites() ]
 		createEntUpdates = list( self.createdEnts )
 		removeEntUpdates = list( self.removedEnts )
+		swapAnimUpdates = list( self.swapAnims )
+		changeAnimUpdates = list( self.changeAnims )
+		startSoundUpdates = list( self.startSounds )
+		stopSoundUpdates = list( self.stopSounds )
 
 		#Iterate over every client
 		for eachClient in self.clients:
 			#Send each a network update.
-			eachClient.connection.net_updateEvent( self.networkTick, createEntUpdates, removeEntUpdates, updatedPositions, [], [], [], [] )
+			eachClient.connection.net_updateEvent( self.networkTick, createEntUpdates, removeEntUpdates, updatedPositions, startSoundUpdates, stopSoundUpdates, changeAnimUpdates, swapAnimUpdates )
 
 		#Clear for the next update
 		self.createdEnts = []
 		self.removedEnts = []
+		self.swapAnims = []
+		self.changeAnims = []
+		self.startSounds = []
+		self.stopSounds = []
 
 		self.networkTick += 1

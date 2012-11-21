@@ -32,6 +32,8 @@ class Sound:
 
 	def play( self, priority, loops=0, maxtime=0, fade_ms=0 ):
 		sndMgr = self.soundManagerRef()
+		if sndMgr.playStateRef().isHost:
+			sndMgr.playStateRef().networkNode.addStartSound( self.fileName, priority, loops, maxtime, fade_ms )
 		inst = PlayInstance( self, sndMgr.curTime, priority, loops, maxtime, fade_ms )
 		if not (inst.channelId is None):
 			return inst.channelId
@@ -121,13 +123,14 @@ class PlayInstance:
 		self.attemptRestart( self.soundManagerRef().getSound( self.soundFileName )._pygameSound )
 		
 class SoundManager:
-	def __init__( self, curTime=0.0 ):
+	def __init__( self, playState, curTime=0.0 ):
 		self.sounds = {}
 		self.path = os.path.join( "data", "sounds" )
 		self.channelCount = pygame.mixer.get_num_channels()
 		self.channels = [ pygame.mixer.Channel(idNum) for idNum in range( self.channelCount ) ]
 		self.playInstances = []
 		self.curTime = curTime
+		self.playStateRef = weakref.ref( playState )
 
 	def update( self, dt ):
 		"""Basically all this method does is remove playInstances that are no longer valid."""
@@ -185,6 +188,8 @@ class SoundManager:
 				return eachInst.channelId
 
 	def stopSound( self, soundName, idNum ):
+		if self.playStateRef().isHost:
+			self.playStateRef().networkNode.addStopSound( soundName, idNum )
 		pygame.mixer.Channel(idNum).stop()
 		for each in self.playInstances[:]:
 			if each.channelId is idNum and each.soundFileName == soundName:

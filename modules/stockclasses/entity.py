@@ -15,7 +15,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import pygame, pymunk
+import pygame, pymunk, weakref
 
 #sys.path.append( "../../" )
 
@@ -223,8 +223,10 @@ class Entity( pygame.sprite.DirtySprite ):
 			self.addToGroup( group )
 			if group.playState.isHost:
 				group.playState.networkNode.addCreateEnt( self )
+			self.playStateRef = weakref.ref( group.playState )
 		else:
 			self.id = None
+			self.playStateRef = None
 		self.tags = {}
 		self.children = []
 		self.classUpdated = False
@@ -315,6 +317,10 @@ class Entity( pygame.sprite.DirtySprite ):
 		self.maxFrameTime = 1.000/self.curAnimation['fps']
 		self.frame = -1
 		self.nextFrame()
+		if self.playStateRef is not None:
+			playState =self.playStateRef()
+			if playState.isHost:
+				playState.networkNode.addChangeAnim( self, name )
 		
 
 	#This function changes to a new animation, but keeps the same PERCENTAGE completion of animation, (eg, if one animation playing and is half way through, a swapped in animation will start at halfway )
@@ -328,6 +334,10 @@ class Entity( pygame.sprite.DirtySprite ):
 		self.maxFrameTime = 1.000/self.curAnimation['fps']
 		self.frame = int( curFrameFraction*len( self.curAnimation['frames'] ) ) - 1
 		self.nextFrame()
+		if self.playStateRef is not None:
+			playState =self.playStateRef()
+			if playState.isHost:
+				playState.networkNode.addSwapAnim( self, name )
 		
 	def getMomentumOnAxis( self, axis ):
 		return self.mass*self.velocity[axis]
@@ -346,7 +356,7 @@ class Entity( pygame.sprite.DirtySprite ):
 
 
 	def kill( self ):
-		playState = self.groups()[0].playState
+		playState = self.playStateRef()
 		if self.collidable:
 			playState.space.remove( self.physicsObjects )
 		if playState.isHost:
@@ -374,8 +384,8 @@ class Entity( pygame.sprite.DirtySprite ):
 
 		listOfGroups = self.groups()
 		if len( listOfGroups ) > 0:
-			npx = listOfGroups[0].playState.panX
-			npy = listOfGroups[0].playState.panY
+			npx = self.playStateRef().panX
+			npy = self.playStateRef().panY
 		else:
 			npx, npy = 0, 0
 		self.rect.x += npx

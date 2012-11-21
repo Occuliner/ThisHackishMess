@@ -15,7 +15,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import cPickle, os, pygame, zlib, gzip, collections
+import cPickle, os, pygame, zlib, gzip, collections, weakref
 #import msgpack
 
 from imageload import loadImage, loadImageNoAlpha
@@ -113,6 +113,7 @@ def loadPlayState( fileName, curTileSet, classDefs ):
 	#Replace the sound manager.
 	stateTuple.soundManager.makeUnpicklable()
 	givenState.soundManager = stateTuple.soundManager
+	givenState.soundManager.playStateRef = weakref.ref( givenState )
 
 	#Set the filename property.
 	givenState.fileName = fileName
