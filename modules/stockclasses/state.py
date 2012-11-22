@@ -95,7 +95,7 @@ class PlayState:
 	
 		self.isClient = False
 		self.isHost = False
-		self.networkRate = 20.0
+		self.networkRate = 60.0
 		self.networkTicker = 0
 		self.networkNode = None
 		self.networkEntHolder = None
