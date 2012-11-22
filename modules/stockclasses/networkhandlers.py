@@ -88,7 +88,8 @@ class ServerHandler(pygnetic.Handler):
 	def net_inputEvent( self, message, **kwargs ):
 		client = self.server.networkServerRef().getClientByConnection( self.connection )
 		
-		playerEntList = self.server.networkServerRef().players[self.server.networkServerRef().getPlayerKey( client )]
+		playerKey = self.server.networkServerRef().getPlayerKey( client )
+		playerEntList = self.server.networkServerRef().players.get( playerKey, [] )
 
 		for each in playerEntList:
 			each.sendInput( message.inputDict )

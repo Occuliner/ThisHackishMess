@@ -93,7 +93,8 @@ class NetworkServer:
 
 	def getPlayerKey( self, client ):
 		"""Return the adler32 digest of the client name"""
-		return zlib.alder32( client.name )
+		if client is not None:
+			return zlib.adler32( client.name )
 
 	def addPlayer( self, client ):
 		#This can vary HUGELY. So it will do nothing by default.

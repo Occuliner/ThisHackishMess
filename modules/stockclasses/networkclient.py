@@ -31,13 +31,15 @@ class NetworkClient:
 
 		self.name = "Banana"
 
+		self.connection = None
+
 	def connect( self, address, port, message_factory=pygnetic.message.message_factory, **kwargs ):
-		connection = self._client.connect( address, port, message_factory, **kwargs )
+		self.connection = self._client.connect( address, port, message_factory, **kwargs )
 		self.handler = networkhandlers.ClientHandler( self )
-		connection.add_handler( self.handler )
+		self.connection.add_handler( self.handler )
 
 	def sendInput( self, inputDict ):
-		[ each.net_inputEvent( self,networkTick, inputDict ) for each in self._client.connections() ]
+		self.connection.net_inputEvent( self.networkTick, inputDict )
 
 	def createEntities( self, createTuples ):
 		for eachTuple in createTuples:
@@ -105,7 +107,7 @@ class NetworkClient:
 				print "WAT. RECEIVED UPDATE REFERRING TO NON-EXISTANT ENTITY."
 
 	def disconnectAll( self ):
-		[ each.disconnect() for each in self._server.connections() ]
+		self.connection.disconnect()
 
 	def update( self, timeout=0 ):
 		self._client.update( timeout )
