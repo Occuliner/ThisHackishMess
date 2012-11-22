@@ -36,6 +36,9 @@ class NetworkClient:
 		self.handler = networkhandlers.ClientHandler( self )
 		connection.add_handler( self.handler )
 
+	def sendInput( self, inputDict ):
+		[ each.net_inputEvent( self,networkTick, inputDict ) for each in self._client.connections() ]
+
 	def createEntities( self, createTuples ):
 		for eachTuple in createTuples:
 			classDef = self.networkEntsClassDefs[eachTuple[1]+"Network"]
@@ -100,6 +103,9 @@ class NetworkClient:
 					eachEnt.changeAnimation( eachTuple[1] )
 			if not matchFound:
 				print "WAT. RECEIVED UPDATE REFERRING TO NON-EXISTANT ENTITY."
+
+	def disconnectAll( self ):
+		[ each.disconnect() for each in self._server.connections() ]
 
 	def update( self, timeout=0 ):
 		self._client.update( timeout )

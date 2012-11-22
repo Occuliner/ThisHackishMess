@@ -128,6 +128,8 @@ while not done:
 
 	for event in pygame.event.get():
 		if event.type == QUIT:
+			if currentState.isHost or currentState.isClient:
+				currentState.networkNode.disconnectAll()
 			pygame.quit()
 			sys.exit()
 		elif event.type == KEYDOWN:

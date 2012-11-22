@@ -117,6 +117,9 @@ class NetworkServer:
 		#	each.kill()
 		pass
 
+	def disconnectAll( self ):
+		[ each.disconnect() for each in self._server.connections() ]
+
 	def update( self, timeout=0 ):
 		self._server.update( timeout )
 		

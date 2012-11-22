@@ -190,6 +190,9 @@ class PlayState:
 			
 			for eachElement in self.hudList:
 				eachElement.sendInput( self.curInputDict )
+
+			if self.isClient:
+				self.networkNode.sendInput( self.curInputDict )
 		self.curInputDict = {}
 		
 		
