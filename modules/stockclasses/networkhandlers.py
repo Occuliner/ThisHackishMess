@@ -38,6 +38,8 @@ class ClientHandler(pygnetic.Handler):
 		
 		self.connection.net_hereIsMyInfo( self.client().name )
 
+		self.connection.net_joinGame( self.client().name )
+
 	def net_acceptPlayer( self, message, **kwargs ):
 		pass
 	def net_kickPlayer( self, message, **kwargs ):
@@ -59,7 +61,7 @@ class ClientHandler(pygnetic.Handler):
 	def on_disconnect( self ):
 		pass
 	
-	def on_revice( self, message, **kwargs ):
+	def on_receive( self, message, **kwargs ):
 		print "Unrecognized message: ", message
 
 class ServerHandler(pygnetic.Handler):
@@ -97,6 +99,6 @@ class ServerHandler(pygnetic.Handler):
 	def on_disconnect( self ):
 		self.server.networkServerRef().removeClientByConnection( self.connection )
 
-	def on_revice( self, message, **kwargs ):
+	def on_receive( self, message, **kwargs ):
 		print "Unrecognized message: ", message
 

@@ -97,15 +97,19 @@ class NetworkServer:
 			return zlib.adler32( client.name )
 
 	def addPlayer( self, client ):
-		#This can vary HUGELY. So it will do nothing by default.
+		#This can vary HUGELY.
 		#The idea is that you should probably create a player instance here.
 		#Below is a template for this method
 		
-		#if not client.isPlayer:
-		#	playerEntity = CREATIONHERE
-		#	self.players[self.getPlayerKey( client )] = [ playerEntity ]
-		#	client.isPlayer = True
-		pass
+		if not client.isPlayer:
+			for each in self.playStateRef().devMenuRef().masterEntSet.individualSets["players"]:
+				if each.__name__ == "YasbClass":
+					classDef = each
+					break
+			destGroup = getattr( self.playStateRef(), "networkPlayers" )
+			playerEntity = classDef( pos=[0,0], vel=[0,0], group=destGroup )
+			self.players[self.getPlayerKey( client )] = [ playerEntity ]
+			client = ClientTuple( client.name, client.connection, True )
 
 	def removePlayer( self, client ):
 		#Again, this can vary a lot, so by default it does nothing.

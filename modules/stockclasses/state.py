@@ -24,6 +24,7 @@ from idsource import IdSource
 from networkserver import NetworkServer
 from networkclient import NetworkClient
 from modules.networkents.mindlessentholder import *
+from entity import EntityGroup
 
 """This module defines the PlayState class."""
 
@@ -101,6 +102,9 @@ class PlayState:
 		self.networkEntHolder = None
 		self.networkingStarted = False
 
+		#This is set by the DevMenu init
+		self.devMenuRef = None
+
 	def initNetworking( self ):
 		if not self.networkingStarted:
 			#pygnetic.init(logging_lvl=logging.DEBUG)
@@ -115,6 +119,8 @@ class PlayState:
 			self.isHost = True
 			self.initNetworking()
 		self.networkNode = NetworkServer( playState=self )
+
+		self.addGroup( EntityGroup( 'networkPlayers' ), name='networkPlayers' ) 
 		print "Beginning hosting..."
 
 	def connectToGame( self ):
@@ -147,7 +153,7 @@ class PlayState:
 		gc.collect()
 		#Pymunk is leaky for me.
 		for obj in gc.garbage:
-			if obj.__class__.__name__ is "Space":
+			if obj.__class__.__name__ == "Space":
 				del obj.__dict__['_handlers']
 		del gc.garbage[:]
 		

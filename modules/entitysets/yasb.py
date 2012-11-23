@@ -166,25 +166,25 @@ class YasbClass( Entity ):
 
 	def sendInput( self, inputDict ):
 		for eachKey, eachVal in inputDict.items():
-			if eachKey is 'K_UP':
-				if eachVal is 'down':
+			if eachKey == 'K_UP':
+				if eachVal == 'down':
 					self.walkingForward = True
-				elif eachVal is 'up':
+				elif eachVal == 'up':
 					self.walkingForward = False
-			elif eachKey is 'K_DOWN':
-				if eachVal is 'down':
+			elif eachKey == 'K_DOWN':
+				if eachVal == 'down':
 					self.walkingBackward = True
-				elif eachVal is 'up':
+				elif eachVal == 'up':
 					self.walkingBackward = False
-			elif eachKey is 'K_LEFT':
-				if eachVal is 'down':
+			elif eachKey == 'K_LEFT':
+				if eachVal == 'down':
 					self.walkingLeft = True
-				elif eachVal is 'up':
+				elif eachVal == 'up':
 					self.walkingLeft = False
-			elif eachKey is 'K_RIGHT':
-				if eachVal is 'down':
+			elif eachKey == 'K_RIGHT':
+				if eachVal == 'down':
 					self.walkingRight = True
-				elif eachVal is 'up':
+				elif eachVal == 'up':
 					self.walkingRight = False
 			#elif eachKey is 'K_RIGHT':
 			#	kickUpMap = self.groups()[0].playState.floor.kickUpMap

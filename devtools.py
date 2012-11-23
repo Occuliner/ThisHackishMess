@@ -14,7 +14,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """The devtools file defines the DevMenu class."""
-import pygame
+import pygame, weakref
 
 from imageload import loadImage
 
@@ -68,6 +68,8 @@ class DevMenu( pygame.sprite.OrderedUpdates ):
 
 		self.draggingMenu = False
 		self.draggedSpot = [0,0]
+
+		self.playState.devMenuRef = weakref.ref( self )
 		
 	def toggle( self ):
 		"""Flips the DevMenu.open boolean, and wasOpen boolean.

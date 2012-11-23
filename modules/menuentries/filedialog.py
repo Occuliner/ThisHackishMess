@@ -99,7 +99,7 @@ class FileDialogState( MenuState ):
 			self.pageLengeth = 0
 
 	def generateListOfFiles( self, givenString ):
-		if givenString is "":
+		if givenString == "":
 			return sorted( [ eachPath for eachPath in os.listdir( os.path.join( "data", "maps" ) ) if not os.path.isdir( eachPath ) ] )
 		else:
 			return sorted( [ eachPath for eachPath in os.listdir( os.path.join( "data", "maps" ) ) if not os.path.isdir( eachPath ) and givenString == eachPath[:len(givenString)] ] )
