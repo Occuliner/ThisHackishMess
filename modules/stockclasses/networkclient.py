@@ -33,6 +33,8 @@ class NetworkClient:
 
 		self.connection = None
 
+		self.timer = 0.0
+
 	def connect( self, address, port, message_factory=pygnetic.message.message_factory, **kwargs ):
 		self.connection = self._client.connect( address, port, message_factory, **kwargs )
 		self.handler = networkhandlers.ClientHandler( self )
@@ -111,5 +113,6 @@ class NetworkClient:
 		if self.connection.connected:
 			self.connection.disconnect()
 
-	def update( self, timeout=0 ):
+	def update( self, dt, timeout=0 ):
 		self._client.update( timeout )
+		self.timer += dt

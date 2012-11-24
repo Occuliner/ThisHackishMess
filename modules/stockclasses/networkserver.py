@@ -49,6 +49,8 @@ class NetworkServer:
 		#The key is the md5 sum created from throwing the md5StartString and the client name into md5.
 		self.players = {}
 
+		self.timer = 0.0
+
 	def addCreateEnt( self, ent ):
 		if ent.collidable:
 			vel = [ent.body.velocity[0], ent.body.velocity[1]]
@@ -125,7 +127,7 @@ class NetworkServer:
 	def disconnectAll( self ):
 		[ each.disconnect() for each in self._server.connections() if each.connected ]
 
-	def update( self, timeout=0 ):
+	def update( self, dt, timeout=0 ):
 		self._server.update( timeout )
 		
 		#Create the network update.
@@ -156,3 +158,4 @@ class NetworkServer:
 		self.stopSounds = []
 
 		self.networkTick += 1
+		self.timer += dt

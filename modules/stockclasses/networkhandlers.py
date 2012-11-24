@@ -58,6 +58,16 @@ class ClientHandler(pygnetic.Handler):
 		client.changeAnims( message.changeAnims )
 
 		client.networkTick = message.tickNum
+
+	def net_hostRequestPing( self, message, **kwargs ):
+		self.connection.net_hostRequestPing( message.timeStamp )
+
+	def net_clientRequestPing( self, message, **kwargs ):
+		#Here is the ping calc:
+		#self.client().timer - message.timeStamp	
+		#Find something to do with it.
+		pass
+
 	def on_disconnect( self ):
 		pass
 	
@@ -95,6 +105,15 @@ class ServerHandler(pygnetic.Handler):
 
 		for each in playerEntList:
 			each.sendInput( message.inputDict )
+
+	def net_clientRequestPing( self, message, **kwargs ):
+		self.connection.net_clientRequestPing( message.timeStamp )
+
+	def net_hostRequestPing( self, message, **kwargs ):
+		#Here is the ping calc:
+		#self.server.networkServerRef().timer - message.timeStamp	
+		#Find something to do with it.
+		pass
 
 	def on_disconnect( self ):
 		self.server.networkServerRef().removeClientByConnection( self.connection )
