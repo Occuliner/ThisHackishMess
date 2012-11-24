@@ -109,21 +109,21 @@ class NetworkServer:
 			destGroup = getattr( self.playStateRef(), "networkPlayers" )
 			playerEntity = classDef( pos=[0,0], vel=[0,0], group=destGroup )
 			self.players[self.getPlayerKey( client )] = [ playerEntity ]
-			client = ClientTuple( client.name, client.connection, True )
+			self.clients.remove( client )
+			self.clients.append( ClientTuple( client.name, client.connection, True ) )
 
 	def removePlayer( self, client ):
-		#Again, this can vary a lot, so by default it does nothing.
-
+		#Again, this can vary a lot.
 		#But what you want is probably something like this:
-		#playerKey = self.getPlayerKey( client )
-		#playerEntList = self.players[playerKey]
-		#del self.players[playerKey]
-		#for each in playerEntList:
-		#	each.kill()
-		pass
+		if client.isPlayer:
+			playerKey = self.getPlayerKey( client )
+			playerEntList = self.players[playerKey]
+			del self.players[playerKey]
+			for each in playerEntList:
+				each.kill()
 
 	def disconnectAll( self ):
-		[ each.disconnect() for each in self._server.connections() ]
+		[ each.disconnect() for each in self._server.connections() if each.connected ]
 
 	def update( self, timeout=0 ):
 		self._server.update( timeout )
@@ -138,10 +138,15 @@ class NetworkServer:
 		stopSoundUpdates = list( self.stopSounds )
 
 		#Iterate over every client
-		for eachClient in self.clients:
-			#Send each a network update.
-			eachClient.connection.net_updateEvent( self.networkTick, createEntUpdates, removeEntUpdates, updatedPositions, startSoundUpdates, stopSoundUpdates, changeAnimUpdates, swapAnimUpdates )
-
+		for eachClient in self.clients[:]:
+			#Check if the connection is still valid:
+			if eachClient.connection.connected:
+				#Send each a network update.
+				eachClient.connection.net_updateEvent( self.networkTick, createEntUpdates, removeEntUpdates, updatedPositions, startSoundUpdates, stopSoundUpdates, changeAnimUpdates, swapAnimUpdates )
+			else:
+				#Remove associated players and the client tuple.
+				self.removePlayer( eachClient )
+				self.clients.remove( eachClient )
 		#Clear for the next update
 		self.createdEnts = []
 		self.removedEnts = []

@@ -39,7 +39,8 @@ class NetworkClient:
 		self.connection.add_handler( self.handler )
 
 	def sendInput( self, inputDict ):
-		self.connection.net_inputEvent( self.networkTick, inputDict )
+		if self.connection.connected:
+			self.connection.net_inputEvent( self.networkTick, inputDict )
 
 	def createEntities( self, createTuples ):
 		for eachTuple in createTuples:
@@ -107,7 +108,8 @@ class NetworkClient:
 				print "WAT. RECEIVED UPDATE REFERRING TO NON-EXISTANT ENTITY."
 
 	def disconnectAll( self ):
-		self.connection.disconnect()
+		if self.connection.connected:
+			self.connection.disconnect()
 
 	def update( self, timeout=0 ):
 		self._client.update( timeout )
