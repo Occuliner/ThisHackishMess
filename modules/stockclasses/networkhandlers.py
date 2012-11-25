@@ -59,6 +59,11 @@ class ClientHandler(pygnetic.Handler):
 
 		client.networkTick = message.tickNum
 
+	def net_forceEntFrame( self, message, **kwargs ):
+		client = self.client()
+
+		client.forceAnims( message.entIdFrameTuples )
+
 	def net_hostRequestPing( self, message, **kwargs ):
 		self.connection.net_hostRequestPing( message.timeStamp )
 
@@ -87,9 +92,12 @@ class ServerHandler(pygnetic.Handler):
 		pygnetic.Handler.on_connect( self )
 
 	def net_hereIsMyInfo( self, message, **kwargs ):
-		self.server.networkServerRef().addClient( message, self.connection )
-		#Send all the existing ents.
-		self.server.networkServerRef().sendAlreadyExistingEnts()
+		networkServer = self.server.networkServerRef()
+		networkServer.addClient( message, self.connection )
+
+		#Send all the existing state info.
+		client = networkServer.getClientByConnection( self.connection )
+		networkServer.sendAlreadyExistingState( client )
 
 	def net_joinGame( self, message, **kwargs ):
 		client = self.server.networkServerRef().getClientByConnection( self.connection )
@@ -100,10 +108,11 @@ class ServerHandler(pygnetic.Handler):
 		pass
 
 	def net_inputEvent( self, message, **kwargs ):
-		client = self.server.networkServerRef().getClientByConnection( self.connection )
+		networkServer = self.server.networkServerRef()
+		client = networkServer.getClientByConnection( self.connection )
 		
-		playerKey = self.server.networkServerRef().getPlayerKey( client )
-		playerEntList = self.server.networkServerRef().players.get( playerKey, [] )
+		playerKey = networkServer.getPlayerKey( client )
+		playerEntList = networkServer.players.get( playerKey, [] )
 
 		for each in playerEntList:
 			each.sendInput( message.inputDict )

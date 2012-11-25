@@ -109,6 +109,20 @@ class NetworkClient:
 			if not matchFound:
 				print "WAT. RECEIVED UPDATE REFERRING TO NON-EXISTANT ENTITY."
 
+	def forceAnims( self, entIdFrameTuples ):
+		playState = self.playStateRef()
+		for eachTuple in entIdFrameTuples:
+			eachId = eachTuple[0]
+			matchFound = False
+			for eachEnt in playState.sprites():
+				if eachEnt.id == eachId:
+					matchFound = True
+					eachEnt.frame = eachTuple[1] - 1
+					eachEnt.nextFrame()
+					eachEnt.frameTime = eachTuple[2]
+			if not matchFound:
+				print "WAT. RECEIVED UPDATE REFERRING TO NON-EXISTANT ENTITY."
+
 	def disconnectAll( self ):
 		if self.connection.connected:
 			self.connection.disconnect()

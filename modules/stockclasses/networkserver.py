@@ -51,13 +51,16 @@ class NetworkServer:
 
 		self.timer = 0.0
 
-	def addCreateEnt( self, ent ):
+	def addCreateEnt( self, ent, forceReturn=False ):
 		if ent.collidable:
 			vel = [ent.body.velocity[0], ent.body.velocity[1]]
 		else:
 			vel = [0.0,0.0]
 		#self.createdEnts.append( CreateEnt( ent.id, ent.__class__.__name__, ent.getPosition(), vel ) )
-		self.createdEnts.append( CreateEnt( ent.id, ent.__class__.__name__, ent.rect.topleft, vel ) )
+		if not forceReturn:
+			self.createdEnts.append( CreateEnt( ent.id, ent.__class__.__name__, ent.rect.topleft, vel ) )
+		else:
+			return CreateEnt( ent.id, ent.__class__.__name__, ent.rect.topleft, vel ) )
 
 	def addRemoveEnt( self, ent ):
 		self.removedEnts.append( RemoveEnt( ent.id ) )
@@ -81,15 +84,37 @@ class NetworkServer:
 
 		self.clients.append( ClientTuple( info.name, connection, False ) )
 
-	def sendAlreadyExistingEnts( self ):
+	def sendAlreadyExistingState( self, client ):
 		playState = self.playStateRef()
+
+		#Get the list of entities we need info on.
 		entNum = playState.amountOfEntsOnLoad
 		if entNum is None:
 			listOfEntsToSend = playState.sprites()
 		else:
 			listOfEntsToSend = [ each for each in playState.sprites() if each.id >= entNum ]
 
-		[ self.addCreateEnt( each ) for each in listOfEntsToSend ]
+		#Make a create list
+		createEntList = [ self.addCreateEnt( each, forceReturn=True ) for each in listOfEntsToSend ]
+		
+		#Make a list of the animations to change them each to, and the forceAnim list.
+		changeAnimList = []
+		forceAnimList = []
+		for each in listOfEntsToSend:
+			for eachAnimName, eachAnim in each.animations.items():
+				if eachAnim == each.curAnimation:
+					changeAnimList.append( ChangeAnim( each.id, eachAnimName ) )
+					forceAnimList.append( ( each.id, each.frame, each.frameTime ) )
+					break
+
+		#Make a list of the sounds to start.
+		startSoundList = [ StartSound( each.soundFileName, each.priority, each.loops, each.maxtime, each.fade_ms ) for each in playState.soundManager.playInstances ]
+
+		#Send the update
+		client.connection.net_updateEvent( self.networkTick, createEntList, [], [], startSoundList, [], changeAnimList, [] )
+
+		#Now send the forceAnims.
+		client.connection.net_forceEntFrame( self.networkTick, forceAnimList )
 
 	def getClientByConnection( self, connection ):
 		for eachClient in self.clients:
@@ -159,6 +184,7 @@ class NetworkServer:
 				#Remove associated players and the client tuple.
 				self.removePlayer( eachClient )
 				self.clients.remove( eachClient )
+
 		#Clear for the next update
 		self.createdEnts = []
 		self.removedEnts = []

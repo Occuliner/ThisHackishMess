@@ -54,6 +54,9 @@ pygnetic.register( 'clientRequestPing', ('timeStamp') )
 #This message is sent from the host to the client to get ping, the client then echos it.
 pygnetic.register( 'hostRquestPing', ('timeStamp') )
 
+#This message is sent from the host to the client to force a list of ents to have certain frames.
+pygnetic.register( 'forceEntFrame', ('ticknum', 'entIdFrameTuples') ) 
+
 ###Merge these all into a single event, each being a sub-event. This is to make sure you receive whole updates. There is no interest in partial updates.
 ##This message is to create a network ent on the client side.
 #pygnetic.register( 'createEnt', ('className', 'id', 'animation', 'frameNum') )
