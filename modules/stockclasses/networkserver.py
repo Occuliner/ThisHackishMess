@@ -60,7 +60,7 @@ class NetworkServer:
 		if not forceReturn:
 			self.createdEnts.append( CreateEnt( ent.id, ent.__class__.__name__, ent.rect.topleft, vel ) )
 		else:
-			return CreateEnt( ent.id, ent.__class__.__name__, ent.rect.topleft, vel ) )
+			return CreateEnt( ent.id, ent.__class__.__name__, ent.rect.topleft, vel )
 
 	def addRemoveEnt( self, ent ):
 		self.removedEnts.append( RemoveEnt( ent.id ) )
