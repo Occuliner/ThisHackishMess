@@ -82,7 +82,7 @@ def dumpPlayState( givenState, fileName ):
 	#Set the filename property
 	givenState.fileName = fileName
 
-def loadPlayState( fileName, curTileSet, classDefs ):
+def loadPlayState( fileName, curTileSet, classDefs, networkServer=None, networkClient=None ):
 	#Create a new playState
 	givenState = PlayState()
 
@@ -90,6 +90,11 @@ def loadPlayState( fileName, curTileSet, classDefs ):
 	givenState.addGroup( EntityGroup(), name="levelWarpGroup" )
 	givenState.addGroup( EntityGroup(), isPlayerGroupBool=True )
 	givenState.addGroup( EntityGroup(), name="genericStuffGroup", indexValue=0 )
+	if not (networkServer is None):
+		givenState.addGroup( EntityGroup( 'networkPlayers' ), name='networkPlayers' )
+		givenState.isHost = True
+		givenState.networkNode = networkServer
+		givenState.networkingStarted = True
 
 	#Create it's floor
 	givenState.floor = Floor( curTileSet, ( 800, 608 ) )
@@ -100,12 +105,22 @@ def loadPlayState( fileName, curTileSet, classDefs ):
 		print "No map called: " + fileName + " in the data/maps folder."
 		return None
 
+	#Set the amount of ents this file has.
+	givenState.amountOfEntsOnLoad = len( stateTuple.entityGhostList )
+
 	#Generate class dict.
 	classDefsDict = dict( [ ( eachClass.__name__, eachClass ) for eachClass in classDefs ] )
 
 	#Add all ze entities.
-	for eachGhost in stateTuple.entityGhostList:
-		eachGhost.resurrect( classDefsDict, givenState )
+	if not (networkClient is None):
+		givenState.networkNode = networkClient
+		givenState.networkingStarted = True
+		givenState.isClient = True
+		for eachGhost in stateTuple.entityGhostList:
+			eachGhost.resurrectNetworked( classDefsDict, givenState )
+	else:
+		for eachGhost in stateTuple.entityGhostList:
+			eachGhost.resurrect( classDefsDict, givenState )
 
 	#Replace the floorImage
 	givenState.floor.image = pygame.image.fromstring( zlib.decompress( stateTuple.floorImageBuffer.stringBuffer ), stateTuple.floorImageBuffer.size, "RGB" ).convert()

@@ -21,8 +21,8 @@ pygnetic.init( logging_lvl=None )
 
 #Register all the messages types in this file, to make sure they're in the correct order for both client and host.
 
-#This message is sent when the host doesn't instant-kick the client
-pygnetic.register( 'requestInfo', ('soundMgrCurPlayId') )
+#This message is sent when the host doesn't instant-kick the client, it also contains the current level name.
+pygnetic.register( 'requestInfo', ('soundMgrCurPlayId', 'levelName') )
 
 #This message is sent on info request
 pygnetic.register( 'hereIsMyInfo', ('name') )

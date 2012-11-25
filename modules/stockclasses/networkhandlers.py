@@ -88,6 +88,8 @@ class ServerHandler(pygnetic.Handler):
 
 	def net_hereIsMyInfo( self, message, **kwargs ):
 		self.server.networkServerRef().addClient( message, self.connection )
+		#Send all the existing ents.
+		self.server.networkServerRef().sendAlreadyExistingEnts()
 
 	def net_joinGame( self, message, **kwargs ):
 		client = self.server.networkServerRef().getClientByConnection( self.connection )

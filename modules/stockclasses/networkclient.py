@@ -41,7 +41,7 @@ class NetworkClient:
 		self.connection.add_handler( self.handler )
 
 	def sendInput( self, inputDict ):
-		if self.connection.connected:
+		if self.connection.connected and len(inputDict) > 0:
 			self.connection.net_inputEvent( self.networkTick, inputDict )
 
 	def createEntities( self, createTuples ):

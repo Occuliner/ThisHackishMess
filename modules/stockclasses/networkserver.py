@@ -80,7 +80,17 @@ class NetworkServer:
 			return None
 
 		self.clients.append( ClientTuple( info.name, connection, False ) )
-	
+
+	def sendAlreadyExistingEnts( self ):
+		playState = self.playStateRef()
+		entNum = playState.amountOfEntsOnLoad
+		if entNum is None:
+			listOfEntsToSend = playState.sprites()
+		else:
+			listOfEntsToSend = [ each for each in playState.sprites() if each.id >= entNum ]
+
+		[ self.addCreateEnt( each ) for each in listOfEntsToSend ]
+
 	def getClientByConnection( self, connection ):
 		for eachClient in self.clients:
 			if eachClient.connection == connection:

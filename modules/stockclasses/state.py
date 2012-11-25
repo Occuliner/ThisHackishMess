@@ -85,6 +85,7 @@ class PlayState:
 		self.hudList = []
 		
 		self.fileName = "Untitled"
+		self.amountOfEntsOnLoad = None
 
 		self.hardBlockInput = False
 
