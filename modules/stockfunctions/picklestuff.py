@@ -83,6 +83,12 @@ def dumpPlayState( givenState, fileName ):
 	givenState.fileName = fileName
 
 def loadPlayState( fileName, curTileSet, classDefs, networkServer=None, networkClient=None ):
+	#Get the StateStoreTuple.
+	stateTuple = loadObjectFromFile( fileName )
+	if stateTuple is None:
+		print "No map called: " + fileName + " in the data/maps folder."
+		return None
+
 	#Create a new playState
 	givenState = PlayState()
 
@@ -95,15 +101,10 @@ def loadPlayState( fileName, curTileSet, classDefs, networkServer=None, networkC
 		givenState.isHost = True
 		givenState.networkNode = networkServer
 		givenState.networkingStarted = True
+		networkSever.playStateRef = weakref.ref( givenState )
 
 	#Create it's floor
 	givenState.floor = Floor( curTileSet, ( 800, 608 ) )
-
-	#Get the StateStoreTuple.
-	stateTuple = loadObjectFromFile( fileName )
-	if stateTuple is None:
-		print "No map called: " + fileName + " in the data/maps folder."
-		return None
 
 	#Set the amount of ents this file has.
 	givenState.amountOfEntsOnLoad = len( stateTuple.entityGhostList )
@@ -116,6 +117,7 @@ def loadPlayState( fileName, curTileSet, classDefs, networkServer=None, networkC
 		givenState.networkNode = networkClient
 		givenState.networkingStarted = True
 		givenState.isClient = True
+		networkClient.playStateRef = weakref.ref( givenState )
 		for eachGhost in stateTuple.entityGhostList:
 			eachGhost.resurrectNetworked( classDefsDict, givenState )
 	else:

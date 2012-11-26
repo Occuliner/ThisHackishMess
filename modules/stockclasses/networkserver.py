@@ -108,10 +108,10 @@ class NetworkServer:
 					break
 
 		#Make a list of the sounds to start.
-		startSoundList = [ StartSound( each.soundFileName, each.priority, each.loops, each.maxtime, each.fade_ms ) for each in playState.soundManager.playInstances ]
+		#startSoundList = [ StartSound( each.soundFileName, each.priority, each.loops, each.maxtime, each.fade_ms ) for each in playState.soundManager.playInstances ]
 
 		#Send the update
-		client.connection.net_updateEvent( self.networkTick, createEntList, [], [], startSoundList, [], changeAnimList, [] )
+		client.connection.net_updateEvent( self.networkTick, createEntList, [], [], [], [], changeAnimList, [] )
 
 		#Now send the forceAnims.
 		client.connection.net_forceEntFrame( self.networkTick, forceAnimList )

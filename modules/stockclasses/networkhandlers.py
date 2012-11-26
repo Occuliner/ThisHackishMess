@@ -18,6 +18,7 @@
 import extern_modules.pygnetic as pygnetic, networkmessages, weakref
 
 from idsource import IdSource
+from picklestuff import loadPlayState
 
 class ClientHandler(pygnetic.Handler):
 	def __init__( self, client ):
@@ -30,12 +31,20 @@ class ClientHandler(pygnetic.Handler):
 
 	def net_requestInfo( self, message, **kwargs ):
 		playState = self.client().playStateRef()
+		if not (message.levelName is "Untitled"):
+			#So, if there is a level name, load that level if found.
+			newState = loadPlayState( message.levelName, playState.floor.tileSet, self.client().networkEntsClassDefs, networkClient=self.client() )
+			if newState is None:
+				print "Host was on a level you don't have."
+			else:
+				playState.swap( newState )
+		
 		playState.soundManager.idGen = IdSource()
 		if message.soundMgrCurPlayId != 0:
 			for each in xrange( message.soundMgrCurPlayId+1 ):
 				playState.soundManager.idGen.getId()
 		playState.soundManager.curPlayId = message.soundMgrCurPlayId
-		
+
 		self.connection.net_hereIsMyInfo( self.client().name )
 
 		self.connection.net_joinGame( self.client().name )

@@ -223,7 +223,6 @@ class Entity( pygame.sprite.DirtySprite ):
 			self.addToGroup( group )
 			if group.playState.isHost:
 				group.playState.networkNode.addCreateEnt( self )
-			self.playStateRef = weakref.ref( group.playState )
 		else:
 			self.id = None
 			self.playStateRef = None
@@ -238,6 +237,7 @@ class Entity( pygame.sprite.DirtySprite ):
 		if self.collidable:
 			for group in groups:
 				group.playState.space.add( self.physicsObjects )
+				self.playStateRef = weakref.ref( group.playState )
 				#if hasattr( self, "sensorBox" ):
 				#	if self.sensorBox not in group.playState.space.shapes:
 				#		group.playState.space.add( self.sensorBox )
