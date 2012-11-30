@@ -32,11 +32,11 @@ class Sound:
 		self.volume = value
 		self._pygameSound.set_volume( value )
 
-	def play( self, priority, loops=0, maxtime=0, fade_ms=0 ):
+	def play( self, priority, loops=0, maxtime=0, fade_ms=0, forceNoPlay=False ):
 		sndMgr = self.soundManagerRef()
 		if sndMgr.playStateRef().isHost:
 			sndMgr.playStateRef().networkNode.addStartSound( self.fileName, priority, loops, maxtime, fade_ms )
-		inst = PlayInstance( self, sndMgr.curTime, priority, loops, maxtime, fade_ms )
+		inst = PlayInstance( self, sndMgr.curTime, priority, loops, maxtime, fade_ms, forceNoPlay )
 		sndMgr.curPlayId = inst.playId
 		if not (inst.channelId is None):
 			return inst.playId
@@ -63,8 +63,11 @@ class PlayInstance:
 	track of what time it is and phase out unneeded play instances when appropriate.
 
 	Upon saving, a list of the SoundManager's current playInstances will be dumped into the save. This can then be used to restore
-	the audio state after load."""
-	def __init__( self, sound, curTime, priority, loops, maxtime, fade_ms ):
+	the audio state after load.
+
+	The "forceNoPlay" parameter seems really weird, but it's for starting sounds midway through their run, such as on connect to
+	a server."""
+	def __init__( self, sound, curTime, priority, loops, maxtime, fade_ms, forceNoPlay=False ):
 		if loops != -1:
 			self.endTime = sound._pygameSound.get_length()*(loops+1) + curTime
 		else:
@@ -78,7 +81,8 @@ class PlayInstance:
 
 		self.channelId = self.soundManagerRef().getChannel( priority )
 		self.playId = self.soundManagerRef().idGen.getId()
-		self.attemptPlay( sound._pygameSound )
+		if not forceNoPlay:
+			self.attemptPlay( sound._pygameSound )
 
 		self.priority = priority
 		

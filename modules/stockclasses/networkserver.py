@@ -107,14 +107,17 @@ class NetworkServer:
 					forceAnimList.append( ( each.id, each.frame, each.frameTime ) )
 					break
 
-		#Make a list of the sounds to start.
-		#startSoundList = [ StartSound( each.soundFileName, each.priority, each.loops, each.maxtime, each.fade_ms ) for each in playState.soundManager.playInstances ]
+		#Make a list of the sounds to force midplay.
+		forceSoundList  = [ (each.soundFileName, each.priority, each.loops, each.maxtime, each.fade_ms, each.endTime-playState.soundManager.curTime ) for each in playState.soundManager.playInstances ]
 
 		#Send the update
 		client.connection.net_updateEvent( self.networkTick, createEntList, [], [], [], [], changeAnimList, [] )
 
 		#Now send the forceAnims.
 		client.connection.net_forceEntFrame( self.networkTick, forceAnimList )
+
+		#Now send the forceSounds.
+		client.connection.net_forcePlayingSound( self.networkTick, forceSoundList )
 
 	def getClientByConnection( self, connection ):
 		for eachClient in self.clients:

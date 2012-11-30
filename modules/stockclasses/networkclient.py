@@ -123,6 +123,14 @@ class NetworkClient:
 			if not matchFound:
 				print "WAT. RECEIVED UPDATE REFERRING TO NON-EXISTANT ENTITY."
 
+	def forcePlayingSounds( self, soundTuples ):
+		sndMgr = self.playStateRef().soundManager
+		for eachTuple in soundTuples:
+			eachSound = sndMgr.getSound( eachTuple[0] )
+			playInst = eachSound.play( eachTuple[1], eachTuple[2], eachTuple[3], eachTuple[4], forceNoPlay=True )
+			playInst.endTime = sndMgr.curTime+eachTuple[5]
+			playInst.attemptRestart( eachSound._pygameSound )
+
 	def disconnectAll( self ):
 		if self.connection.connected:
 			self.connection.disconnect()

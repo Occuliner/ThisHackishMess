@@ -55,7 +55,10 @@ pygnetic.register( 'clientRequestPing', ('timeStamp') )
 pygnetic.register( 'hostRquestPing', ('timeStamp') )
 
 #This message is sent from the host to the client to force a list of ents to have certain frames.
-pygnetic.register( 'forceEntFrame', ('ticknum', 'entIdFrameTuples') ) 
+pygnetic.register( 'forceEntFrame', ('tickNum', 'entIdFrameTuples') )
+
+#This message is sent from the host to the client to force a bunch of sounds into mid-play.
+pygnetic.register( 'forcePlayingSound', ('tickNum', 'soundTuples') )
 
 ###Merge these all into a single event, each being a sub-event. This is to make sure you receive whole updates. There is no interest in partial updates.
 ##This message is to create a network ent on the client side.
