@@ -22,7 +22,7 @@ from networkupdateclasses import *
 ClientTuple = namedtuple( 'ClientTuple', ['name', 'connection', 'isPlayer'] )
 
 class NetworkServer:
-	def __init__( self, playState=None, host="", port=1337, con_limit=4 ):
+	def __init__( self, playState=None, host="", port=1337, con_limit=4, networkingMode=0 ):
 		self._server = pygnetic.Server( host, port, con_limit )
 		self._server.handler = networkhandlers.ServerHandler
 		self._server.networkServerRef = weakref.ref( self )
@@ -50,6 +50,14 @@ class NetworkServer:
 		self.players = {}
 
 		self.timer = 0.0
+
+		#Networking mode is whether the client will merely recreate the state as sent from the host, and send input, or use interpolation and/or extrapolation.
+		#0=No interoplation/extrapoltion, 1=Extrapolation, 2=Interpolation.
+		self.interpolationOn, self.extrapolationOn = False, False
+		if networkingMode is 1:
+			self.extrapolationOn = True
+		elif networkingMode is 2:
+			self.interpolationOn = True
 
 	def addCreateEnt( self, ent, forceReturn=False ):
 		if ent.collidable:
@@ -177,16 +185,33 @@ class NetworkServer:
 		startSoundUpdates = list( self.startSounds )
 		stopSoundUpdates = list( self.stopSounds )
 
-		#Iterate over every client
-		for eachClient in self.clients[:]:
-			#Check if the connection is still valid:
-			if eachClient.connection.connected:
-				#Send each a network update.
-				eachClient.connection.net_updateEvent( self.networkTick, createEntUpdates, removeEntUpdates, updatedPositions, startSoundUpdates, stopSoundUpdates, changeAnimUpdates, swapAnimUpdates )
-			else:
-				#Remove associated players and the client tuple.
-				self.removePlayer( eachClient )
-				self.clients.remove( eachClient )
+		if self.extrapolationOn:
+			#Create the velocity tuple list.
+			velocityTuples = [ (each.id, (each.body.velocity.x, each.body.velocity.y)) for each in self.playStateRef().sprites() if each.collidable ]
+
+		if not self.extrapolationOn:
+			#Iterate over every client
+			for eachClient in self.clients[:]:
+				#Check if the connection is still valid:
+				if eachClient.connection.connected:
+					#Send each a network update.
+					eachClient.connection.net_updateEvent( self.networkTick, createEntUpdates, removeEntUpdates, updatedPositions, startSoundUpdates, stopSoundUpdates, changeAnimUpdates, swapAnimUpdates )
+				else:
+					#Remove associated players and the client tuple.
+					self.removePlayer( eachClient )
+					self.clients.remove( eachClient )
+		else:
+			#Iterate over every client
+			for eachClient in self.clients[:]:
+				#Check if the connection is still valid:
+				if eachClient.connection.connected:
+					#Send each a network update.
+					eachClient.connection.net_updateEvent( self.networkTick, createEntUpdates, removeEntUpdates, updatedPositions, startSoundUpdates, stopSoundUpdates, changeAnimUpdates, swapAnimUpdates )
+					eachClient.connection.net_forceVelocities( self.networkTick, velocityTuples )
+				else:
+					#Remove associated players and the client tuple.
+					self.removePlayer( eachClient )
+					self.clients.remove( eachClient )
 
 		#Clear for the next update
 		self.createdEnts = []

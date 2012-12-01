@@ -97,7 +97,7 @@ class PlayState:
 	
 		self.isClient = False
 		self.isHost = False
-		self.networkRate = 60.0
+		self.networkRate = 20.0
 		self.networkTicker = 0
 		self.networkNode = None
 		self.networkEntHolder = None
@@ -119,7 +119,7 @@ class PlayState:
 		else:
 			self.isHost = True
 			self.initNetworking()
-		self.networkNode = NetworkServer( playState=self )
+		self.networkNode = NetworkServer( playState=self, networkingMode=1 )
 
 		self.addGroup( EntityGroup( 'networkPlayers' ), name='networkPlayers' ) 
 		print "Beginning hosting..."
@@ -132,7 +132,7 @@ class PlayState:
 			self.isClient = True
 			self.initNetworking()
 		self.networkEntHolder = MindlessEntHolder()
-		self.networkNode = NetworkClient( self, self.networkEntHolder.dictOfEnts )
+		self.networkNode = NetworkClient( self, self.networkEntHolder.dictOfEnts, networkingMode=1 )
 		self.networkNode.connect( "localhost", 1337 )
 		print "Connecting..."
 

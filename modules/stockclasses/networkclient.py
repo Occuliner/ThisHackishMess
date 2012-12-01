@@ -139,6 +139,19 @@ class NetworkClient:
 			playInst.endTime = sndMgr.curTime+eachTuple[5]
 			playInst.attemptRestart( eachSound._pygameSound )
 
+	def forceVelocities( self, entIdVelocityTuples ):
+		playState = self.playStateRef()
+		for eachTuple in entIdVelocityTuples:
+			eachId = eachTuple[0]
+			matchFound = False
+			for eachEnt in playState.sprites():
+				if eachEnt.id == eachId:
+					matchFound = True
+					eachEnt.body.velocity.x = eachTuple[1][0]
+					eachEnt.body.velocity.y = eachTuple[1][1]
+			if not matchFound:
+				print "WAT. RECEIVED UPDATE REFERRING TO NON-EXISTANT ENTITY."
+
 	def disconnectAll( self ):
 		if self.connection.connected:
 			self.connection.disconnect()

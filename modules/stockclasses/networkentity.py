@@ -15,7 +15,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import pygame
+import pygame, pymunk
 
 from imageload import loadImage, loadImageNoAlpha
 from imageslice import sliceImage
@@ -88,7 +88,7 @@ class NetworkEntity( pygame.sprite.DirtySprite ):
 		if collidable is not None:
 			self.collidable = collidable
 
-		if self.collidable and self.solid and group.networkNode.extrapolationOn:
+		if self.collidable and self.solid and group.playState.networkNode.extrapolationOn:
 			if not self.circular:
 				self.body = pymunk.Body( self.mass, 1e100 )
 			else:
@@ -174,7 +174,7 @@ class NetworkEntity( pygame.sprite.DirtySprite ):
 
 	def setPosition( self, newPos ):
 		if self.collidable:
-			self.body.position = list( newPos )
+			self.body.position.x, self.body.position.y = newPos[0], newPos[1]
 		else:
 			self.rect.topleft = newPos[0], newPos[1]
 

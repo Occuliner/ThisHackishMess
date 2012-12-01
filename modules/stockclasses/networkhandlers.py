@@ -85,6 +85,9 @@ class ClientHandler(pygnetic.Handler):
 	def net_forcePlayingSound( self, message, **kwargs ):
 		self.client().forcePlayingSounds( message.soundTuples )
 
+	def net_forceVelocities( self, message, **kwargs ):
+		self.client().forceVelocities( message.entIdVelocityTuples )
+
 	def on_disconnect( self ):
 		pass
 	

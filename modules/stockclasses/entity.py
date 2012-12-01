@@ -269,7 +269,7 @@ class Entity( pygame.sprite.DirtySprite ):
 
 	def setPosition( self, newPos ):
 		if self.collidable:
-			self.body.position = list( newPos )
+			self.body.position.x, self.body.position.y = newPos[0], newPos[1]
 		else:
 			self.rect.topleft = newPos[0], newPos[1]
 

@@ -60,6 +60,9 @@ pygnetic.register( 'forceEntFrame', ('tickNum', 'entIdFrameTuples') )
 #This message is sent from the host to the client to force a bunch of sounds into mid-play.
 pygnetic.register( 'forcePlayingSound', ('tickNum', 'soundTuples') )
 
+#This message is sent from the host to client to force a set of velocities. This could be put into the updateEvent tuple, but I don't want to need it to be modified between making a game use extrapolation or interpolation.
+pygnetic.register( 'forceVelocities', ('tickNum', 'entIdVelocityTuples') )
+
 ###Merge these all into a single event, each being a sub-event. This is to make sure you receive whole updates. There is no interest in partial updates.
 ##This message is to create a network ent on the client side.
 #pygnetic.register( 'createEnt', ('className', 'id', 'animation', 'frameNum') )

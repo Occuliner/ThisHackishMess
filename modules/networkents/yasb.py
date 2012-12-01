@@ -77,6 +77,7 @@ class YasbClassNetwork( NetworkEntity ):
 
 	mass = 70
 	solid = True
+	collidable = True
 
 	
 	def __init__( self, pos = [0,0], vel = [0,0], group=None ):
