@@ -103,8 +103,8 @@ class BoundaryEditState( MenuState ):
 		self.removingMode = False
 
 		self.curStart = None
-		self.gridX = 32
-		self.gridY = 16
+		self.gridX = 20
+		self.gridY = 20
 		self.snapToGrid = False
 
 	def toggleSnapToGrid( self ):

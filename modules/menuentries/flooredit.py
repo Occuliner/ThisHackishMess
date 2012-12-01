@@ -43,7 +43,7 @@ class UndoButton( Button ):
 	def push( self, clickKey ):
 		"""Call Floor.undoChange() on the playState's floor."""
 		if "up" in clickKey:
-			self.parentState.floor.undoChange()
+			self.parentState.curSelectedFloor.undoChange()
 
 class RedoButton( Button ):
 	"""RedoButton class, also pretty obvious what it does."""
@@ -55,7 +55,27 @@ class RedoButton( Button ):
 		self.rect.topleft = ( 93, 18 )
 	def push( self, clickKey ):
 		if clickKey is 'mouse1up':
-			self.parentState.floor.redoChange()
+			self.parentState.curSelectedFloor.redoChange()
+
+class RemoveFloorButton( Button ):
+	image = loadImage("remove.png", 2 )
+	def __init__( self, menu=None ):
+		Button.__init__( self, None, None, menu )
+		self.rect = self.image.get_rect()
+		self.rect.topleft = ( 24, 338 )
+	def push( self, clickKey ):
+		if "up" in clickKey:
+			self.parentState.applySelectionBox( self )
+
+class AddFloorButton( Button ):
+	image = loadImage("add.png", 2 )
+	def __init__( self, menu=None ):
+		Button.__init__( self, None, None, menu )
+		self.rect = self.image.get_rect()
+		self.rect.topleft = ( 54, 338 )
+	def push( self, clickKey ):
+		if "up" in clickKey:
+			self.parentState.applySelectionBox( self )
 
 class TileButton( Button ):
 	"""TileButton class, is used for creating Buttons from a given tile in the FloorEditState."""
@@ -66,11 +86,7 @@ class TileButton( Button ):
 		"""Sets the parentState (Should be FloorEditState) to start using this given Tile."""
 		if clickKey is 'mouse1up' and self.parentState.tileNum is not self.tileNum:
 			self.parentState.tileNum = self.tileNum
-			if self.parentState.tileSelectionBox in self.parentState.sprites:
-				self.parentState.removeSprite( self.parentState.tileSelectionBox )
-			self.parentState.tileSelectionBox = SelectionBox( self.rect, self.parentState )
-			self.parentState.addSprite( self.parentState.tileSelectionBox )
-			self.parentState.menu.loadMenuState( self.parentState )
+			self.parentState.applySelectionBox( self )
 
 class ScrollBackButtonTiles( Button ):
 	def __init__( self, parentState=None ):
@@ -118,9 +134,15 @@ class FloorEditState( MenuState ):
 
 		self.scrollBackButton = ScrollBackButtonTiles( self )
 		self.addButton( self.scrollBackButton )
+
+		self.removeFloorButton = RemoveFloorButton( self )
+		self.addButton( self.removeFloorButton )
+
+		self.addFloorButton = AddFloorButton( self )
+		self.addButton( self.addFloorButton )
 		
 		#A local copy to prevent excessive look ups.
-		self.floor = self.menu.playState.floor
+		self.curSelectedFloor = self.menu.playState.floor
 
 		self.tileNum = 0
 
@@ -150,11 +172,20 @@ class FloorEditState( MenuState ):
 
 		self.tileSelectionBox = SelectionBox( self.pages[self.curPage][0].rect, self )
 		self.addSprite( self.tileSelectionBox )
+		self.curSelectedButton = self.pages[self.curPage][0]
+
+	def applySelectionBox( self, button ):
+		if self.tileSelectionBox in self.sprites:
+				self.removeSprite( self.tileSelectionBox )
+		self.tileSelectionBox = SelectionBox( button.rect, self )
+		self.addSprite( self.tileSelectionBox )
+		self.curSelectedButton = button
+		self.menu.loadMenuState( self )
 
 	def generateButtons( self ):
 		curPageKey = max( self.pages.keys() )
 		curTileNum = 0
-		for eachTile in self.floor.tileSet.getTiles():
+		for eachTile in self.curSelectedFloor.tileSet.getTiles():
 			position = ( self.xPos + 21, self.yPos + 50 )
 			givenButton = TileButton( eachTile, curTileNum, position, self )
 			if eachTile not in self.processedTiles:
@@ -169,7 +200,7 @@ class FloorEditState( MenuState ):
 			if self.xPos > 108:
 				self.xPos = 0
 				self.yPos += self.tallest
-			if self.yPos > 318:
+			if self.yPos > 278:
 				self.yPos = 0
 				curPageKey += 1
 			curTileNum += 1
@@ -179,10 +210,14 @@ class FloorEditState( MenuState ):
 		map( self.removeButton, self.pages[self.curPage] )
 		self.curPage = newPageNum
 		map( self.addButton, self.pages[self.curPage] )
-		if self.tileNum not in [ each.tileNum for each in self.pages[self.curPage] ] and self.tileSelectionBox in self.sprites:
-			self.removeSprite( self.tileSelectionBox )
-		elif self.tileNum in [ each.tileNum for each in self.pages[self.curPage] ] and self.tileSelectionBox not in self.sprites:
-			self.addSprite( self.tileSelectionBox )
+		if self.curSelectedButton in [self.addFloorButton, self.removeFloorButton]:
+			pass
+		else:
+			if self.curSelectedButton not in self.pages[self.curPage]:
+				if self.tileSelectionBox in self.sprites:
+					self.removeSprite( self.tileSelectionBox )
+			elif self.tileSelectionBox not in self.sprites:
+				self.addSprite( self.tileSelectionBox )
 		self.menu.loadMenuState( self )
 	
 	def update( self, dt, click, clickKey, curMousePos=None ):
@@ -194,7 +229,6 @@ class FloorEditState( MenuState ):
 				self.startOfBlock = click
 			elif clickKey is 'mouse1up':
 				if self.startOfBlock != None:
-					#curTile = self.floor.tileSet.getTiles()[self.tileNum]
 					curTile = self.processedTiles[self.tileNum]
 					
 					height = curTile.rect.h
@@ -210,7 +244,7 @@ class FloorEditState( MenuState ):
 					
 	
 	
-					self.floor.writeArea( self.tileNum, pygame.Rect( x1Position, y1Position, x2Position-x1Position, y2Position-y1Position ) )
+					self.curSelectedFloor.writeArea( self.tileNum, pygame.Rect( x1Position, y1Position, x2Position-x1Position, y2Position-y1Position ) )
 					self.startOfBlock = None
 		elif curMousePos is not None:
 			pass
