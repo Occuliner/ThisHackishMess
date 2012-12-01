@@ -63,11 +63,13 @@ class NetworkEntity( pygame.sprite.DirtySprite ):
 
 	collidable = False
 
+	solid = False
+
 	specialCollision = None
 
 	circular = False
 	radius = 1
-	def __init__( self, pos, vel, image=None, group=None, rect=None, animated=None ):
+	def __init__( self, pos, vel, image=None, group=None, rect=None, animated=None, solid=None, collidable=None ):
 		pygame.sprite.DirtySprite.__init__( self )
 		
 		#All of these are purely so that instances CAN have their own unique one of each of these variables, but if one isn't specified, it'll use its Class's one.
@@ -81,9 +83,50 @@ class NetworkEntity( pygame.sprite.DirtySprite ):
 			self.width = self.rect.w
 		if self.height is None:
 			self.height = self.rect.h
+		if solid is not None:
+			self.solid = solid
+		if collidable is not None:
+			self.collidable = collidable
 
-		
-		self.rect.topleft = pos
+		if self.collidable and self.solid and group.networkNode.extrapolationOn:
+			if not self.circular:
+				self.body = pymunk.Body( self.mass, 1e100 )
+			else:
+				self.body = pymunk.Body( self.mass, pymunk.moment_for_circle(self.mass, 0.0, self.radius ) )
+			self.body.velocity_limit = 200
+			self.body.angular_velocity_limit = 0
+			self.velocity_func = idleCentricVelocityUpdate
+			self.body.velocity_func = idleCentricVelocityUpdate
+
+			width, height = self.rect.width, self.rect.height
+			self.physicsObjects = [self.body]
+
+			if not self.circular:
+				if self.wbHeight is not None and self.wbWidth is not None:
+					self.shape = pymunk.Poly( self.body, map( pymunk.vec2d.Vec2d, [ (self.wbWidth+self.wbdx, 0+self.wbdy), (self.wbWidth+self.wbdx, self.wbHeight+self.wbdy), (0+self.wbdx, self.wbHeight+self.wbdy), (0+self.wbdx, 0+self.wbdy) ] ) )
+				elif height is not None and width is not None:
+					self.shape = pymunk.Poly( self.body, map( pymunk.vec2d.Vec2d, [ (width, 0), (width, height), (0, height), (0, 0) ] ) )
+				else:
+					self.shape = pymunk.Poly( self.body, map( pymunk.vec2d.Vec2d, [ (self.rect.w, 0), (self.rect.w, self.rect.h), (0, self.rect.h), (0, 0) ] ) )
+	
+			else:
+				self.shape = pymunk.Circle( self.body, self.radius )
+
+			self.physicsObjects.append( self.shape )
+			self.shape.sensor = False
+			self.shape.elasticity = 0.0
+			self.shape.friction = 0.5
+			self.collision_type = 0
+			self.body.position = pymunk.vec2d.Vec2d( pos )
+			self.shape.collision_type = 1
+			self.shape.entity = self
+
+			self.bodyId = id( self.body )
+			self.shapeId = id( self.shape )
+		else:
+			self.rect.topleft = pos
+			self.collidable = False
+			self.solid = False
 		
 		
 		self.animated = animated

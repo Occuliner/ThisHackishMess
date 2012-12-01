@@ -18,7 +18,7 @@
 import extern_modules.pygnetic as pygnetic, networkhandlers, weakref
 
 class NetworkClient:
-	def __init__( self, playState=None, networkEntsClassDefs=None, conn_limit=1, *args, **kwargs ):
+	def __init__( self, playState=None, networkEntsClassDefs=None, conn_limit=1, networkingMode=0 *args, **kwargs ):
 		self._client = pygnetic.Client( conn_limit, *args, **kwargs )
 		
 		self.playStateRef = weakref.ref( playState )
@@ -34,6 +34,14 @@ class NetworkClient:
 		self.connection = None
 
 		self.timer = 0.0
+
+		#Networking mode is whether the client will merely recreate the state as sent from the host, and send input, or use interpolation and/or extrapolation.
+		#0=No interoplation/extrapoltion, 1=Extrapolation, 2=Interpolation.
+		self.interpolationOn, self.extrapolationOn = False, False
+		if networkingMode is 1:
+			self.extrapolationOn = True
+		elif networkingMode is 2:
+			self.interpolationOn = True
 
 	def connect( self, address, port, message_factory=pygnetic.message.message_factory, **kwargs ):
 		self.connection = self._client.connect( address, port, message_factory, **kwargs )
