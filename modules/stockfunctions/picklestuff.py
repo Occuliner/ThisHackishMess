@@ -15,14 +15,12 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import cPickle, os, pygame, zlib, gzip, collections, weakref
+import cPickle, os, pygame, zlib, gzip, collections, weakref, state
 #import msgpack
 
 from imageload import loadImage, loadImageNoAlpha
 
 from entityserialize import EntityGhost
-
-from state import PlayState
 
 from floor import Floor
 
@@ -90,7 +88,7 @@ def loadPlayState( fileName, curTileSet, classDefs, networkServer=None, networkC
 		return None
 
 	#Create a new playState
-	givenState = PlayState()
+	givenState = state.PlayState()
 
 	#Create the groups.
 	givenState.addGroup( EntityGroup(), name="levelWarpGroup" )

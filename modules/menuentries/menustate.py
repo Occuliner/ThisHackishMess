@@ -70,6 +70,9 @@ class MenuState:
 
 	def removeSprite( self, sprite ):
 		self.sprites.remove( sprite )
+		if not sprite.fixed:
+			sprite.rect.x -= self.x
+			sprite.rect.y -= self.y
 		
 	def removeButton( self, button ):
 		self.removeSprite( button )

@@ -77,7 +77,7 @@ currentState.addGroup( genericStuffGroup, name="genericStuffGroup", indexValue=0
 #	This import seems pointless, but without there won't actually be any 
 #	tiles placed in MasterTileSet, causing the Floor() call later to fail.
 #
-from modules.tilesets.testtileset import TestTileSet
+from modules.tilesets.devtileset import DevDraftSet
 
 from modules.tilesets.mastertileset import MasterTileSet
 
@@ -101,7 +101,7 @@ theDevMenu = DevMenu( currentState )
 
 #This dict is a dict of all the key events.
 
-del levelWarpGroup, playerGroup, genericStuffGroup, playArea, TestTileSet, MasterTileSet, prototypeTileGroup
+del levelWarpGroup, playerGroup, genericStuffGroup, playArea, DevDraftSet, MasterTileSet, prototypeTileGroup
 
 inputDict = {}
 

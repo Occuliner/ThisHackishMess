@@ -21,11 +21,14 @@ from imageload import *
 
 from mastertileset import *
 
-class TestTileSet( TileGroup ):
-	name = "TestTileSet"
+import pygame
+
+class DevDraftSet( TileGroup ):
+	name = "DevDraftSet"
 	a = 1
 	def __init__( self ):
-		self.tiles = TileGroup.createFromSheet( self, loadImageNoAlpha( "testTileMap.png", 2 ), size=( 32, 16 ), kickUpBreak=1, solidList = [] )
+		sheetImage = loadImageNoAlpha( "devtileset.png", 2 )
+		sheetImage.set_colorkey( pygame.Color( 255, 0, 255 ) )
+		self.tiles = TileGroup.createFromSheet( self, sheetImage, size=( 40, 40 ), kickUpBreak=1, solidList = [] )
 
-#MasterTileSet.tileSetClasses.append( TestTileSet )
-#MasterTileSet.tileSetsToLoad.append( TestTileSet )
+MasterTileSet.tileSetsToLoad.append( DevDraftSet )

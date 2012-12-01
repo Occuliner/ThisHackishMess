@@ -23,7 +23,7 @@ from label import Label
 import pygame
 import os
 
-class ScrollBackButton( Button ):
+class ScrollBackButtonFiles( Button ):
 	def __init__( self, parentState=None ):
 		Button.__init__( self, loadImage( "backarrow.png", 2 ), ( 42, 526 ), parentState )
 	def push( self, clickKey ):
@@ -32,7 +32,7 @@ class ScrollBackButton( Button ):
 				self.parentState.forceUpdate = True
 				self.parentState.startButtonIndex -= self.parentState.pageLength
 
-class ScrollNextButton( Button ):
+class ScrollNextButtonFiles( Button ):
 	def __init__( self, parentState=None ):
 		Button.__init__( self, loadImage( "forwardarrow.png", 2 ), ( 670, 526 ), parentState )
 	def push( self, clickKey ):
@@ -47,9 +47,9 @@ class FileDialogState( MenuState ):
 		self.panelImage = loadImage( "filebrowserbackground.png", 2 )
 		self.panel = StaticImage( self.panelImage, ( 10, 10 ) )
 		sprites.append( self.panel )
-		self.backButton = ScrollBackButton( self )
+		self.backButton = ScrollBackButtonFiles( self )
 		sprites.append( self.backButton )
-		self.nextButton = ScrollNextButton( self )
+		self.nextButton = ScrollNextButtonFiles( self )
 		sprites.append( self.nextButton )
 		MenuState.__init__( self, menu, sprites )
 		self.keyboardEnabled = True

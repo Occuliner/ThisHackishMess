@@ -72,7 +72,7 @@ class TileButton( Button ):
 			self.parentState.addSprite( self.parentState.tileSelectionBox )
 			self.parentState.menu.loadMenuState( self.parentState )
 
-class ScrollBackButton( Button ):
+class ScrollBackButtonTiles( Button ):
 	def __init__( self, parentState=None ):
 		Button.__init__( self, loadImage( "backarrowsmall.png", 2 ), ( 24, 380 ), parentState )
 	def push( self, clickKey ):
@@ -80,7 +80,7 @@ class ScrollBackButton( Button ):
 			if self.parentState.curPage > 0:
 				self.parentState.repage( self.parentState.curPage - 1 )
 
-class ScrollNextButton( Button ):
+class ScrollNextButtonTiles( Button ):
 	def __init__( self, parentState=None ):
 		Button.__init__( self, loadImage( "forwardarrowsmall.png", 2 ), ( 116, 380 ), parentState )
 	def push( self, clickKey ):
@@ -113,10 +113,10 @@ class FloorEditState( MenuState ):
 		self.redoButton = RedoButton( self )
 		self.addButton( self.redoButton )
 
-		self.scrollNextButton = ScrollNextButton( self )
+		self.scrollNextButton = ScrollNextButtonTiles( self )
 		self.addButton( self.scrollNextButton )
 
-		self.scrollBackButton = ScrollBackButton( self )
+		self.scrollBackButton = ScrollBackButtonTiles( self )
 		self.addButton( self.scrollBackButton )
 		
 		#A local copy to prevent excessive look ups.
