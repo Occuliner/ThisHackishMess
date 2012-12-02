@@ -43,7 +43,7 @@ class UndoButton( Button ):
 	def push( self, clickKey ):
 		"""Call Floor.undoChange() on the playState's floor."""
 		if "up" in clickKey:
-			self.parentState.curSelectedFloor.undoChange()
+			self.parentState.floor.undoChange()
 
 class RedoButton( Button ):
 	"""RedoButton class, also pretty obvious what it does."""
@@ -55,7 +55,7 @@ class RedoButton( Button ):
 		self.rect.topleft = ( 93, 18 )
 	def push( self, clickKey ):
 		if clickKey is 'mouse1up':
-			self.parentState.curSelectedFloor.redoChange()
+			self.parentState.floor.redoChange()
 
 class RemoveFloorButton( Button ):
 	image = loadImage("remove.png", 2 )
@@ -142,7 +142,7 @@ class FloorEditState( MenuState ):
 		self.addButton( self.addFloorButton )
 		
 		#A local copy to prevent excessive look ups.
-		self.curSelectedFloor = self.menu.playState.floor
+		self.floor = self.menu.playState.floor
 
 		self.tileNum = 0
 
@@ -185,7 +185,7 @@ class FloorEditState( MenuState ):
 	def generateButtons( self ):
 		curPageKey = max( self.pages.keys() )
 		curTileNum = 0
-		for eachTile in self.curSelectedFloor.tileSet.getTiles():
+		for eachTile in self.floor.tileSet.getTiles():
 			position = ( self.xPos + 21, self.yPos + 50 )
 			givenButton = TileButton( eachTile, curTileNum, position, self )
 			if eachTile not in self.processedTiles:
@@ -244,7 +244,7 @@ class FloorEditState( MenuState ):
 					
 	
 	
-					self.curSelectedFloor.writeArea( self.tileNum, pygame.Rect( x1Position, y1Position, x2Position-x1Position, y2Position-y1Position ) )
+					self.floor.writeArea( self.tileNum, pygame.Rect( x1Position, y1Position, x2Position-x1Position, y2Position-y1Position ) )
 					self.startOfBlock = None
 		elif curMousePos is not None:
 			pass

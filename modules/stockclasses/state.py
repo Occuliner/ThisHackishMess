@@ -216,6 +216,8 @@ class PlayState:
 
 		self.soundManager.update( dt )
 
+		self.floor.update( self.panX, self.panY )
+
 		if self.isHost:
 			if self.networkTicker >= int(60.0/self.networkRate):
 				self.networkNode.update( dt )
@@ -239,13 +241,13 @@ class PlayState:
 	def draw( self, surface ):
 		"""Draw all the child entity groups in PlayState, returning changed area rects"""
 		changeRects = []
-		self.floor.draw( surface, ( self.panX, self.panY ) )
+		#self.floor.draw( surface, ( self.panX, self.panY ) )
 		#for eachVal in self.drawOrder:
 		#	changeRects.extend( self.groups[eachVal].draw( surface ) )
 		
-		renderList = sorted( self.sprites(), lambda x, y: cmp( x.rect.bottom, y.rect.bottom ) )
+		renderList = sorted( self.sprites()+self.floor.layers[1:], lambda x, y: cmp( x.rect.bottom, y.rect.bottom ) )
 		#I probably shouldn't be doing this.
-		tmpDrawGroup = pygame.sprite.LayeredDirty( renderList )
+		tmpDrawGroup = pygame.sprite.LayeredDirty( self.floor.layers[0], renderList )
 		changeRects.extend( tmpDrawGroup.draw( surface ) )
 		tmpDrawGroup.empty()
 		del tmpDrawGroup

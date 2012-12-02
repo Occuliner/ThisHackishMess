@@ -38,17 +38,28 @@ class FloorChange:
 	"""It is created with a given position, and image.\n""" \
 	"""Each of those attributes specifies what USED to be true of that given spot.\n""" \
 	"""This is for use in undo/redo."""
-	def __init__( self, image, pos ):
+	def __init__( self, image, pos, layerNum=0 ):
 		#What the Floor used to look like at that spot.
 		self.image = image
 		self.pos = pos
+		self.layerNum = layerNum
+
+class FloorLayer( pygame.sprite.DirtySprite ):
+	def __init__( self, size=None, pos=(0,0), image=None ):
+		pygame.sprite.DirtySprite.__init__( self )
+		if not (image is None):
+			self.image = image
+		else:
+			self.image = pygame.Surface( size )
+		self.rect = self.image.get_rect()
+		self.rect.topleft = pos
 	
 class Floor:
 	"""The Floor class. This class is sort of like a specialized pygame Surface.\n""" \
 	"""The idea is some visual elements are non-animated, non-moving and generally non-changing, \n""" \
 	""" so using a class like Entity, which takes into account movement, animation and general change \n""" \
 	""" would be highly ineffecient. The Floor class contains one giant image, mainly."""
-	def __init__( self, tileSet, size=None, sourceImage=None, defaultTileIndex=0 ):
+	def __init__( self, tileSet, size=None, defaultTileIndex=0 ):
 		self.tileSet = tileSet
 		self.mass = 9999
 		#A list of the rects that need to be redrawn because a Write has been performed
@@ -60,7 +71,7 @@ class Floor:
 
 		self.size = size
 		if size != None:
-			self.image = pygame.Surface( size )
+			self.mainLayer = FloorLayer( size )
 			
 			#Now fill the surface with the repeating default tile.
 
@@ -69,17 +80,21 @@ class Floor:
 			defTileHeight = defaultTile.image.get_height()
 			
 
-			for y in xrange( 0, self.image.get_height(), defTileHeight ):
-				for x in xrange( 0, self.image.get_width(), defTileWidth ):
-					self.image.blit( defaultTile.image, ( x, y ) )
-		elif sourceImage != None:
-			self.image = sourceImage
-			self.size = ( self.image.w, self.image.h )
+			for y in xrange( 0, self.mainLayer.image.get_height(), defTileHeight ):
+				for x in xrange( 0, self.mainLayer.image.get_width(), defTileWidth ):
+					self.mainLayer.image.blit( defaultTile.image, ( x, y ) )
 		else:
-			raise  Exception( "Floor.__init__() was called without a size or sourceImage." )
+			raise  Exception( "Floor.__init__() was called without a size" )
 
 		self.changes = []
 		self.undoneChanges = []
+
+		#This list points to all the images used in the "floor".
+		self.layers = [self.mainLayer]
+
+		self.curLayer = 0
+
+		self.curPan = (0, 0)
 
 	def popChangedAreas( self ):
 		"""Returns the areas changed, I don't quite remember what for.\n""" \
@@ -105,7 +120,7 @@ class Floor:
 			theChangeRect = theChange.image.get_rect()
 			changeWidth, changeHeight = theChangeRect.width, theChangeRect.height
 			self.undoneChanges.insert( 0, self.createChange( (changeWidth, changeHeight), theChange.pos ) )
-			self.write( theChange.image, theChange.pos )
+			self.write( theChange.image, theChange.pos, theChange.layerNum )
 
 	def redoChange( self ):
 		"""Redo a Floor eidt, based on a FloorChange."""
@@ -114,7 +129,7 @@ class Floor:
 			theChangeRect = theChange.image.get_rect()
 			changeWidth, changeHeight = theChangeRect.width, theChangeRect.height
 			self.changes.append( self.createChange( (changeWidth, changeHeight), theChange.pos ) )
-			self.write( theChange.image, theChange.pos )
+			self.write( theChange.image, theChange.pos, theChange.layerNum )
 		
 
 	def createChange( self, area, pos ):
@@ -123,7 +138,7 @@ class Floor:
 		tmpSurface = pygame.Surface( area )
 		targetRect = tmpSurface.get_rect()
 		targetRect.topleft = pos
-		tmpSurface.blit( self.image, (0,0), targetRect )
+		tmpSurface.blit( self.layers[self.curLayer].image, (0,0), targetRect )
 
 	
 		newChange = FloorChange( tmpSurface, pos )
@@ -137,17 +152,22 @@ class Floor:
 	def addRedo( self, change ):
 		self.undoneChanges.insert( change, 0 )
 		
-	def write( self, image, pos ):
+	def write( self, image, pos, layerNum=None ):
 		"""Write a given image to a certain place."""
 		
 		targetRect = image.get_rect()
 		targetRect.topleft = pos
 		
-		self.image.blit( image, pos )
+		
+		if not (layerNum is None):
+			destLayer = self.layers[layerNum].image
+		else:
+			destLayer = self.layers[self.curLayer].image
+		destLayer.blit( image, pos )
 
 		self.nextChangedAreas.append( targetRect )
 	
-	def writeArea( self, tileIndexValue, someRect ):
+	def writeArea( self, tileIndexValue, someRect, layerNum=None ):
 		"""Write one tile (selected from given tileIndexValue), all over a given area. \n """ \
 		"""This blits images just as slowly as going over writeTile() a lot, but \n """ \
 		"""passes one big area to self.nextChangedAreas."""
@@ -159,9 +179,13 @@ class Floor:
 		self.undoneChanges = []
 		self.addUndo( self.createChange( ( someRect.width, someRect.height ), someRect.topleft ) )
 
+		if not (layerNum is None):
+			destLayer = self.layers[layerNum].image
+		else:
+			destLayer = self.layers[self.curLayer].image	
 		for x in xrange( someRect.topleft[0], someRect.topleft[0]+someRect.w, curTile.rect.w ):
 			for y in xrange( someRect.topleft[1], someRect.topleft[1]+someRect.h, curTile.rect.h ):
-				self.image.blit( curTile.image, (x,y) )
+				destLayer.blit( curTile.image, (x,y) )
 
 		self.nextChangedAreas.append( someRect )
 
@@ -171,6 +195,7 @@ class Floor:
 		self.addUndo( self.createChange( ( theTile.rect.w, theTile.rect.h ), pos ) )
 		self.write( theTile.image, pos )
 
-	def draw( self, surface, destPoint=( 0, 0 ) ):
-		"""Blit the Floor's image to a given surface, at (0,0)."""
-		surface.blit( self.image, destPoint )
+	def update( self, panX, panY ):
+		for each in self.layers:
+			each.rect.topleft = ( each.rect.left-self.curPan[0]+panX, each.rect.top-self.curPan[1]+panY )
+		self.curPan = (panX, panY)

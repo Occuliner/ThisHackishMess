@@ -169,6 +169,7 @@ class SoundManager:
 
 	def makePicklable( self ):
 		self.channels = None
+		self.playStateRef = None
 		for eachKey, eachVal in self.sounds.items():
 			self.sounds[eachKey] = eachVal()
 		for eachSound in self.sounds.values():
@@ -176,7 +177,8 @@ class SoundManager:
 		for eachInst in self.playInstances:
 			eachInst.makePicklable()
 
-	def makeUnpicklable( self ):
+	def makeUnpicklable( self, playState ):
+		self.playStateRef = weakref.ref( playState )
 		self.channelCount = pygame.mixer.get_num_channels()
 		self.channels = [ pygame.mixer.Channel(idNum) for idNum in range( self.channelCount ) ]
 		for eachSound in self.sounds.values():

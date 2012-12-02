@@ -22,7 +22,7 @@ from imageload import loadImage, loadImageNoAlpha
 
 from entityserialize import EntityGhost
 
-from floor import Floor
+from floor import Floor, FloorLayer
 
 from entity import EntityGroup
 
@@ -30,9 +30,18 @@ from entity import EntityGroup
 from physicsserialize import SpaceGhost
 from linevisualiser import LineVisualiser
 
-StateStoreTuple = collections.namedtuple( "StateStoreTuple", [ "entityGhostList", "floorImageBuffer", "soundManager", "hudElements" ] )
+StateStoreTuple = collections.namedtuple( "StateStoreTuple", [ "entityGhostList", "floorImageBuffers", "soundManager", "hudElements" ] )
 
 ImageBuffer = collections.namedtuple( "ImageBuffer", [ "size", "stringBuffer" ] )
+
+def makeImageBuffer( image ):
+	#Create a compressed stringbuffer of the levels floor image.
+	floorImageStringBuffer = zlib.compress( pygame.image.tostring( image, "RGBA" ) )
+	#Store it
+	return ImageBuffer( (image.get_width(), image.get_height()), floorImageStringBuffer )
+
+def makeImageFromBuffer( imgBuffer ):
+	return pygame.image.fromstring( zlib.decompress( imgBuffer.stringBuffer ), imgBuffer.size, "RGBA" ).convert_alpha()
 
 def writeObjectToFile( obj, fileName ):
 	destFile = gzip.open( fileName, 'wb' )
@@ -53,16 +62,14 @@ def loadObjectFromFile( fileName ):
 	
 
 def dumpPlayState( givenState, fileName ):
-	#Create a compressed stringbuffer of the levels floor image.
-	floorImageStringBuffer = zlib.compress( pygame.image.tostring( givenState.floor.image, "RGB" ) )
-	#Store it
-	floorImageBuffer = ImageBuffer( givenState.floor.size, floorImageStringBuffer )
+	#Store all the Floor layers.
+	floorImageBuffers = [ ( makeImageBuffer( each.image ), each.rect.topleft ) for each in givenState.floor.layers ]
 
 	#Make the sound State picklable.
 	givenState.soundManager.makePicklable()
 
 	#Create the StateStoreTuple, this will store all the data, and be serialized.
-	stateTuple = StateStoreTuple( [], floorImageBuffer, givenState.soundManager, [] )
+	stateTuple = StateStoreTuple( [], floorImageBuffers, givenState.soundManager, [] )
 
 	for eachSprite in givenState.sprites():
 		#Create EntityGhost.
@@ -75,7 +82,7 @@ def dumpPlayState( givenState, fileName ):
 	writeObjectToFile( stateTuple, fileName )
 
 	#Make the soundState unpicklable
-	givenState.soundManager.makeUnpicklable()
+	givenState.soundManager.makeUnpicklable( givenState )
 
 	#Set the filename property
 	givenState.fileName = fileName
@@ -122,11 +129,11 @@ def loadPlayState( fileName, curTileSet, classDefs, networkServer=None, networkC
 		for eachGhost in stateTuple.entityGhostList:
 			eachGhost.resurrect( classDefsDict, givenState )
 
-	#Replace the floorImage
-	givenState.floor.image = pygame.image.fromstring( zlib.decompress( stateTuple.floorImageBuffer.stringBuffer ), stateTuple.floorImageBuffer.size, "RGB" ).convert()
+	#Replace the floor layers.
+	givenState.floor.layers = [ FloorLayer( pos=each[1], image=makeImageFromBuffer( each[0] ) ) for each in stateTuple.floorImageBuffers ]
 
 	#Replace the sound manager.
-	stateTuple.soundManager.makeUnpicklable()
+	stateTuple.soundManager.makeUnpicklable( givenState )
 	givenState.soundManager = stateTuple.soundManager
 	givenState.soundManager.playStateRef = weakref.ref( givenState )
 
