@@ -220,10 +220,19 @@ class FloorEditState( MenuState ):
 		map( self.addButton, self.pages[self.curPage] )
 
 	def selectFloorLayer( self, click ):
-		for eachNum, eachLayer in enumerate( self.floor.layers ):
+		for eachNum, eachLayer in [each for each in enumerate( self.floor.layers )][::-1]:
 			if eachLayer.rect.collidepoint( click ):
 				if self.currentFloorLayer != eachNum:
 					self.currentFloorLayer = eachNum
+
+	def deleteFloorLayer( self, click ):
+		theNum = None
+		for eachNum, eachLayer in [each for each in enumerate( self.floor.layers )][::-1]:
+			if eachLayer.rect.collidepoint( click ):
+				theNum = eachNum
+				break
+		if theNum is not None:
+			self.floor.layers.pop( theNum )
 
 	def repage( self, newPageNum ):
 		map( self.removeButton, self.pages[self.curPage] )
@@ -261,10 +270,10 @@ class FloorEditState( MenuState ):
 						height = curTile.rect.h
 						width = curTile.rect.w
 					
-						leftBoundary = min( click[0], self.startOfBlock[0] )
-						rightBoundary = max( click[0], self.startOfBlock[0] )
-						topBoundary = min( click[1], self.startOfBlock[1] )
-						bottomBoundary = max( click[1], self.startOfBlock[1] )
+						leftBoundary = min( click[0], self.startOfBlock[0] )-self.floor.layers[self.currentFloorLayer].rect.left
+						rightBoundary = max( click[0], self.startOfBlock[0] )-self.floor.layers[self.currentFloorLayer].rect.left
+						topBoundary = min( click[1], self.startOfBlock[1] )-self.floor.layers[self.currentFloorLayer].rect.top
+						bottomBoundary = max( click[1], self.startOfBlock[1] )-self.floor.layers[self.currentFloorLayer].rect.top
 	
 						x1Position, y1Position = gridRound( [ leftBoundary, topBoundary ], width, height, roundToTopLeft=True )
 						x2Position, y2Position = gridRound( [ rightBoundary, bottomBoundary], width, height, roundToTopLeft=False )
@@ -278,6 +287,8 @@ class FloorEditState( MenuState ):
 						self.floor.layers.append( newLayer )
 				elif self.editMode is 2:
 					self.selectFloorLayer( click )
+				elif self.editMode is 3:
+					self.deleteFloorLayer( click )
 		elif curMousePos is not None:
 			pass
 

@@ -17,7 +17,7 @@
 
 """This file defines the FloorChange and Floor classes."""
 import pygame
-#from pygame.locals import *
+from pygame.locals import BLEND_RGBA_MIN, SRCALPHA
 
 
 #
@@ -50,7 +50,7 @@ class FloorLayer( pygame.sprite.DirtySprite ):
 		if not (image is None):
 			self.image = image
 		else:
-			self.image = pygame.Surface( size, depth=24 )
+			self.image = pygame.Surface( size, SRCALPHA )
 		self.rect = self.image.get_rect()
 		self.rect.topleft = pos
 	
