@@ -32,6 +32,10 @@ from selectionbox import SelectionBox
 
 from label import Label
 
+from floor import FloorLayer
+
+from linegenfromcorners import generateListOfLines
+
 class UndoButton( Button ):
 	"""UndoButton class, pretty obvious what it does."""
 	image = loadImage("undo.png", 2)
@@ -62,13 +66,14 @@ class RemoveFloorButton( Button ):
 	def __init__( self, menu=None ):
 		Button.__init__( self, None, None, menu )
 		self.rect = self.image.get_rect()
-		self.rect.topleft = ( 24, 338 )
+		self.rect.topleft = ( 84, 338 )
 	def push( self, clickKey ):
 		if "up" in clickKey:
 			self.parentState.applySelectionBox( self )
+			self.parentState.editMode = 3
 
-class AddFloorButton( Button ):
-	image = loadImage("add.png", 2 )
+class EditFloorButton( Button ):
+	image = loadImage("arrowedit.png", 2 )
 	def __init__( self, menu=None ):
 		Button.__init__( self, None, None, menu )
 		self.rect = self.image.get_rect()
@@ -76,6 +81,18 @@ class AddFloorButton( Button ):
 	def push( self, clickKey ):
 		if "up" in clickKey:
 			self.parentState.applySelectionBox( self )
+			self.parentState.editMode = 2
+
+class AddFloorButton( Button ):
+	image = loadImage("add.png", 2 )
+	def __init__( self, menu=None ):
+		Button.__init__( self, None, None, menu )
+		self.rect = self.image.get_rect()
+		self.rect.topleft = ( 24, 338 )
+	def push( self, clickKey ):
+		if "up" in clickKey:
+			self.parentState.applySelectionBox( self )
+			self.parentState.editMode = 1
 
 class TileButton( Button ):
 	"""TileButton class, is used for creating Buttons from a given tile in the FloorEditState."""
@@ -87,6 +104,7 @@ class TileButton( Button ):
 		if clickKey is 'mouse1up' and self.parentState.tileNum is not self.tileNum:
 			self.parentState.tileNum = self.tileNum
 			self.parentState.applySelectionBox( self )
+			self.parentState.editMode = 0
 
 class ScrollBackButtonTiles( Button ):
 	def __init__( self, parentState=None ):
@@ -140,9 +158,17 @@ class FloorEditState( MenuState ):
 
 		self.addFloorButton = AddFloorButton( self )
 		self.addButton( self.addFloorButton )
+
+		self.editFloorButton = EditFloorButton( self )
+		self.addButton( self.editFloorButton )
 		
 		#A local copy to prevent excessive look ups.
 		self.floor = self.menu.playState.floor
+
+		self.currentFloorLayer = 0
+
+		#Edit modes are zero for tiles, 1 for creating/editing layers, 2 for select/edit, and 3 for removing
+		self.editMode = 0
 
 		self.tileNum = 0
 
@@ -156,19 +182,6 @@ class FloorEditState( MenuState ):
 
 		#For the tile placing functionality.
 		self.startOfBlock = None
-		#self.endOfBlock = None
-
-		#curTileNum = 0
-		#row = 1
-		#column = 0
-		#for eachTile in self.floor.tileSet.getTiles():
-		#	position = ( column*eachTile.rect.w + 21, row*eachTile.rect.h + 30 )
-		#	self.addButton( TileButton( eachTile, curTileNum, position, self ) )
-		#	column += 1
-		#	if column > 3:
-		#		column = 0
-		#		row += 1
-		#	curTileNum += 1
 
 		self.tileSelectionBox = SelectionBox( self.pages[self.curPage][0].rect, self )
 		self.addSprite( self.tileSelectionBox )
@@ -206,6 +219,12 @@ class FloorEditState( MenuState ):
 			curTileNum += 1
 		map( self.addButton, self.pages[self.curPage] )
 
+	def selectFloorLayer( self, click ):
+		for eachNum, eachLayer in enumerate( self.floor.layers ):
+			if eachLayer.rect.collidepoint( click ):
+				if self.currentFloorLayer != eachNum:
+					self.currentFloorLayer = eachNum
+
 	def repage( self, newPageNum ):
 		map( self.removeButton, self.pages[self.curPage] )
 		self.curPage = newPageNum
@@ -222,30 +241,43 @@ class FloorEditState( MenuState ):
 	
 	def update( self, dt, click, clickKey, curMousePos=None ):
 		"""Where the actual Tile placing on the Floor happens."""
+		self.menu.playState.lineVisualiser.devMenuLineGroups = []
+		for eachLayer in self.floor.layers:
+			self.menu.playState.lineVisualiser.devMenuLineGroups.extend( generateListOfLines( eachLayer.rect.topleft, eachLayer.rect.bottomright  ) )
+		if self.startOfBlock is not None and click is not None:
+			if self.editMode is 1:
+				self.menu.playState.lineVisualiser.devMenuLineGroups.extend( generateListOfLines( click, self.startOfBlock ) )
+				self.menu.playState.lineVisualiser.flush = True
+		self.menu.playState.lineVisualiser.renderLines = True
+		self.menu.playState.lineVisualiser.forceNoRender = True
 		if click is not None:
 			if clickKey is 'mouse1down':
-				#print "Down"
-				
 				self.startOfBlock = click
 			elif clickKey is 'mouse1up':
-				if self.startOfBlock != None:
-					curTile = self.processedTiles[self.tileNum]
+				if self.editMode is 0:
+					if self.startOfBlock != None:
+						curTile = self.processedTiles[self.tileNum]
 					
-					height = curTile.rect.h
-					width = curTile.rect.w
+						height = curTile.rect.h
+						width = curTile.rect.w
 					
-					leftBoundary = min( click[0], self.startOfBlock[0] )
-					rightBoundary = max( click[0], self.startOfBlock[0] )
-					topBoundary = min( click[1], self.startOfBlock[1] )
-					bottomBoundary = max( click[1], self.startOfBlock[1] )
+						leftBoundary = min( click[0], self.startOfBlock[0] )
+						rightBoundary = max( click[0], self.startOfBlock[0] )
+						topBoundary = min( click[1], self.startOfBlock[1] )
+						bottomBoundary = max( click[1], self.startOfBlock[1] )
 	
-					x1Position, y1Position = gridRound( [ leftBoundary, topBoundary ], width, height, roundToTopLeft=True )
-					x2Position, y2Position = gridRound( [ rightBoundary, bottomBoundary], width, height, roundToTopLeft=False )
+						x1Position, y1Position = gridRound( [ leftBoundary, topBoundary ], width, height, roundToTopLeft=True )
+						x2Position, y2Position = gridRound( [ rightBoundary, bottomBoundary], width, height, roundToTopLeft=False )
 					
-	
-	
-					self.floor.writeArea( self.tileNum, pygame.Rect( x1Position, y1Position, x2Position-x1Position, y2Position-y1Position ) )
-					self.startOfBlock = None
+						self.floor.writeArea( self.tileNum, pygame.Rect( x1Position, y1Position, x2Position-x1Position, y2Position-y1Position ), layerNum=self.currentFloorLayer )
+						self.startOfBlock = None
+				elif self.editMode is 1:
+					if self.startOfBlock != None:
+						newSize = ( abs( click[0]-self.startOfBlock[0] ), abs( click[1]-self.startOfBlock[1] ) )
+						newLayer = FloorLayer( newSize, ( min( click[0], self.startOfBlock[0] ), min( click[1], self.startOfBlock[1] ) ) )
+						self.floor.layers.append( newLayer )
+				elif self.editMode is 2:
+					self.selectFloorLayer( click )
 		elif curMousePos is not None:
 			pass
 

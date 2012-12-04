@@ -50,7 +50,7 @@ class FloorLayer( pygame.sprite.DirtySprite ):
 		if not (image is None):
 			self.image = image
 		else:
-			self.image = pygame.Surface( size )
+			self.image = pygame.Surface( size, depth=24 )
 		self.rect = self.image.get_rect()
 		self.rect.topleft = pos
 	
