@@ -37,7 +37,7 @@ class SnapToGridButton( Button ):
 		Button.__init__( self, None, None, menu )
 		self.rect = self.image.get_rect()
 		self.rect.topleft = ( 84, 24 )
-	def push( self, clickKey ):
+	def push( self, clickKey, click ):
 		if "up" in clickKey:
 			self.parentState.toggleSnapToGrid()
 
@@ -47,7 +47,7 @@ class RemoveBoundaryButton( Button ):
 		Button.__init__( self, None, None, menu )
 		self.rect = self.image.get_rect()
 		self.rect.topleft = ( 24, 24 )
-	def push( self, clickKey ):
+	def push( self, clickKey, click ):
 		if "up" in clickKey:
 			self.parentState.removeMode()
 
@@ -57,7 +57,7 @@ class AddBoundaryButton( Button ):
 		Button.__init__( self, None, None, menu )
 		self.rect = self.image.get_rect()
 		self.rect.topleft = ( 54, 24 )
-	def push( self, clickKey ):
+	def push( self, clickKey, click ):
 		if "up" in clickKey:
 			self.parentState.addMode()
 
@@ -68,7 +68,7 @@ class BoundaryEditButton( Button ):
 	def __init__( self, menu=None ):
 		Button.__init__( self, None, None, menu )
 
-	def push( self, clickKey ):
+	def push( self, clickKey, click ):
 		if "up" in clickKey:
 			aBoundEditState = BoundaryEditState( self.parentState.menu )
 			self.parentState.menu.loadMenuState( aBoundEditState )

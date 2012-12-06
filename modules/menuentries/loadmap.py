@@ -32,7 +32,7 @@ class FileLoadButton( Button ):
 		self.image = self.FileLoadButtonText.render( text, False, pygame.Color( 0, 0, 0 ) )
 		self.rect = self.image.get_rect()
 		self.rect.topleft = pos
-	def push( self, clickKey ):
+	def push( self, clickKey, click ):
 		if "up" in clickKey:
 			self.parentState.menu.playState.swap( loadPlayState( os.path.join( "data", "maps", self.text ), self.parentState.menu.playState.floor.tileSet, self.parentState.menu.masterEntSet.getEnts() ) )
 			self.parentState.menu.rerenderEverythingIn = 1
@@ -47,7 +47,7 @@ class LoadMapButton( Button ):
 	def __init__( self, parentState=None ):
 		Button.__init__( self,  None, None, parentState )
 
-	def push( self, clickKey ):
+	def push( self, clickKey, click ):
 		"""Pull the state from a file"""
 		#SWITCH TO FLOOREDIT MENU STATE
 		if "up" in clickKey:

@@ -34,7 +34,7 @@ class TagEditButton( Button ):
 	def __init__( self, menu=None ):
 		Button.__init__( self, None, None, menu )
 
-	def push( self, clickKey ):
+	def push( self, clickKey, click ):
 		if "up" in clickKey:
 			aTagEditState = TagEditState( self.parentState.menu )
 			self.parentState.menu.loadMenuState( aTagEditState )
@@ -87,7 +87,7 @@ class TagButton( Button ):
 			self.selected = True
 			self.renderImage()
 
-	def push( self, clickKey ):
+	def push( self, clickKey, click ):
 		if "up" in clickKey:
 			if self.parentState.curTag is not self and self.parentState.curTag is not None:
 				self.parentState.curTag.toggleSelect()
@@ -99,7 +99,7 @@ class AddTagButton( Button ):
 		Button.__init__( self, None, None, parentState )
 		self.rect = self.image.get_rect()
 		self.rect.topleft = ( 30, 370 )
-	def push( self, clickKey ):
+	def push( self, clickKey, click ):
 		if "up" in clickKey:
 			curEnt = self.parentState.curEnt
 			if curEnt is not None:
@@ -119,7 +119,7 @@ class SubTagButton( Button ):
 		Button.__init__( self, None, None, parentState )
 		self.rect = self.image.get_rect()
 		self.rect.topleft = ( 60, 370 )
-	def push( self, clickKey ):
+	def push( self, clickKey, click ):
 		if "up" in clickKey:
 			curEnt = self.parentState.curEnt
 			if curEnt is not None:

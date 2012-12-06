@@ -33,7 +33,7 @@ class FileSaveButton( Button ):
 		self.image = self.FileSaveButtonText.render( text, False, pygame.Color( 0, 0, 0 ) )
 		self.rect = self.image.get_rect()
 		self.rect.topleft = pos
-	def push( self, clickKey ):
+	def push( self, clickKey, click ):
 		if "up" in clickKey:
 			self.parentState.menu.playState.fileName = self.text
 			dumpPlayState( self.parentState.menu.playState, os.path.join( "data", "maps", self.text ) )
@@ -63,7 +63,7 @@ class SaveMapButton( Button ):
 	def __init__( self, parentState=None ):
 		Button.__init__( self,  None, None, parentState )
 
-	def push( self, clickKey ):
+	def push( self, clickKey, click ):
 		"""Dump the state to a file"""
 		#SWITCH TO FLOOREDIT MENU STATE
 		#writeObjectToFile( self.parentState.menu.playState, "asdf.pickle" )

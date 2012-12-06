@@ -25,7 +25,7 @@ class ConnectToButton( Button ):
 	def __init__( self, menu=None ):
 		Button.__init__( self, None, None, menu )
 
-	def push( self, clickKey ):
+	def push( self, clickKey, click ):
 		if "up" in clickKey:
 			self.parentState.menu.playState.connectToGame()
 			#aBoundEditState = SensorEditState( self.parentState.menu )
@@ -38,7 +38,7 @@ class HostButton( Button ):
 	def __init__( self, menu=None ):
 		Button.__init__( self, None, None, menu )
 
-	def push( self, clickKey ):
+	def push( self, clickKey, click ):
 		if "up" in clickKey:
 			self.parentState.menu.playState.hostGame()
 			#aBoundEditState = SensorEditState( self.parentState.menu )

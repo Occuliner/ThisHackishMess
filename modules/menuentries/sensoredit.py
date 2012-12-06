@@ -39,7 +39,7 @@ class SnapToGridButton( Button ):
 		Button.__init__( self, None, None, menu )
 		self.rect = self.image.get_rect()
 		self.rect.topleft = ( 24, 24 )
-	def push( self, clickKey ):
+	def push( self, clickKey, click ):
 		if "up" in clickKey:
 			self.parentState.toggleSnapToGrid()
 
@@ -50,7 +50,7 @@ class SensorEditButton( Button ):
 	def __init__( self, menu=None ):
 		Button.__init__( self, None, None, menu )
 
-	def push( self, clickKey ):
+	def push( self, clickKey, click ):
 		if "up" in clickKey:
 			aBoundEditState = SensorEditState( self.parentState.menu )
 			self.parentState.menu.loadMenuState( aBoundEditState )

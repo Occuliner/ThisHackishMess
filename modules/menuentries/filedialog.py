@@ -26,7 +26,7 @@ import os
 class ScrollBackButtonFiles( Button ):
 	def __init__( self, parentState=None ):
 		Button.__init__( self, loadImage( "backarrow.png", 2 ), ( 42, 526 ), parentState )
-	def push( self, clickKey ):
+	def push( self, clickKey, click ):
 		if "up" in clickKey:
 			if self.parentState.startButtonIndex - self.parentState.pageLength >= 0 and self.parentState.pageLength != 0:
 				self.parentState.forceUpdate = True
@@ -35,7 +35,7 @@ class ScrollBackButtonFiles( Button ):
 class ScrollNextButtonFiles( Button ):
 	def __init__( self, parentState=None ):
 		Button.__init__( self, loadImage( "forwardarrow.png", 2 ), ( 670, 526 ), parentState )
-	def push( self, clickKey ):
+	def push( self, clickKey, click ):
 		if "up" in clickKey:
 			if self.parentState.startButtonIndex + self.parentState.pageLength < len( self.parentState.allTheFiles ) - 1:
 				self.parentState.forceUpdate = True

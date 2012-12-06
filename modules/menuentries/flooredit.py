@@ -44,7 +44,7 @@ class UndoButton( Button ):
 		Button.__init__( self, None, None, parentState )
 		self.rect = self.image.get_rect()
 		self.rect.topleft = ( 44, 18 )
-	def push( self, clickKey ):
+	def push( self, clickKey, click ):
 		"""Call Floor.undoChange() on the playState's floor."""
 		if "up" in clickKey:
 			self.parentState.floor.undoChange()
@@ -57,7 +57,7 @@ class RedoButton( Button ):
 		Button.__init__( self, None, None, parentState )
 		self.rect = self.image.get_rect()
 		self.rect.topleft = ( 93, 18 )
-	def push( self, clickKey ):
+	def push( self, clickKey, click ):
 		if clickKey is 'mouse1up':
 			self.parentState.floor.redoChange()
 
@@ -67,7 +67,7 @@ class RemoveFloorButton( Button ):
 		Button.__init__( self, None, None, menu )
 		self.rect = self.image.get_rect()
 		self.rect.topleft = ( 84, 338 )
-	def push( self, clickKey ):
+	def push( self, clickKey, click ):
 		if "up" in clickKey:
 			self.parentState.applySelectionBox( self )
 			self.parentState.editMode = 3
@@ -79,7 +79,7 @@ class EditFloorButton( Button ):
 		Button.__init__( self, None, None, menu )
 		self.rect = self.image.get_rect()
 		self.rect.topleft = ( 54, 338 )
-	def push( self, clickKey ):
+	def push( self, clickKey, click ):
 		if "up" in clickKey:
 			self.parentState.applySelectionBox( self )
 			self.parentState.editMode = 2
@@ -91,7 +91,7 @@ class AddFloorButton( Button ):
 		Button.__init__( self, None, None, menu )
 		self.rect = self.image.get_rect()
 		self.rect.topleft = ( 24, 338 )
-	def push( self, clickKey ):
+	def push( self, clickKey, click ):
 		if "up" in clickKey:
 			self.parentState.applySelectionBox( self )
 			self.parentState.editMode = 1
@@ -102,17 +102,18 @@ class TileButton( Button ):
 	def __init__( self, theTile, tileNum, pos, parentState=None ):
 		Button.__init__( self, theTile.image, pos, parentState )
 		self.tileNum = tileNum
-	def push( self, clickKey ):
+	def push( self, clickKey, click ):
 		"""Sets the parentState (Should be FloorEditState) to start using this given Tile."""
 		if clickKey is 'mouse1up' and self.parentState.tileNum is not self.tileNum:
 			self.parentState.tileNum = self.tileNum
 			self.parentState.applySelectionBox( self )
 			self.parentState.editMode = 0
+			self.parentState.setClampVisibility( False )
 
 class ScrollBackButtonTiles( Button ):
 	def __init__( self, parentState=None ):
 		Button.__init__( self, loadImage( "backarrowsmall.png", 2 ), ( 24, 380 ), parentState )
-	def push( self, clickKey ):
+	def push( self, clickKey, click ):
 		if "up" in clickKey:
 			if self.parentState.curPage > 0:
 				self.parentState.repage( self.parentState.curPage - 1 )
@@ -120,7 +121,7 @@ class ScrollBackButtonTiles( Button ):
 class ScrollNextButtonTiles( Button ):
 	def __init__( self, parentState=None ):
 		Button.__init__( self, loadImage( "forwardarrowsmall.png", 2 ), ( 116, 380 ), parentState )
-	def push( self, clickKey ):
+	def push( self, clickKey, click ):
 		if "up" in clickKey:
 			if self.parentState.curPage < max( self.parentState.pages.keys() ):
 				self.parentState.repage( self.parentState.curPage + 1 )
@@ -128,20 +129,24 @@ class ScrollNextButtonTiles( Button ):
 class TopLeftLayerClamp( Button ):
 	def __init__( self, parentState=None ):
 		Button.__init__( self, loadImage( "topleftlayerclamp.png", 2 ), ( 0, 0 ), parentState )
-	def push( self, clickKey ):
-		if "down" in clickKey:
-			pass
-		elif "up" in clickKey:
-			pass
+	def push( self, clickKey, click ):
+		if clickKey is "mouse1down":
+			self.parentState.currentlyGrabbedClamp = 1
+			self.parentState.grabPoint = ( click[0]-self.rect.x, click[1]-self.rect.y )
+		if clickKey is "mouse1up":
+			self.parentState.grabPoint = None
+			self.parentState.currentlyGrabbedClamp = None
 				
 class BottomRightLayerClamp( Button ):
 	def __init__( self, parentState=None ):
 		Button.__init__( self, loadImage( "bottomrightlayerclamp.png", 2 ), ( 0, 0 ), parentState )
-	def push( self, clickKey ):
-		if "down" in clickKey:
-			pass
-		elif "up" in clickKey:
-			pass				
+	def push( self, clickKey, click ):
+		if clickKey is "mouse1down":
+			self.parentState.currentlyGrabbedClamp = 2
+			self.parentState.grabPoint = ( click[0]-self.rect.x, click[1]-self.rect.y )
+		if clickKey is "mouse1up":
+			self.parentState.grabPoint = None
+			self.parentState.currentlyGrabbedClamp = None
 
 class FloorEditState( MenuState ):
 	"""The FloorEditState class, a MenuState for editing the current PlayState's Floor."""
@@ -192,6 +197,8 @@ class FloorEditState( MenuState ):
 		self.currentLayerIsGrabbed = False
 		self.grabPoint = None
 
+		self.currentlyGrabbedClamp = None
+
 		#Edit modes are zero for tiles, 1 for creating/editing layers, 2 for select/edit, and 3 for removing
 		self.editMode = 0
 
@@ -211,6 +218,8 @@ class FloorEditState( MenuState ):
 		self.tileSelectionBox = SelectionBox( self.pages[self.curPage][0].rect, self )
 		self.addSprite( self.tileSelectionBox )
 		self.curSelectedButton = self.pages[self.curPage][0]
+
+		self.setClamps()
 
 	def applySelectionBox( self, button ):
 		if self.tileSelectionBox in self.sprites:
@@ -328,11 +337,14 @@ class FloorEditState( MenuState ):
 						newSize = ( abs( click[0]-self.startOfBlock[0] ), abs( click[1]-self.startOfBlock[1] ) )
 						newLayer = FloorLayer( newSize, ( min( click[0], self.startOfBlock[0] ), min( click[1], self.startOfBlock[1] ) ) )
 						self.floor.layers.append( newLayer )
+					self.grabPoint = None
+					self.currentlyGrabbedClamp = None
 				elif self.editMode is 2:
 					self.selectFloorLayer( click )
 					self.currentLayerIsGrabbed = False
 				elif self.editMode is 3:
 					self.deleteFloorLayer( click )
+				
 			elif clickKey is 'mouse3down':
 				if self.editMode is 2:
 					self.currentLayerIsGrabbed = True
@@ -345,6 +357,16 @@ class FloorEditState( MenuState ):
 			if self.currentLayerIsGrabbed and self.grabPoint is not None:
 				self.floor.layers[self.currentFloorLayer].rect.topleft = (curMousePos[0]-self.grabPoint[0], curMousePos[1]-self.grabPoint[1])
 				self.setClamps()
+			elif self.currentlyGrabbedClamp == 1:
+				nx = curMousePos[0]-self.grabPoint[0]
+				ny = curMousePos[1]-self.grabPoint[1]
+				self.floor.layers[self.currentFloorLayer].resize( nx-self.topLeftLayerClamp.rect.left, 0, ny-self.topLeftLayerClamp.rect.top, 0 )
+				self.setClamps()
+			elif self.currentlyGrabbedClamp == 2:
+				nx = curMousePos[0]-self.grabPoint[0]
+				ny = curMousePos[1]-self.grabPoint[1]
+				self.floor.layers[self.currentFloorLayer].resize( 0, nx-self.bottomRightLayerClamp.rect.left, 0, ny-self.bottomRightLayerClamp.rect.top )
+				self.setClamps()
 
 class FloorEditButton( Button ):
 	"""The FloorEditButton class, just creates a Button that invokes FloorEditState on the DevMenu."""
@@ -354,7 +376,7 @@ class FloorEditButton( Button ):
 	def __init__( self, parentState=None ):
 		Button.__init__( self,  None, None, parentState )
 
-	def push( self, clickKey ):
+	def push( self, clickKey, click ):
 		"""Invoke the FloorEditState"""
 		#SWITCH TO FLOOREDIT MENU STATE
 		if "up" in clickKey:

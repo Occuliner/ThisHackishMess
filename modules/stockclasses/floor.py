@@ -53,6 +53,17 @@ class FloorLayer( pygame.sprite.DirtySprite ):
 			self.image = pygame.Surface( size, SRCALPHA )
 		self.rect = self.image.get_rect()
 		self.rect.topleft = pos
+	def resize( self, dleft, dright, dtop, dbottom ):
+		tmpImage = self.image
+		nx = self.rect.x + dleft
+		ny = self.rect.y + dtop
+		nsize = ( self.rect.w-dleft+dright, self.rect.h-dtop+dbottom )
+		if nsize[0] < 1 or nsize[1] < 1:
+			return None
+		self.image = pygame.Surface( nsize, SRCALPHA )
+		self.image.blit( tmpImage, ( -dleft, -dtop ) )
+		self.rect = self.image.get_rect()
+		self.rect.topleft = nx, ny
 	
 class Floor:
 	"""The Floor class. This class is sort of like a specialized pygame Surface.\n""" \

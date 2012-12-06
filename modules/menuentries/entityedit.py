@@ -53,7 +53,7 @@ class EntButton( Button ):
 
 		self.entNum = entNum
 
-	def push( self, clickKey ):
+	def push( self, clickKey, click ):
 		"""This method sets the parent state (which should always be EntityEditState)\n""" \
 		""" to be using this Button's given entity in the Entity-placing functionality."""
 		if clickKey is 'mouse1up':
@@ -70,7 +70,7 @@ class EntButton( Button ):
 class ScrollBackButton( Button ):
 	def __init__( self, parentState=None ):
 		Button.__init__( self, loadImage( "backarrowsmall.png", 2 ), ( 24, 380 ), parentState )
-	def push( self, clickKey ):
+	def push( self, clickKey, click ):
 		if "up" in clickKey:
 			if self.parentState.curPage > 0:
 				self.parentState.repage( self.parentState.curPage - 1 )
@@ -78,7 +78,7 @@ class ScrollBackButton( Button ):
 class ScrollNextButton( Button ):
 	def __init__( self, parentState=None ):
 		Button.__init__( self, loadImage( "forwardarrowsmall.png", 2 ), ( 116, 380 ), parentState )
-	def push( self, clickKey ):
+	def push( self, clickKey, click ):
 		if "up" in clickKey:
 			if self.parentState.curPage < max( self.parentState.pages.keys() ):
 				self.parentState.repage( self.parentState.curPage + 1 )
@@ -237,7 +237,7 @@ class EntityEditButton( Button ):
 	def __init__( self, menu=None ):
 		Button.__init__( self, None, None, menu )
 
-	def push( self, clickKey ):
+	def push( self, clickKey, click ):
 		"""Invokes the EntityEditState MenuState on the parentState's DevMenu."""
 		if "up" in clickKey:
 			anEntityEditState = EntityEditState( self.parentState.menu )

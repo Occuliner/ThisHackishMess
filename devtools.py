@@ -99,26 +99,33 @@ class DevMenu( pygame.sprite.OrderedUpdates ):
 		curMousePos = pygame.mouse.get_pos()
 		
 		self.menuState.update( dt, None, None, curMousePos )
-		#if hasattr( self.menuState, "panel" ):
 		curButtonArea = self.menuState.panel.rect
-		#else:
-		#	curButtonArea = self.devPanel.rect
 		for clickKey, clickList in self.clicks.items():
 			for eachClick in clickList:
-				#if "3up" in clickKey:
-				#	self.menuState.moveTo( 0, 0 )
-				if curButtonArea.collidepoint( eachClick ):
-					someButtonPressed = False
-					for eachButton in self.buttons:
-						if eachButton.rect.collidepoint( eachClick ):
-							eachButton.push( clickKey )
-							someButtonPressed = True
-							break
-					if not someButtonPressed and "down" in clickKey:
+				#if curButtonArea.collidepoint( eachClick ):
+				#	someButtonPressed = False
+				#	for eachButton in self.buttons:
+				#		if eachButton.rect.collidepoint( eachClick ):
+				#			eachButton.push( clickKey )
+				#			someButtonPressed = True
+				#			break
+				#	if not someButtonPressed and "down" in clickKey:
+				#		self.draggingMenu = True
+				#		self.draggedSpot = curMousePos[0]-self.menuState.x, curMousePos[1]-self.menuState.y
+				#else:
+				#	self.menuState.update( dt, eachClick, clickKey, curMousePos )
+				someButtonPressed = False
+				for eachButton in self.buttons:
+					if eachButton.rect.collidepoint( eachClick ):
+						eachButton.push( clickKey, eachClick )
+						someButtonPressed = True
+						break
+				if not someButtonPressed:
+					if curButtonArea.collidepoint( eachClick ) and "down" in clickKey:
 						self.draggingMenu = True
 						self.draggedSpot = curMousePos[0]-self.menuState.x, curMousePos[1]-self.menuState.y
-				else:
-					self.menuState.update( dt, eachClick, clickKey, curMousePos )
+					else:
+						self.menuState.update( 0, eachClick, clickKey, curMousePos )
 				self.clicks[clickKey].remove( eachClick )
 			
 		if self.draggingMenu:

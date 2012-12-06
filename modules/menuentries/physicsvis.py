@@ -26,7 +26,7 @@ class PhysicsVisButton( Button ):
 		self.rect = self.image.get_rect()
 		self.rect.topleft = ( 30, 370 )
 		self.on = False
-	def push( self, clickKey ):
+	def push( self, clickKey, click ):
 		if "up" in clickKey:
 			if not self.on:
 				self.on = True
