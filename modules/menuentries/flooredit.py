@@ -167,6 +167,9 @@ class FloorEditState( MenuState ):
 
 		self.currentFloorLayer = 0
 
+		self.currentLayerIsGrabbed = False
+		self.grabPoint = None
+
 		#Edit modes are zero for tiles, 1 for creating/editing layers, 2 for select/edit, and 3 for removing
 		self.editMode = 0
 
@@ -224,6 +227,7 @@ class FloorEditState( MenuState ):
 			if eachLayer.rect.collidepoint( click ):
 				if self.currentFloorLayer != eachNum:
 					self.currentFloorLayer = eachNum
+					break
 
 	def deleteFloorLayer( self, click ):
 		theNum = None
@@ -287,10 +291,20 @@ class FloorEditState( MenuState ):
 						self.floor.layers.append( newLayer )
 				elif self.editMode is 2:
 					self.selectFloorLayer( click )
+					self.currentLayerIsGrabbed = False
 				elif self.editMode is 3:
 					self.deleteFloorLayer( click )
+			elif clickKey is 'mouse3down':
+				if self.editMode is 2:
+					self.currentLayerIsGrabbed = True
+					self.grabPoint = ( click[0]-self.floor.layers[self.currentFloorLayer].rect.x, click[1]-self.floor.layers[self.currentFloorLayer].rect.y )
+			elif clickKey is 'mouse3up':
+				if self.editMode is 2:
+					self.currentLayerIsGrabbed = False
+					self.grabPoint = None
 		elif curMousePos is not None:
-			pass
+			if self.currentLayerIsGrabbed and self.grabPoint is not None:
+				self.floor.layers[self.currentFloorLayer].rect.topleft = (curMousePos[0]-self.grabPoint[0], curMousePos[1]-self.grabPoint[1])
 
 class FloorEditButton( Button ):
 	"""The FloorEditButton class, just creates a Button that invokes FloorEditState on the DevMenu."""
