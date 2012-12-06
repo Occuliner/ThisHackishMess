@@ -71,6 +71,7 @@ class RemoveFloorButton( Button ):
 		if "up" in clickKey:
 			self.parentState.applySelectionBox( self )
 			self.parentState.editMode = 3
+			self.parentState.setClampVisibility( False )
 
 class EditFloorButton( Button ):
 	image = loadImage("arrowedit.png", 2 )
@@ -82,6 +83,7 @@ class EditFloorButton( Button ):
 		if "up" in clickKey:
 			self.parentState.applySelectionBox( self )
 			self.parentState.editMode = 2
+			self.parentState.setClampVisibility( True )
 
 class AddFloorButton( Button ):
 	image = loadImage("add.png", 2 )
@@ -93,6 +95,7 @@ class AddFloorButton( Button ):
 		if "up" in clickKey:
 			self.parentState.applySelectionBox( self )
 			self.parentState.editMode = 1
+			self.parentState.setClampVisibility( False )
 
 class TileButton( Button ):
 	"""TileButton class, is used for creating Buttons from a given tile in the FloorEditState."""
@@ -121,8 +124,24 @@ class ScrollNextButtonTiles( Button ):
 		if "up" in clickKey:
 			if self.parentState.curPage < max( self.parentState.pages.keys() ):
 				self.parentState.repage( self.parentState.curPage + 1 )
+
+class TopLeftLayerClamp( Button ):
+	def __init__( self, parentState=None ):
+		Button.__init__( self, loadImage( "topleftlayerclamp.png", 2 ), ( 0, 0 ), parentState )
+	def push( self, clickKey ):
+		if "down" in clickKey:
+			pass
+		elif "up" in clickKey:
+			pass
 				
-				
+class BottomRightLayerClamp( Button ):
+	def __init__( self, parentState=None ):
+		Button.__init__( self, loadImage( "bottomrightlayerclamp.png", 2 ), ( 0, 0 ), parentState )
+	def push( self, clickKey ):
+		if "down" in clickKey:
+			pass
+		elif "up" in clickKey:
+			pass				
 
 class FloorEditState( MenuState ):
 	"""The FloorEditState class, a MenuState for editing the current PlayState's Floor."""
@@ -161,6 +180,9 @@ class FloorEditState( MenuState ):
 
 		self.editFloorButton = EditFloorButton( self )
 		self.addButton( self.editFloorButton )
+
+		self.topLeftLayerClamp = TopLeftLayerClamp( self )
+		self.bottomRightLayerClamp = BottomRightLayerClamp( self )
 		
 		#A local copy to prevent excessive look ups.
 		self.floor = self.menu.playState.floor
@@ -228,6 +250,23 @@ class FloorEditState( MenuState ):
 				if self.currentFloorLayer != eachNum:
 					self.currentFloorLayer = eachNum
 					break
+		self.setClamps()
+
+	def setClamps( self ):
+		tlp = self.floor.layers[self.currentFloorLayer].rect.topleft
+		brp = self.floor.layers[self.currentFloorLayer].rect.bottomright
+		self.topLeftLayerClamp.rect.topleft = tlp[0]-15, tlp[1]-15
+		self.bottomRightLayerClamp.rect.topleft = brp[0]-15, brp[1]-15
+
+	def setClampVisibility( self, val ):
+		if val and self.topLeftLayerClamp not in self.sprites:
+			self.addButton( self.topLeftLayerClamp )
+			self.addButton( self.bottomRightLayerClamp )
+			self.menu.loadMenuState( self )
+		elif not val and self.topLeftLayerClamp in self.sprites:
+			self.removeButton( self.topLeftLayerClamp )
+			self.removeButton( self.bottomRightLayerClamp )
+			self.menu.loadMenuState( self )
 
 	def deleteFloorLayer( self, click ):
 		theNum = None
@@ -305,6 +344,7 @@ class FloorEditState( MenuState ):
 		elif curMousePos is not None:
 			if self.currentLayerIsGrabbed and self.grabPoint is not None:
 				self.floor.layers[self.currentFloorLayer].rect.topleft = (curMousePos[0]-self.grabPoint[0], curMousePos[1]-self.grabPoint[1])
+				self.setClamps()
 
 class FloorEditButton( Button ):
 	"""The FloorEditButton class, just creates a Button that invokes FloorEditState on the DevMenu."""
