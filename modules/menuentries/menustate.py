@@ -53,20 +53,23 @@ class MenuState:
 		for each in [ sprite for sprite in self.sprites if not sprite.fixed ]:
 			each.rect.topleft = each.rect.x+dx, each.rect.y+dy
 
-	def addButton( self, button ):
+	def addButton( self, button, spriteIndex=None ):
 		"""Adds a button to the MenuState."""
 		#button.parentState = self
 		#self.sprites.append( button )
-		self.addSprite( button )		
+		self.addSprite( button, spriteIndex )	
 		self.buttons.append( button )
 
-	def addSprite( self, sprite ):
+	def addSprite( self, sprite, index=None ):
 		"""Adds a sprite to the MenuState."""
 		sprite.parentState = self
 		if not sprite.fixed:
 			sprite.rect.x += self.x
 			sprite.rect.y += self.y
-		self.sprites.append( sprite )
+		if index is None or index > len( self.sprites ) - 1:
+			self.sprites.append( sprite )
+		else:
+			self.sprites.insert( index, sprite )
 
 	def removeSprite( self, sprite ):
 		self.sprites.remove( sprite )

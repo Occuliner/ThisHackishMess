@@ -36,6 +36,8 @@ from floor import FloorLayer
 
 from linegenfromcorners import generateListOfLines
 
+from gridrounding import gridRound
+
 class UndoButton( Button ):
 	"""UndoButton class, pretty obvious what it does."""
 	image = loadImage("undo.png", 2)
@@ -60,6 +62,16 @@ class RedoButton( Button ):
 	def push( self, clickKey, click ):
 		if clickKey is 'mouse1up':
 			self.parentState.floor.redoChange()
+
+class SnapToGridButtonFloor( Button ):
+	image = loadImage( "gridbutton.png", 2 )
+	def __init__( self, menu=None ):
+		Button.__init__( self, None, None, menu )
+		self.rect = self.image.get_rect()
+		self.rect.topleft = ( 114, 338 )
+	def push( self, clickKey, click ):
+		if "up" in clickKey:
+			self.parentState.toggleSnapToGrid()
 
 class RemoveFloorButton( Button ):
 	image = loadImage("remove.png", 2 )
@@ -188,6 +200,9 @@ class FloorEditState( MenuState ):
 
 		self.topLeftLayerClamp = TopLeftLayerClamp( self )
 		self.bottomRightLayerClamp = BottomRightLayerClamp( self )
+
+		self.snapToGridButton = SnapToGridButtonFloor( self )
+		self.addButton( self.snapToGridButton )
 		
 		#A local copy to prevent excessive look ups.
 		self.floor = self.menu.playState.floor
@@ -196,6 +211,9 @@ class FloorEditState( MenuState ):
 
 		self.currentLayerIsGrabbed = False
 		self.grabPoint = None
+
+		self.snapToGrid = False
+		self.gridButtonSelectionBox = None
 
 		self.currentlyGrabbedClamp = None
 
@@ -219,6 +237,7 @@ class FloorEditState( MenuState ):
 		self.addSprite( self.tileSelectionBox )
 		self.curSelectedButton = self.pages[self.curPage][0]
 
+		self.gridX, self.gridY = self.curSelectedButton.rect.w, self.curSelectedButton.rect.h
 		self.setClamps()
 
 	def applySelectionBox( self, button ):
@@ -227,6 +246,16 @@ class FloorEditState( MenuState ):
 		self.tileSelectionBox = SelectionBox( button.rect, self )
 		self.addSprite( self.tileSelectionBox )
 		self.curSelectedButton = button
+		self.menu.loadMenuState( self )
+
+	def toggleSnapToGrid( self ):
+		self.snapToGrid = not self.snapToGrid
+		if self.gridButtonSelectionBox is None:
+			self.gridButtonSelectionBox = SelectionBox( self.snapToGridButton.rect, self )
+			self.addSprite( self.gridButtonSelectionBox )
+		else:
+			self.removeSprite( self.gridButtonSelectionBox )
+			self.gridButtonSelectionBox = None
 		self.menu.loadMenuState( self )
 
 	def generateButtons( self ):
@@ -269,8 +298,8 @@ class FloorEditState( MenuState ):
 
 	def setClampVisibility( self, val ):
 		if val and self.topLeftLayerClamp not in self.sprites:
-			self.addButton( self.topLeftLayerClamp )
-			self.addButton( self.bottomRightLayerClamp )
+			self.addButton( self.topLeftLayerClamp, 0 )
+			self.addButton( self.bottomRightLayerClamp, 0 )
 			self.menu.loadMenuState( self )
 		elif not val and self.topLeftLayerClamp in self.sprites:
 			self.removeButton( self.topLeftLayerClamp )
@@ -305,15 +334,22 @@ class FloorEditState( MenuState ):
 		self.menu.playState.lineVisualiser.devMenuLineGroups = []
 		for eachLayer in self.floor.layers:
 			self.menu.playState.lineVisualiser.devMenuLineGroups.extend( generateListOfLines( eachLayer.rect.topleft, eachLayer.rect.bottomright  ) )
-		if self.startOfBlock is not None and click is not None:
+		if self.startOfBlock is not None:
 			if self.editMode is 1:
-				self.menu.playState.lineVisualiser.devMenuLineGroups.extend( generateListOfLines( click, self.startOfBlock ) )
+				if self.snapToGrid:
+					curPoint = gridRound( curMousePos, self.gridX, self.gridY, trueRounding=True )
+				else:
+					curPoint = curMousePos
+				self.menu.playState.lineVisualiser.devMenuLineGroups.extend( generateListOfLines( curPoint, self.startOfBlock ) )
 				self.menu.playState.lineVisualiser.flush = True
 		self.menu.playState.lineVisualiser.renderLines = True
 		self.menu.playState.lineVisualiser.forceNoRender = True
 		if click is not None:
 			if clickKey is 'mouse1down':
-				self.startOfBlock = click
+				if self.snapToGrid:
+					self.startOfBlock = gridRound( click, self.gridX, self.gridY, trueRounding=True )
+				else:
+					self.startOfBlock = click
 			elif clickKey is 'mouse1up':
 				if self.editMode is 0:
 					if self.startOfBlock != None:
@@ -334,17 +370,24 @@ class FloorEditState( MenuState ):
 						self.startOfBlock = None
 				elif self.editMode is 1:
 					if self.startOfBlock != None:
-						newSize = ( abs( click[0]-self.startOfBlock[0] ), abs( click[1]-self.startOfBlock[1] ) )
-						newLayer = FloorLayer( newSize, ( min( click[0], self.startOfBlock[0] ), min( click[1], self.startOfBlock[1] ) ) )
+						if self.snapToGrid:
+							curPoint = gridRound( click, self.gridX, self.gridY, trueRounding=True )
+						else:
+							curPoint = click
+						newSize = ( abs( curPoint[0]-self.startOfBlock[0] ), abs( curPoint[1]-self.startOfBlock[1] ) )
+						newLayer = FloorLayer( newSize, ( min( curPoint[0], self.startOfBlock[0] ), min( curPoint[1], self.startOfBlock[1] ) ) )
 						self.floor.layers.append( newLayer )
 					self.grabPoint = None
 					self.currentlyGrabbedClamp = None
 				elif self.editMode is 2:
-					self.selectFloorLayer( click )
+					if self.currentlyGrabbedClamp is None:
+						self.selectFloorLayer( click )
 					self.currentLayerIsGrabbed = False
 				elif self.editMode is 3:
 					self.deleteFloorLayer( click )
-				
+				self.startOfBlock = None
+				self.grabPoint = None
+				self.currentlyGrabbedClamp = None
 			elif clickKey is 'mouse3down':
 				if self.editMode is 2:
 					self.currentLayerIsGrabbed = True
@@ -355,16 +398,28 @@ class FloorEditState( MenuState ):
 					self.grabPoint = None
 		elif curMousePos is not None:
 			if self.currentLayerIsGrabbed and self.grabPoint is not None:
-				self.floor.layers[self.currentFloorLayer].rect.topleft = (curMousePos[0]-self.grabPoint[0], curMousePos[1]-self.grabPoint[1])
+				if self.snapToGrid:
+					curPoint = gridRound( curMousePos, self.gridX, self.gridY, trueRounding=True )
+				else:
+					curPoint = curMousePos
+				self.floor.layers[self.currentFloorLayer].rect.topleft = (curPoint[0]-self.grabPoint[0], curPoint[1]-self.grabPoint[1])
 				self.setClamps()
 			elif self.currentlyGrabbedClamp == 1:
-				nx = curMousePos[0]-self.grabPoint[0]
-				ny = curMousePos[1]-self.grabPoint[1]
+				if self.snapToGrid:
+					curPoint = gridRound( curMousePos, self.gridX, self.gridY, trueRounding=True )
+				else:
+					curPoint = curMousePos
+				nx = curPoint[0]-self.grabPoint[0]
+				ny = curPoint[1]-self.grabPoint[1]
 				self.floor.layers[self.currentFloorLayer].resize( nx-self.topLeftLayerClamp.rect.left, 0, ny-self.topLeftLayerClamp.rect.top, 0 )
 				self.setClamps()
 			elif self.currentlyGrabbedClamp == 2:
-				nx = curMousePos[0]-self.grabPoint[0]
-				ny = curMousePos[1]-self.grabPoint[1]
+				if self.snapToGrid:
+					curPoint = gridRound( curMousePos, self.gridX, self.gridY, trueRounding=True )
+				else:
+					curPoint = curMousePos
+				nx = curPoint[0]-self.grabPoint[0]
+				ny = curPoint[1]-self.grabPoint[1]
 				self.floor.layers[self.currentFloorLayer].resize( 0, nx-self.bottomRightLayerClamp.rect.left, 0, ny-self.bottomRightLayerClamp.rect.top )
 				self.setClamps()
 
