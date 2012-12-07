@@ -399,10 +399,10 @@ class FloorEditState( MenuState ):
 		elif curMousePos is not None:
 			if self.currentLayerIsGrabbed and self.grabPoint is not None:
 				if self.snapToGrid:
-					curPoint = gridRound( curMousePos, self.gridX, self.gridY, trueRounding=True )
+					curPoint = gridRound( (curMousePos[0]-self.grabPoint[0], curMousePos[1]-self.grabPoint[1]), self.gridX, self.gridY, trueRounding=True )
 				else:
-					curPoint = curMousePos
-				self.floor.layers[self.currentFloorLayer].rect.topleft = (curPoint[0]-self.grabPoint[0], curPoint[1]-self.grabPoint[1])
+					curPoint = (curMousePos[0]-self.grabPoint[0], curMousePos[1]-self.grabPoint[1])
+				self.floor.layers[self.currentFloorLayer].rect.topleft = curPoint
 				self.setClamps()
 			elif self.currentlyGrabbedClamp == 1:
 				if self.snapToGrid:
