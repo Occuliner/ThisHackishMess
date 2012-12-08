@@ -89,6 +89,9 @@ def dumpPlayState( givenState, fileName ):
 	#Make the soundState unpicklable
 	givenState.soundManager.makeUnpicklable( givenState )
 
+	#Make the hud elements unpicklable
+	[ each.makeUnpicklable( givenState ) for each in givenState.hudList ]
+
 	#Set the filename property
 	givenState.fileName = fileName
 

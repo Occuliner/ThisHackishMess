@@ -112,7 +112,7 @@ class TextBox( HudElement ):
 			self.image.set_alpha( int( 255*ratio ) )
 			self.removeTimer += dt
 			if self.removeTimer > self.removeTime:
-				self.playState.hudList.remove( self )
+				self.playStateRef().hudList.remove( self )
 				self.removed = True
 				self.dying = False
 				self.removeTimer = 0.0
