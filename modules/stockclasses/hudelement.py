@@ -15,8 +15,9 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import pygame
+import pygame, weakref
 from pygame.locals import *
+from imageload import loadImageNoAlpha, loadImage
 
 class HudElement:
 	colourKey = None
@@ -26,7 +27,7 @@ class HudElement:
 		if sheet is not None:
 			self.sheet = sheet
 		self.animated = animated
-		self.playState = playState
+		self.playStateRef = weakref.ref( playState )
 		if animated:
 			self.rect = pygame.Rect( (0,0), frameSize )
 			self.rect.topleft = pos
@@ -41,6 +42,30 @@ class HudElement:
 		self.maxFrameTime = 1.000/self.curAnimation['fps']
 		self.frameTime = self.maxFrameTime
 
+	def makePicklable( self ):
+		self.image = None
+		self.sheet = None
+		#This is just a forced reference to make sure it should error if you try to save something without this.
+		self.sheetFileName = self.sheetFileName
+		self.rect = ( self.rect.x, self.rect.y, self.rect.w, self.rect.h )
+		self.frames = None
+		self.playStateRef = None
+		if self.colourKey is not None:
+			self.colourKey = self.colourKey.r, self.colourKey.g, self.colourKey.b
+
+	def makeUnpicklable( self, playState ):
+		if self.alpha:
+			self.sheet = loadImage( self.sheetFileName, self.scale )
+		else:
+			self.sheet = loadImageNoAlpha( self.sheetFileName, self.scale )
+		if self.colourKey is not None:
+			self.colourKey = pygame.Color( self.colourKey[0], self.colourKey[1], self.colourKey[2] )
+			self.sheet.set_colorkey( self.colourKey )
+		self.rect = pygame.Rect( self.rect[0], self.rect[1], self.rect[2], self.rect[3] )
+		self.createFrames()
+		self.image = self.frames[ self.curAnimation['frames'][self.frame] ]
+		self.playStateRef = weakref.ref( playState )
+		
 	def nextFrame( self ):
 		self.frame += 1
 		if self.frame > len(self.curAnimation['frames']) - 1:

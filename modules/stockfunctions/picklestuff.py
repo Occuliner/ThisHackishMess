@@ -71,8 +71,11 @@ def dumpPlayState( givenState, fileName ):
 	#Make a list representing all the boundaries.
 	bndList = [ ( (each.a.x, each.a.y), (each.b.x, each.b.y) ) for each in givenState.boundaries ]
 
+	#Make the hudElements picklable.
+	[ each.makePicklable() for each in givenState.hudList ]
+
 	#Create the StateStoreTuple, this will store all the data, and be serialized.
-	stateTuple = StateStoreTuple( [], floorImageBuffers, givenState.soundManager, [], bndList )
+	stateTuple = StateStoreTuple( [], floorImageBuffers, givenState.soundManager, givenState.hudList, bndList )
 
 	for eachSprite in givenState.sprites():
 		#Create EntityGhost.
@@ -80,7 +83,6 @@ def dumpPlayState( givenState, fileName ):
 		#Add the the ghost list.
 		stateTuple.entityGhostList.append( ghost )
 
-	print "HudElements still need serialization."
 	
 	writeObjectToFile( stateTuple, fileName )
 
@@ -145,6 +147,10 @@ def loadPlayState( fileName, curTileSet, classDefs, networkServer=None, networkC
 
 	#Add the boundaries.
 	[ givenState.addBoundary( each[0], each[1] ) for each in stateTuple.boundaries ]
+
+	#Make the hud elements unpicklable, then add them.
+	[ each.makeUnpicklable( givenState ) for each in stateTuple.hudElements ]
+	givenState.hudList = stateTuple.hudElements
 
 	return givenState
 		
