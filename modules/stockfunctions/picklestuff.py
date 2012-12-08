@@ -30,7 +30,7 @@ from entity import EntityGroup
 from physicsserialize import SpaceGhost
 from linevisualiser import LineVisualiser
 
-StateStoreTuple = collections.namedtuple( "StateStoreTuple", [ "entityGhostList", "floorImageBuffers", "soundManager", "hudElements" ] )
+StateStoreTuple = collections.namedtuple( "StateStoreTuple", [ "entityGhostList", "floorImageBuffers", "soundManager", "hudElements", "boundaries" ] )
 
 ImageBuffer = collections.namedtuple( "ImageBuffer", [ "size", "stringBuffer" ] )
 
@@ -68,8 +68,11 @@ def dumpPlayState( givenState, fileName ):
 	#Make the sound State picklable.
 	givenState.soundManager.makePicklable()
 
+	#Make a list representing all the boundaries.
+	bndList = [ ( (each.a.x, each.a.y), (each.b.x, each.b.y) ) for each in givenState.boundaries ]
+
 	#Create the StateStoreTuple, this will store all the data, and be serialized.
-	stateTuple = StateStoreTuple( [], floorImageBuffers, givenState.soundManager, [] )
+	stateTuple = StateStoreTuple( [], floorImageBuffers, givenState.soundManager, [], bndList )
 
 	for eachSprite in givenState.sprites():
 		#Create EntityGhost.
@@ -139,6 +142,9 @@ def loadPlayState( fileName, curTileSet, classDefs, networkServer=None, networkC
 
 	#Set the filename property.
 	givenState.fileName = fileName
+
+	#Add the boundaries.
+	[ givenState.addBoundary( each[0], each[1] ) for each in stateTuple.boundaries ]
 
 	return givenState
 		
