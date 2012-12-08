@@ -61,7 +61,7 @@ def loadObjectFromFile( fileName ):
 	return cPickle.loads( loadString )
 	
 
-def dumpPlayState( givenState, fileName ):
+def dumpPlayState( givenState, fileName, saveHud=False ):
 	#Store all the Floor layers.
 	floorImageBuffers = [ ( makeImageBuffer( each.image ), each.rect.topleft ) for each in givenState.floor.layers ]
 
@@ -71,11 +71,14 @@ def dumpPlayState( givenState, fileName ):
 	#Make a list representing all the boundaries.
 	bndList = [ ( (each.a.x, each.a.y), (each.b.x, each.b.y) ) for each in givenState.boundaries ]
 
-	#Make the hudElements picklable.
-	[ each.makePicklable() for each in givenState.hudList ]
+	if saveHud:
+		#Make the hudElements picklable.
+		hudList = [ each.makePicklable() for each in givenState.hudList ]
+	else:
+		hudList = []
 
 	#Create the StateStoreTuple, this will store all the data, and be serialized.
-	stateTuple = StateStoreTuple( [], floorImageBuffers, givenState.soundManager, givenState.hudList, bndList )
+	stateTuple = StateStoreTuple( [], floorImageBuffers, givenState.soundManager, hudList, bndList )
 
 	for eachSprite in givenState.sprites():
 		#Create EntityGhost.
@@ -89,13 +92,14 @@ def dumpPlayState( givenState, fileName ):
 	#Make the soundState unpicklable
 	givenState.soundManager.makeUnpicklable( givenState )
 
-	#Make the hud elements unpicklable
-	[ each.makeUnpicklable( givenState ) for each in givenState.hudList ]
+	if saveHud:
+		#Make the hud elements unpicklable
+		[ each.makeUnpicklable( givenState ) for each in givenState.hudList ]
 
 	#Set the filename property
 	givenState.fileName = fileName
 
-def loadPlayState( fileName, curTileSet, classDefs, networkServer=None, networkClient=None ):
+def loadPlayState( fileName, curTileSet, classDefs, networkServer=None, networkClient=None, loadHud=False ):
 	#Get the StateStoreTuple.
 	stateTuple = loadObjectFromFile( fileName )
 	if stateTuple is None:
@@ -151,9 +155,10 @@ def loadPlayState( fileName, curTileSet, classDefs, networkServer=None, networkC
 	#Add the boundaries.
 	[ givenState.addBoundary( each[0], each[1] ) for each in stateTuple.boundaries ]
 
-	#Make the hud elements unpicklable, then add them.
-	[ each.makeUnpicklable( givenState ) for each in stateTuple.hudElements ]
-	givenState.hudList = stateTuple.hudElements
+	if loadHud:
+		#Make the hud elements unpicklable, then add them.
+		[ each.makeUnpicklable( givenState ) for each in stateTuple.hudElements ]
+		givenState.hudList = stateTuple.hudElements
 
 	return givenState
 		
