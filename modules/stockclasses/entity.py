@@ -232,6 +232,14 @@ class Entity( pygame.sprite.DirtySprite ):
 
 		self.oldPan = group.playState.panX, group.playState.panY
 
+		if self.collidable:
+			framePosition = self.framePositions.get( self.curAnimation['frames'][self.frame], (0,0) )
+			self.rect.topleft = self.body.position.x+framePosition[0], self.body.position.y+framePosition[1]
+			#Behold, a cheap hack to fix circular objects physics and visuals not lining up.
+			if self.circular:
+				self.rect.y -= self.height/2
+				self.rect.x -= self.width/2
+
 	def addToGroup( self, *groups ):
 		self.id = groups[0].playState.idSource.getId()
 		if self.collidable:
