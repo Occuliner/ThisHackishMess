@@ -121,9 +121,10 @@ class DevMenu( pygame.sprite.OrderedUpdates ):
 						someButtonPressed = True
 						break
 				if not someButtonPressed:
-					if curButtonArea.collidepoint( eachClick ) and "down" in clickKey:
-						self.draggingMenu = True
-						self.draggedSpot = curMousePos[0]-self.menuState.x, curMousePos[1]-self.menuState.y
+					if curButtonArea.collidepoint( eachClick ):
+						if "down" in clickKey:
+							self.draggingMenu = True
+							self.draggedSpot = curMousePos[0]-self.menuState.x, curMousePos[1]-self.menuState.y
 					else:
 						self.menuState.update( 0, eachClick, clickKey, curMousePos )
 				self.clicks[clickKey].remove( eachClick )
