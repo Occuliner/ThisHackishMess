@@ -44,6 +44,8 @@ from label import Label
 
 from networkbuttons import ConnectToButton, HostButton
 
+from pausestart import PauseStartButton
+
 class DefaultMenuState( MenuState ):
 	"""The DefaultMenuState is the class for the default MenuState.\n""" \
 	"""Shocking, I know."""
@@ -67,7 +69,9 @@ class DefaultMenuState( MenuState ):
 
 	hostButton = HostButton()
 
+	pauseStartButton = PauseStartButton()
+
 	panel = StaticImage( loadImage("devmenu.png", 2), (10, 10) )
 
-	def __init__( self, menu, sprites=[panel, floorEditButton, entityEditButton, saveMapButton, loadMapButton, tagEditButton, boundEditButton, physicsVisButton, sensorEditButton, connectToButton, hostButton] ):
+	def __init__( self, menu, sprites=[panel, floorEditButton, entityEditButton, saveMapButton, loadMapButton, tagEditButton, boundEditButton, physicsVisButton, sensorEditButton, connectToButton, hostButton, pauseStartButton] ):
 		MenuState.__init__( self, menu, sprites )

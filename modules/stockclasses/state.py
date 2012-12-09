@@ -106,6 +106,8 @@ class PlayState:
 		#This is set by the DevMenu init
 		self.devMenuRef = None
 
+		self.paused = False
+
 	def initNetworking( self ):
 		if not self.networkingStarted:
 			#pygnetic.init(logging_lvl=logging.DEBUG)
@@ -190,6 +192,11 @@ class PlayState:
 		Sends input dictionaries to playerGroups.
 		Updates all the child groups, runs the collision system."""
 		
+		self.floor.update( self.panX, self.panY )
+		
+		if self.paused:
+			return None
+
 		if not self.hardBlockInput:
 			if self.playersGroup is not None and len( self.curInputDict ) > 0:
 				for eachPlayer in self.playersGroup.sprites():
@@ -215,8 +222,6 @@ class PlayState:
 			eachElement.update( dt )
 
 		self.soundManager.update( dt )
-
-		self.floor.update( self.panX, self.panY )
 
 		if self.isHost:
 			if self.networkTicker >= int(60.0/self.networkRate):
