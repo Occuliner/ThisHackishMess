@@ -70,10 +70,13 @@ class TextBox( HudElement ):
 		lastIndex = 0
 		for eachIndex in range( len( text ) ):
 			eachSub = text[lastIndex:eachIndex]
-			if self.font.size( eachSub )[0] > wLimit:
+			if text[eachIndex] == "\n":
+				subStrings.append( eachSub )
+				lastIndex = eachIndex + 1
+			elif self.font.size( eachSub )[0] > wLimit:
 				subStrings.append( eachSub[:-1] )
 				lastIndex = eachIndex - 1
-			if eachIndex == ( len( text ) - 1 ):
+			elif eachIndex == ( len( text ) - 1 ):
 				subStrings.append( eachSub+text[-1] )
 		if len( subStrings ) is  0:
 			subStrings = [ text ]
