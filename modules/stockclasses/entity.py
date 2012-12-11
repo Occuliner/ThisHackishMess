@@ -61,6 +61,28 @@ class EntityGroup( pygame.sprite.LayeredDirty ):
 		for each in iter( self ):
 			each.readyAccel( dt )
 
+def idleCentricVelocityUpdateNoGrav( body, gravity, damping, dt ):
+	"""
+	Same as above, but without gravity.
+	"""
+	if body.force.x == 0 and body.force.y == 0:
+		pymunk.Body.update_velocity( body, 0.0, damping, dt )
+	else:
+		pymunk.Body.update_velocity( body, 0.0, 1.0, dt )
+	dx = abs(body.velocity.x)-body.xLimit
+	dy = abs(body.velocity.y)-body.yLimit
+	if dx > 0:
+		body.velocity.x -= dx
+	if dy > 0:
+		body.velocity.y -= dy
+
+def noGravVelocityUpdate( body, gravity, damping, dt ):
+	"""Standard Vel update, but without gravity."""
+	pymunk.Body.update_velocity( body, [0.0, 0.0], damping, dt )
+
+def velocityUpdateWrapped( body, gravity, damping, dt):
+	pymunk.Body.update_velocity( body, gravity, damping, dt )
+
 def idleCentricVelocityUpdate( body, gravity, damping, dt ):
 	"""
 	This function is an "idle-centric" velocity updater for Pymunk.
@@ -97,6 +119,9 @@ class Entity( pygame.sprite.DirtySprite ):
 
 	#RGB colourKey. Look it up on Pygame.
 	colourKey = None
+
+	#Does exactly what it says on the tin.
+	ignoreGravity = False
 
 	#Whether the sprite uses per-pixel alpha
 	alpha = True
@@ -154,8 +179,15 @@ class Entity( pygame.sprite.DirtySprite ):
 				self.body = pymunk.Body( self.mass, pymunk.moment_for_circle(self.mass, 0.0, self.radius ) )
 			self.body.velocity_limit = 200
 			self.body.angular_velocity_limit = 0
-			self.velocity_func = idleCentricVelocityUpdate
-			self.body.velocity_func = idleCentricVelocityUpdate
+			if group.playState.useSuggestedGravityEntityPhysics:
+				self.velocity_func = velocityUpdateWrapped
+			else:
+				self.velocity_func = idleCentricVelocityUpdate
+				self.body.velocity_func = idleCentricVelocityUpdate
+			if self.ignoreGravity:
+				self.body.velocity_func = noGravVelocityUpdate
+				self.velocity_func = noGravVelocityUpdate
+			
 
 			#self.shape = pymunk.Poly( self.body, [ self.rect.bottomright, self.rect.topright, self.rect.topleft, self.rect.bottomleft ] )
 			#self.shape = pymunk.Circle( self.body, 5 )

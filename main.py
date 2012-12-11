@@ -59,20 +59,6 @@ white = pygame.Color( 255, 255, 255 )
 
 currentState = PlayState()
 
-playerGroup = EntityGroup()
-
-genericStuffGroup = EntityGroup()
-
-#theYasb = YasbClass( yasbGroup )
-
-levelWarpGroup = EntityGroup()
-
-currentState.addGroup( levelWarpGroup, name="levelWarpGroup" )
-
-currentState.addGroup( playerGroup, isPlayerGroupBool=True )
-
-currentState.addGroup( genericStuffGroup, name="genericStuffGroup", indexValue=0 )
-
 #
 #	This import seems pointless, but without there won't actually be any 
 #	tiles placed in MasterTileSet, causing the Floor() call later to fail.
@@ -83,25 +69,32 @@ from modules.tilesets.mastertileset import MasterTileSet
 
 prototypeTileGroup = MasterTileSet()
 
-#prototypeTileGroup.addSet( TestTileSet() )
-#prototypeTileGroup.updateSets()
-
 playArea = Floor( prototypeTileGroup, ( 800, 608 ) )
 
 currentState.floor = playArea
 
+
+#Create EntityGroups!
+
+playerGroup = EntityGroup()
+
+genericStuffGroup = EntityGroup()
+
+levelWarpGroup = EntityGroup()
+
+currentState.addGroup( levelWarpGroup, name="levelWarpGroup" )
+
+currentState.addGroup( playerGroup, isPlayerGroupBool=True )
+
+currentState.addGroup( genericStuffGroup, name="genericStuffGroup", indexValue=0 )
+
+#Make the dev menu
 theDevMenu = DevMenu( currentState )
 
-
-#
-#
-#	Game Loop!
-#
-#
+#Delete a lot of unneeded stuff.
+del levelWarpGroup, playerGroup, genericStuffGroup, playArea, DevDraftSet, MasterTileSet, prototypeTileGroup
 
 #This dict is a dict of all the key events.
-
-del levelWarpGroup, playerGroup, genericStuffGroup, playArea, DevDraftSet, MasterTileSet, prototypeTileGroup
 
 inputDict = {}
 
@@ -112,6 +105,13 @@ timeTillFpsPrint = 2.0
 updatedArea = [ pygame.Rect( 0, 0, 800, 600 ) ]
 
 panU, panD, panL, panR = False, False, False, False
+
+
+#
+#
+#	Game Loop!
+#
+#
 
 timer.tick( 60 )
 while not done:

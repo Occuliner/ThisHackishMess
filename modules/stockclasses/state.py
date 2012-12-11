@@ -69,6 +69,7 @@ class PlayState:
 		# it puts the group in the last index of self.drawOrder,
 		# unless passed a index value.
 		self.drawOrder = []
+		self.interweaveOrder={}
 
 		self.curInputDict = {}
 		
@@ -107,6 +108,15 @@ class PlayState:
 		self.devMenuRef = None
 
 		self.paused = False
+
+		#So this is quite an important boolean.
+		#If this is true everything in the PlayState will be drawn in order of the bottom of it's bounding rect, which I will refer
+		#to as 'the foot'. If the foot is higher up the screen, the item will be drawn sooner.
+		#If this is False, everything will be drawn according to the drawOrder and interweaveOrder system.
+		#DrawByFeet is more suitable for some topdown/isometric games.
+		self.drawByFeet = False
+
+		self.useSuggestedGravityEntityPhysics = False
 
 	def initNetworking( self ):
 		if not self.networkingStarted:
@@ -161,25 +171,40 @@ class PlayState:
 				del obj.__dict__['_handlers']
 		del gc.garbage[:]
 		self.devMenuRef = tmpRef
-		
-	def addGroup(self, group, indexValue=None, isPlayerGroupBool=False, name=None):
-		"""addGroup(self, group, indexValue=None, isPlayerGroupBool=False, name=None)
 
-		Add's an entity group to the PlayState.
+	def addInterweaveGroup( self, group, index ):
+		if self.interweaveOrder.get( index, None ) is None:
+			self.interweaveOrder[index] = [group]
+		else:
+			self.interweaveOrder[index].append( group )
+		
+	def addGroup(self, group, indexValue=None, isPlayerGroupBool=False, name=None, interweaveWithFloor=False):
+		"""Add's an entity group to the PlayState.
 
 		If indexValue specifies the draw-order, defaults to last.
 		isPlayerGroupBool specifies if the group is a group of players
 		(ie, a group that will be sent input dictionaries).
-		If a "name" is given, set PlayState.name = group."""
+		If a "name" is given, set PlayState.name = group.
+		interweaveWithFloor means that the entityGroup is drawn with 
+		the floor layers instead, drawn after the layer of it's index.
+		Multiple entgroups can share a interweave number, and they'll be 
+		drawn according to order of their addition. an interweave index of 0
+		means it will be drawn AFTER layer 1, the first layer above the background floor"""
 		
 		group.playState = self
 		self.groups.append( group )
-		newIndex = len( self.groups ) - 1
-		if indexValue == None:
-			self.drawOrder.append( newIndex )
-
+		if not interweaveWithFloor:
+			newIndex = len( self.groups ) - 1
+			if indexValue is None:
+				self.drawOrder.append( newIndex )
+			else:
+				self.drawOrder.insert( indexValue, newIndex )
 		else:
-			self.drawOrder.insert( indexValue, newIndex )
+			newIndex = len( self.floor.layers ) - 1
+			if indexValue is None:
+				self.addInterweaveGroup( group, newIndex )
+			else:
+				self.addInterweaveGroup( group, indexValue )
 		
 		if isPlayerGroupBool:
 			self.namedGroups['playersGroup'] = group
@@ -248,16 +273,31 @@ class PlayState:
 	def draw( self, surface ):
 		"""Draw all the child entity groups in PlayState, returning changed area rects"""
 		changeRects = []
-		#self.floor.draw( surface, ( self.panX, self.panY ) )
-		#for eachVal in self.drawOrder:
-		#	changeRects.extend( self.groups[eachVal].draw( surface ) )
-		
-		renderList = sorted( self.sprites()+self.floor.layers[1:], lambda x, y: cmp( x.rect.bottom, y.rect.bottom ) )
-		#I probably shouldn't be doing this.
-		tmpDrawGroup = pygame.sprite.LayeredDirty( self.floor.layers[0], renderList )
-		changeRects.extend( tmpDrawGroup.draw( surface ) )
-		tmpDrawGroup.empty()
-		del tmpDrawGroup
+
+		changeRects.append( surface.blit( self.floor.layers[0].image, self.floor.layers[0].rect.topleft ) )
+		if not self.drawByFeet:
+			for eachVal in self.drawOrder:
+				changeRects.extend( self.groups[eachVal].draw( surface ) )
+
+			allInterweaveGroups = self.interweaveOrder.values()
+			for eachVal in range( 1, len( self.floor.layers ) ):
+				eachLayer = self.floor.layers[eachVal]			
+				changeRects.append( surface.blit( eachLayer.image, eachLayer.rect.topleft ) )
+				groupsToDraw = self.interweaveOrder.get( eachVal-1, None )
+				if groupsToDraw is not None:
+					allInterweaveGroups.remove( groupsToDraw )
+					[ changeRects.extend( each.draw( surface ) ) for each in groupsToDraw ]
+			#Draw anything left over
+			for eachGroupSet in allInterweaveGroups:
+				[ changeRects.extend( eachGroup.draw( surface ) ) for eachGroup in eachGroupSet ]
+
+		else:
+			renderList = sorted( self.sprites()+self.floor.layers[1:], lambda x, y: cmp( x.rect.bottom, y.rect.bottom ) )
+			#I probably shouldn't be doing this.
+			tmpDrawGroup = pygame.sprite.LayeredDirty( self.floor.layers[0], renderList )
+			changeRects.extend( tmpDrawGroup.draw( surface ) )
+			tmpDrawGroup.empty()
+			del tmpDrawGroup
 		
 		changeRects.extend( self.lineVisualiser.draw( surface, (self.panX, self.panY) ) )
 
