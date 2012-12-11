@@ -126,11 +126,12 @@ class TileButton( Button ):
 		self.tileNum = tileNum
 	def push( self, clickKey, click ):
 		"""Sets the parentState (Should be FloorEditState) to start using this given Tile."""
-		if clickKey is 'mouse1up' and self.parentState.tileNum is not self.tileNum:
-			self.parentState.tileNum = self.tileNum
-			self.parentState.applySelectionBox( self )
-			self.parentState.editMode = 0
-			self.parentState.setClampVisibility( False )
+		if clickKey is 'mouse1up':
+			if (self.parentState.tileNum is not self.tileNum) or self.parentState.editMode is not 0:
+				self.parentState.tileNum = self.tileNum
+				self.parentState.applySelectionBox( self )
+				self.parentState.editMode = 0
+				self.parentState.setClampVisibility( False )
 
 class ScrollBackButtonTiles( Button ):
 	def __init__( self, parentState=None ):
@@ -236,6 +237,7 @@ class FloorEditState( MenuState ):
 		self.editMode = 0
 
 		self.tileNum = 0
+		self.tileFillRect = None
 
 		self.xPos = 0
 		self.yPos = 0
@@ -353,6 +355,19 @@ class FloorEditState( MenuState ):
 			elif self.tileSelectionBox not in self.sprites:
 				self.addSprite( self.tileSelectionBox )
 		self.menu.loadMenuState( self )
+
+	def makeTileRect( self, p1, p2 ):
+		curTile = self.processedTiles[self.tileNum]
+		height = curTile.rect.h
+		width = curTile.rect.w
+		floorRect = self.floor.layers[self.currentFloorLayer].rect
+		leftBoundary = min( p2[0], p1[0] )-floorRect.left
+		rightBoundary = max( p2[0], p1[0] )-floorRect.left
+		topBoundary = min( p2[1], p1[1] )-floorRect.top
+		bottomBoundary = max( p2[1], p1[1] )-floorRect.top
+		x1Position, y1Position = gridRound( [ leftBoundary, topBoundary ], width, height, roundToTopLeft=True )
+		x2Position, y2Position = gridRound( [ rightBoundary, bottomBoundary], width, height, roundToTopLeft=False )
+		return pygame.Rect( x1Position, y1Position, x2Position-x1Position, y2Position-y1Position )
 	
 	def update( self, dt, click, clickKey, curMousePos=None ):
 		"""Where the actual Tile placing on the Floor happens."""
@@ -360,12 +375,29 @@ class FloorEditState( MenuState ):
 		for eachLayer in self.floor.layers:
 			self.menu.playState.lineVisualiser.devMenuLineGroups.extend( generateListOfLines( eachLayer.rect.topleft, eachLayer.rect.bottomright  ) )
 		if self.startOfBlock is not None:
-			if self.editMode is 1:
+			if self.editMode is 0:
+				self.tileFillRect = self.makeTileRect( self.startOfBlock, curMousePos )
+				p1 = self.floor.layers[self.currentFloorLayer].rect.left+self.tileFillRect.left, self.floor.layers[self.currentFloorLayer].rect.top+self.tileFillRect.top
+				p2 = p1[0]+self.tileFillRect.w, p1[1]+self.tileFillRect.h
+				self.menu.playState.lineVisualiser.devMenuLineGroups.extend( generateListOfLines( p1, p2 ) )
+				self.menu.playState.lineVisualiser.flush = True
+
+			elif self.editMode is 1:
 				if self.snapToGrid:
 					curPoint = gridRound( curMousePos, self.gridX, self.gridY, trueRounding=True )
 				else:
 					curPoint = curMousePos
 				self.menu.playState.lineVisualiser.devMenuLineGroups.extend( generateListOfLines( curPoint, self.startOfBlock ) )
+				self.menu.playState.lineVisualiser.flush = True
+		else:
+			if self.editMode is 0:
+				curTile = self.processedTiles[self.tileNum]
+				floorRect = self.floor.layers[self.currentFloorLayer].rect
+				displacedPoint = curMousePos[0]-floorRect.left, curMousePos[1]-floorRect.top
+				p1 = gridRound( displacedPoint, self.gridX, self.gridY )
+				p1 = p1[0]+floorRect.left, p1[1]+floorRect.top
+				p2 = p1[0]+curTile.rect.w, p1[1]+curTile.rect.h
+				self.menu.playState.lineVisualiser.devMenuLineGroups.extend( generateListOfLines( p1, p2 ) )
 				self.menu.playState.lineVisualiser.flush = True
 		self.menu.playState.lineVisualiser.renderLines = True
 		self.menu.playState.lineVisualiser.forceNoRender = True
@@ -378,21 +410,9 @@ class FloorEditState( MenuState ):
 			elif clickKey is 'mouse1up':
 				if self.editMode is 0:
 					if self.startOfBlock != None:
-						curTile = self.processedTiles[self.tileNum]
-					
-						height = curTile.rect.h
-						width = curTile.rect.w
-					
-						leftBoundary = min( click[0], self.startOfBlock[0] )-self.floor.layers[self.currentFloorLayer].rect.left
-						rightBoundary = max( click[0], self.startOfBlock[0] )-self.floor.layers[self.currentFloorLayer].rect.left
-						topBoundary = min( click[1], self.startOfBlock[1] )-self.floor.layers[self.currentFloorLayer].rect.top
-						bottomBoundary = max( click[1], self.startOfBlock[1] )-self.floor.layers[self.currentFloorLayer].rect.top
-	
-						x1Position, y1Position = gridRound( [ leftBoundary, topBoundary ], width, height, roundToTopLeft=True )
-						x2Position, y2Position = gridRound( [ rightBoundary, bottomBoundary], width, height, roundToTopLeft=False )
-					
-						self.floor.writeArea( self.tileNum, pygame.Rect( x1Position, y1Position, x2Position-x1Position, y2Position-y1Position ), layerNum=self.currentFloorLayer, hardBlit=self.hardBlit )
+						self.floor.writeArea( self.tileNum, self.tileFillRect, layerNum=self.currentFloorLayer, hardBlit=self.hardBlit )
 						self.startOfBlock = None
+						self.tileFillRect = None
 				elif self.editMode is 1:
 					if self.startOfBlock != None:
 						if self.snapToGrid:

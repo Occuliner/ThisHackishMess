@@ -128,7 +128,7 @@ class Floor:
 			theChange = self.changes.pop(changeNum - 1)
 			theChangeRect = theChange.image.get_rect()
 			changeWidth, changeHeight = theChangeRect.width, theChangeRect.height
-			self.undoneChanges.insert( 0, self.createChange( (changeWidth, changeHeight), theChange.pos ) )
+			self.undoneChanges.insert( 0, self.createChange( (changeWidth, changeHeight), theChange.pos, theChange.layerNum ) )
 			self.write( theChange.image, theChange.pos, theChange.layerNum, hardBlit=True )
 
 	def redoChange( self ):
@@ -137,20 +137,20 @@ class Floor:
 			theChange = self.undoneChanges.pop(0)
 			theChangeRect = theChange.image.get_rect()
 			changeWidth, changeHeight = theChangeRect.width, theChangeRect.height
-			self.changes.append( self.createChange( (changeWidth, changeHeight), theChange.pos ) )
+			self.changes.append( self.createChange( (changeWidth, changeHeight), theChange.pos, theChange.layerNum ) )
 			self.write( theChange.image, theChange.pos, theChange.layerNum, hardBlit=True )
 		
 
-	def createChange( self, area, pos ):
+	def createChange( self, area, pos, layerNum ):
 		"""Generates FloorChanges from how the map currently looks at one spot, \n""" \
 		"""adds the to the Floor's list of FloorChanges, then calls Floor.limitChanges."""
 		tmpSurface = pygame.Surface( area )
 		targetRect = tmpSurface.get_rect()
 		targetRect.topleft = pos
-		tmpSurface.blit( self.layers[self.curLayer].image, (0,0), targetRect )
+		tmpSurface.blit( self.layers[layerNum].image, (0,0), targetRect )
 
 	
-		newChange = FloorChange( tmpSurface, pos )
+		newChange = FloorChange( tmpSurface, pos, layerNum )
 		
 		return newChange
 
@@ -190,7 +190,7 @@ class Floor:
 		width = curTile.rect.w
 
 		self.undoneChanges = []
-		self.addUndo( self.createChange( ( someRect.width, someRect.height ), someRect.topleft ) )
+		self.addUndo( self.createChange( ( someRect.width, someRect.height ), someRect.topleft, layerNum ) )
 
 		if not (layerNum is None):
 			destLayer = self.layers[layerNum].image
@@ -207,7 +207,7 @@ class Floor:
 	def writeTile( self, tileIndexValue, pos, hardBlit=False ):
 		"""Write on tile (selected from given tileIndex, to a given position."""
 		theTile = self.tileSet.getTiles()[tileIndexValue]
-		self.addUndo( self.createChange( ( theTile.rect.w, theTile.rect.h ), pos ) )
+		self.addUndo( self.createChange( ( theTile.rect.w, theTile.rect.h ), pos, layerNum ) )
 		self.write( theTile.image, pos, hardBlit )
 
 	def update( self, panX, panY ):
