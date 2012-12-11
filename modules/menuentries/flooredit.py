@@ -63,6 +63,16 @@ class RedoButton( Button ):
 		if clickKey is 'mouse1up':
 			self.parentState.floor.redoChange()
 
+class HardBlitButton( Button ):
+	image = loadImage( "hardblit.png", 2 )
+	def __init__( self, menu=None ):
+		Button.__init__( self, None, None, menu )
+		self.rect = self.image.get_rect()
+		self.rect.topleft = ( 73, 370 ) #( 144, 338 )
+	def push( self, clickKey, click ):
+		if "up" in clickKey:
+			self.parentState.toggleHardBlit()
+
 class SnapToGridButtonFloor( Button ):
 	image = loadImage( "gridbutton.png", 2 )
 	def __init__( self, menu=None ):
@@ -170,7 +180,6 @@ class FloorEditState( MenuState ):
 	def __init__( self, menu, sprites=[] ):
 		MenuState.__init__( self, menu, sprites )
 
-		#print len( self.buttons ), len( self.sprites ), len( sprites )
 		self.buttons = []
 		self.sprites = [self.fileNameLabel]
 
@@ -203,6 +212,9 @@ class FloorEditState( MenuState ):
 
 		self.snapToGridButton = SnapToGridButtonFloor( self )
 		self.addButton( self.snapToGridButton )
+
+		self.hardBlitButton = HardBlitButton( self )
+		self.addButton( self.hardBlitButton )
 		
 		#A local copy to prevent excessive look ups.
 		self.floor = self.menu.playState.floor
@@ -214,6 +226,9 @@ class FloorEditState( MenuState ):
 
 		self.snapToGrid = False
 		self.gridButtonSelectionBox = None
+
+		self.hardBlit = False
+		self.hardBlitSelectionBox = None
 
 		self.currentlyGrabbedClamp = None
 
@@ -256,6 +271,16 @@ class FloorEditState( MenuState ):
 		else:
 			self.removeSprite( self.gridButtonSelectionBox )
 			self.gridButtonSelectionBox = None
+		self.menu.loadMenuState( self )
+
+	def toggleHardBlit( self ):
+		self.hardBlit = not self.hardBlit
+		if self.hardBlitSelectionBox is None:
+			self.hardBlitSelectionBox = SelectionBox( self.hardBlitButton.rect, self )
+			self.addSprite( self.hardBlitSelectionBox )
+		else:
+			self.removeSprite( self.hardBlitSelectionBox )
+			self.hardBlitSelectionBox = None
 		self.menu.loadMenuState( self )
 
 	def generateButtons( self ):
@@ -366,7 +391,7 @@ class FloorEditState( MenuState ):
 						x1Position, y1Position = gridRound( [ leftBoundary, topBoundary ], width, height, roundToTopLeft=True )
 						x2Position, y2Position = gridRound( [ rightBoundary, bottomBoundary], width, height, roundToTopLeft=False )
 					
-						self.floor.writeArea( self.tileNum, pygame.Rect( x1Position, y1Position, x2Position-x1Position, y2Position-y1Position ), layerNum=self.currentFloorLayer )
+						self.floor.writeArea( self.tileNum, pygame.Rect( x1Position, y1Position, x2Position-x1Position, y2Position-y1Position ), layerNum=self.currentFloorLayer, hardBlit=self.hardBlit )
 						self.startOfBlock = None
 				elif self.editMode is 1:
 					if self.startOfBlock != None:

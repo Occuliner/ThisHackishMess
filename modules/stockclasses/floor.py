@@ -17,7 +17,7 @@
 
 """This file defines the FloorChange and Floor classes."""
 import pygame
-from pygame.locals import BLEND_RGBA_MIN, SRCALPHA
+from pygame.locals import SRCALPHA
 
 
 #
@@ -30,8 +30,6 @@ from pygame.locals import BLEND_RGBA_MIN, SRCALPHA
 #
 
 #Also stored here, the FloorChange class, since giving it its own files seemed silly.
-
-
 
 class FloorChange:
 	"""The FloorChange class, this is merely an object to keep track of area changes.\n""" \
@@ -131,7 +129,7 @@ class Floor:
 			theChangeRect = theChange.image.get_rect()
 			changeWidth, changeHeight = theChangeRect.width, theChangeRect.height
 			self.undoneChanges.insert( 0, self.createChange( (changeWidth, changeHeight), theChange.pos ) )
-			self.write( theChange.image, theChange.pos, theChange.layerNum )
+			self.write( theChange.image, theChange.pos, theChange.layerNum, hardBlit=True )
 
 	def redoChange( self ):
 		"""Redo a Floor eidt, based on a FloorChange."""
@@ -140,7 +138,7 @@ class Floor:
 			theChangeRect = theChange.image.get_rect()
 			changeWidth, changeHeight = theChangeRect.width, theChangeRect.height
 			self.changes.append( self.createChange( (changeWidth, changeHeight), theChange.pos ) )
-			self.write( theChange.image, theChange.pos, theChange.layerNum )
+			self.write( theChange.image, theChange.pos, theChange.layerNum, hardBlit=True )
 		
 
 	def createChange( self, area, pos ):
@@ -163,7 +161,7 @@ class Floor:
 	def addRedo( self, change ):
 		self.undoneChanges.insert( change, 0 )
 		
-	def write( self, image, pos, layerNum=None ):
+	def write( self, image, pos, layerNum=None, hardBlit=False ):
 		"""Write a given image to a certain place."""
 		
 		targetRect = image.get_rect()
@@ -174,11 +172,15 @@ class Floor:
 			destLayer = self.layers[layerNum].image
 		else:
 			destLayer = self.layers[self.curLayer].image
-		destLayer.blit( image, pos )
 
+		if hardBlit:
+			tmpRect = image.get_rect()
+			tmpRect.topleft = pos
+			destLayer.fill( pygame.Color( 0, 0, 0, 0 ), tmpRect )
+		destLayer.blit( image, pos )
 		self.nextChangedAreas.append( targetRect )
 	
-	def writeArea( self, tileIndexValue, someRect, layerNum=None ):
+	def writeArea( self, tileIndexValue, someRect, layerNum=None, hardBlit=False ):
 		"""Write one tile (selected from given tileIndexValue), all over a given area. \n """ \
 		"""This blits images just as slowly as going over writeTile() a lot, but \n """ \
 		"""passes one big area to self.nextChangedAreas."""
@@ -193,18 +195,20 @@ class Floor:
 		if not (layerNum is None):
 			destLayer = self.layers[layerNum].image
 		else:
-			destLayer = self.layers[self.curLayer].image	
+			destLayer = self.layers[self.curLayer].image
+		
+		if hardBlit:
+			destLayer.fill( pygame.Color( 0, 0, 0, 0 ), someRect )
 		for x in xrange( someRect.topleft[0], someRect.topleft[0]+someRect.w, curTile.rect.w ):
 			for y in xrange( someRect.topleft[1], someRect.topleft[1]+someRect.h, curTile.rect.h ):
 				destLayer.blit( curTile.image, (x,y) )
-
 		self.nextChangedAreas.append( someRect )
 
-	def writeTile( self, tileIndexValue, pos ):
+	def writeTile( self, tileIndexValue, pos, hardBlit=False ):
 		"""Write on tile (selected from given tileIndex, to a given position."""
 		theTile = self.tileSet.getTiles()[tileIndexValue]
 		self.addUndo( self.createChange( ( theTile.rect.w, theTile.rect.h ), pos ) )
-		self.write( theTile.image, pos )
+		self.write( theTile.image, pos, hardBlit )
 
 	def update( self, panX, panY ):
 		for each in self.layers:
