@@ -15,7 +15,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import pygame, pymunk
+import pygame, extern_modules.pymunk as pymunk
 
 from imageload import loadImage, loadImageNoAlpha
 from imageslice import sliceImage

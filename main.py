@@ -29,7 +29,7 @@ from pygame.locals import *
 pygame.init()
 
 #Apparently all the scripts ran by extention of this have this in their paths, huh.
-sys.path.extend( ["modules/stockfunctions", "modules/stockclasses"] )
+sys.path.extend( ["modules/stockfunctions", "modules/stockclasses", "extern_modules"] )
 
 from entity import EntityGroup
 

@@ -15,7 +15,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import pygame, pymunk, sys, gc, logging
+import pygame, extern_modules.pymunk as pymunk, sys, gc, logging
 import extern_modules.pygnetic as pygnetic
 #from pygame.locals import *
 from linevisualiser import LineVisualiser

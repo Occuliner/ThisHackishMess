@@ -16,7 +16,7 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 """ This module contains pre-processer classes for creating simple representations of Physics objects for use with serialization."""
-import pymunk
+import extern_modules.pymunk as pymunk
 
 """I call them ghosts!"""
 

@@ -17,7 +17,7 @@
 
 """This class is a simple class for drawing out lines over the playState for use with the DevMenu and physics-visualisation mode."""
 
-import pygame, pymunk
+import pygame, extern_modules.pymunk as pymunk
 
 red = pygame.Color( 255, 0, 0 )
 blue = pygame.Color( 0, 0, 255 )
