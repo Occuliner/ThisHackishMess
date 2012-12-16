@@ -15,7 +15,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import extern_modules.pygnetic as pygnetic, networkmessages, weakref
+import extern_modules.pygnetic as pygnetic, weakref
 
 from idsource import IdSource
 from picklestuff import loadPlayState
@@ -33,7 +33,7 @@ class ClientHandler(pygnetic.Handler):
 		playState = self.client().playStateRef()
 		if not (message.levelName is "Untitled"):
 			#So, if there is a level name, load that level if found.
-			newState = loadPlayState( message.levelName, playState.floor.tileSet, self.client().networkEntsClassDefs, networkClient=self.client() )
+			newState = loadPlayState( message.levelName, playState.floor.tileSet, self.client().networkEntsClassDefs.values(), networkClient=self.client() )
 			if newState is None:
 				print "Host was on a level you don't have."
 			else:

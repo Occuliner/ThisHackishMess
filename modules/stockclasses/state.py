@@ -23,6 +23,7 @@ from soundmanager import SoundManager
 from idsource import IdSource
 from networkserver import NetworkServer
 from networkclient import NetworkClient
+from networkmessages import registerMessages
 from modules.networkents.mindlessentholder import *
 from entity import EntityGroup
 
@@ -123,6 +124,7 @@ class PlayState:
 			#pygnetic.init(logging_lvl=logging.DEBUG)
 			pygnetic.init(logging_lvl=logging.ERROR)
 			self.networkingStarted = True
+			registerMessages()
 
 	def hostGame( self ):
 		if self.isHost:
