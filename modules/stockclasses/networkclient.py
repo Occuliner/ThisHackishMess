@@ -18,7 +18,7 @@
 import extern_modules.pygnetic as pygnetic, networkhandlers, weakref
 
 class NetworkClient:
-	def __init__( self, playState=None, networkEntsClassDefs=None, conn_limit=1, networkingMode=0, clientSidePrediction=True *args, **kwargs ):
+	def __init__( self, playState=None, networkEntsClassDefs=None, conn_limit=1, networkingMode=0, clientSidePrediction=True, *args, **kwargs ):
 		self._client = pygnetic.Client( conn_limit, *args, **kwargs )
 		
 		self.playStateRef = weakref.ref( playState )
@@ -92,15 +92,23 @@ class NetworkClient:
 				for eachEnt in playState.sprites():
 					if eachEnt.id == eachId:
 						matchFound = True
-						closestTime = min( [ abs( updateTime-each ) for each in eachEnt.logOfPositions.keys() ] )
-						posAtTime = eachEnt.logOfPositions[closestTime]
-						deltaPos = eachTuple[1][0]-posAtTime[0], eachTuple[1][1]-posAtTime[1]
-						curPos = eachEnt.getPosition()
-						newPos = curPos[0]+deltaPos[0], curPos[1]+deltaPos[1]
-						eachEnt.setPosition( newPos )
-						for eachKey in eachEnt.logsOfPositions.keys():
-							if eachKey < closestTime:
-								del eachEnt.logsOfPositions[eachKey]
+						if len( eachEnt.logOfPositions ) > 0:
+							smallestTimeDifference = 10000
+							closestTime = None
+							for each in eachEnt.logOfPositions.keys():
+								if abs( updateTime-each ) < smallestTimeDifference:
+									closestTime = each
+									smallestTimeDIfference = abs( updateTime-each )
+							if smallestTimeDifference < 0.030:
+								posAtTime = eachEnt.logOfPositions[closestTime]
+								deltaPos = eachTuple[1][0]-posAtTime[0], eachTuple[1][1]-posAtTime[1]
+								curPos = eachEnt.getPosition()
+								newPos = curPos[0]+deltaPos[0], curPos[1]+deltaPos[1]
+								if deltaPos[0]**2+deltaPos[1]**2 > 1:
+									eachEnt.setPosition( list(newPos) )
+								for eachKey in eachEnt.logOfPositions.keys():
+									if eachKey < closestTime:
+										del eachEnt.logOfPositions[eachKey]
 						#eachEnt.setPosition( eachTuple[1] )
 				if not matchFound:
 					print "WAT. RECEIVED UPDATE REFERRING TO NON-EXISTANT ENTITY."

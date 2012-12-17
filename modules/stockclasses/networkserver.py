@@ -119,7 +119,7 @@ class NetworkServer:
 		forceSoundList  = [ (each.soundFileName, each.priority, each.loops, each.maxtime, each.fade_ms, each.endTime-playState.soundManager.curTime ) for each in playState.soundManager.playInstances ]
 
 		#Send the update
-		client.connection.net_updateEvent( self.networkTick, createEntList, [], [], [], [], changeAnimList, [] )
+		client.connection.net_updateEvent( self.networkTick, self.timer, createEntList, [], [], [], [], changeAnimList, [] )
 
 		#Now send the forceAnims.
 		client.connection.net_forceEntFrame( self.networkTick, forceAnimList )

@@ -15,7 +15,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import pygame, extern_modules.pymunk as pymunk
+import pygame, extern_modules.pymunk as pymunk, weakref
 
 from imageload import loadImage, loadImageNoAlpha
 from imageslice import sliceImage
@@ -149,6 +149,7 @@ class NetworkEntity( pygame.sprite.DirtySprite ):
 			self.addToGroup( group )
 		else:
 			self.id = None
+			self.playStateRef = None
 
 		self.classUpdated = False
 
@@ -161,6 +162,7 @@ class NetworkEntity( pygame.sprite.DirtySprite ):
 		if self.collidable:
 			for group in groups:
 				group.playState.space.add( self.physicsObjects )
+				self.playStateRef = weakref.ref( group.playState )
 		pygame.sprite.DirtySprite.add( self, groups )
 
 	def removeFromGroup( self, *groups ):
@@ -298,6 +300,7 @@ class NetworkEntity( pygame.sprite.DirtySprite ):
 		networkNode = self.playStateRef().networkNode
 		if networkNode.clientSidePrediction:
 			self.logOfPositions[networkNode.timer] = self.getPosition()
+
 
 		if len( self.groups() ) > 1:
 			raise Exception( "An instance of Entity is in more than one group, that should probably not be happening." )
