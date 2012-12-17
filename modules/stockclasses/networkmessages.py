@@ -44,7 +44,7 @@ def registerMessages():
 	pygnetic.register( 'chatToHost', ( 'message', 'groupId' ) )
 
 	#This message is sent from the host to the player every tick. Each parameter is a list of objects that describe some event that happened this tick.
-	pygnetic.register( 'updateEvent', ('tickNum', 'createEnts', 'removeEnts', 'updatePositions', 'startSounds', 'stopSounds', 'changeAnims', 'swapAnims') )
+	pygnetic.register( 'updateEvent', ('tickNum', 'time', 'createEnts', 'removeEnts', 'updatePositions', 'startSounds', 'stopSounds', 'changeAnims', 'swapAnims') )
 
 	#This message is sent from the player to the host containing the players input dicts.
 	pygnetic.register( 'inputEvent', ('tickNum', 'inputDict') )

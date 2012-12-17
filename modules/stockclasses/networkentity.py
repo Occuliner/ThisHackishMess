@@ -154,6 +154,9 @@ class NetworkEntity( pygame.sprite.DirtySprite ):
 
 		self.oldPan = group.playState.panX, group.playState.panY
 
+		#This is a log of positions for retroactive location correction for networking.
+		self.logOfPositions = {}
+
 	def addToGroup( self, *groups ):
 		if self.collidable:
 			for group in groups:
@@ -291,6 +294,10 @@ class NetworkEntity( pygame.sprite.DirtySprite ):
 
 			self.createFrames()
 			self.classUpdated = False
+
+		networkNode = self.playStateRef().networkNode
+		if networkNode.clientSidePrediction:
+			self.logOfPositions[networkNode.timer] = self.getPosition()
 
 		if len( self.groups() ) > 1:
 			raise Exception( "An instance of Entity is in more than one group, that should probably not be happening." )

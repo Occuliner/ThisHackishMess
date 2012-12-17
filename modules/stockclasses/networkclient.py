@@ -18,7 +18,7 @@
 import extern_modules.pygnetic as pygnetic, networkhandlers, weakref
 
 class NetworkClient:
-	def __init__( self, playState=None, networkEntsClassDefs=None, conn_limit=1, networkingMode=0, *args, **kwargs ):
+	def __init__( self, playState=None, networkEntsClassDefs=None, conn_limit=1, networkingMode=0, clientSidePrediction=True *args, **kwargs ):
 		self._client = pygnetic.Client( conn_limit, *args, **kwargs )
 		
 		self.playStateRef = weakref.ref( playState )
@@ -42,6 +42,8 @@ class NetworkClient:
 			self.extrapolationOn = True
 		elif networkingMode is 2:
 			self.interpolationOn = True
+
+		self.clientSidePrediction = clientSidePrediction
 
 	def connect( self, address, port, message_factory=pygnetic.message.message_factory, **kwargs ):
 		self.connection = self._client.connect( address, port, message_factory, **kwargs )
@@ -71,17 +73,37 @@ class NetworkClient:
 			if not matchFound:		
 				print "WAT. RECEIVED UPDATE REFERRING TO NON-EXISTANT ENTITY."
 
-	def updatePositions( self, positionTuples ):
+	def updatePositions( self, positionTuples, updateTime ):
 		playState = self.playStateRef()
-		for eachTuple in positionTuples:
-			eachId = eachTuple[0]
-			matchFound = False
-			for eachEnt in playState.sprites():
-				if eachEnt.id == eachId:
-					matchFound = True
-					eachEnt.setPosition( eachTuple[1] )
-			if not matchFound:
-				print "WAT. RECEIVED UPDATE REFERRING TO NON-EXISTANT ENTITY."
+		if not self.clientSidePrediction:
+			for eachTuple in positionTuples:
+				eachId = eachTuple[0]
+				matchFound = False
+				for eachEnt in playState.sprites():
+					if eachEnt.id == eachId:
+						matchFound = True
+						eachEnt.setPosition( eachTuple[1] )
+				if not matchFound:
+					print "WAT. RECEIVED UPDATE REFERRING TO NON-EXISTANT ENTITY."
+		else:
+			for eachTuple in positionTuples:
+				eachId = eachTuple[0]
+				matchFound = False
+				for eachEnt in playState.sprites():
+					if eachEnt.id == eachId:
+						matchFound = True
+						closestTime = min( [ abs( updateTime-each ) for each in eachEnt.logOfPositions.keys() ] )
+						posAtTime = eachEnt.logOfPositions[closestTime]
+						deltaPos = eachTuple[1][0]-posAtTime[0], eachTuple[1][1]-posAtTime[1]
+						curPos = eachEnt.getPosition()
+						newPos = curPos[0]+deltaPos[0], curPos[1]+deltaPos[1]
+						eachEnt.setPosition( newPos )
+						for eachKey in eachEnt.logsOfPositions.keys():
+							if eachKey < closestTime:
+								del eachEnt.logsOfPositions[eachKey]
+						#eachEnt.setPosition( eachTuple[1] )
+				if not matchFound:
+					print "WAT. RECEIVED UPDATE REFERRING TO NON-EXISTANT ENTITY."
 
 	def startSounds( self, soundTuples ):
 		sndMgr = self.playStateRef().soundManager

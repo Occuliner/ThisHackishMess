@@ -60,7 +60,7 @@ class ClientHandler(pygnetic.Handler):
 
 		client.createEntities( message.createEnts )
 		client.removeEntities( message.removeEnts )
-		client.updatePositions( message.updatePositions )
+		client.updatePositions( message.updatePositions, message.time )
 		client.startSounds( message.startSounds )
 		client.stopSounds( message.stopSounds )
 		client.swapAnims( message.swapAnims )

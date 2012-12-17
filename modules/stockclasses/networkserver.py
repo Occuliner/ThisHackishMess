@@ -195,7 +195,7 @@ class NetworkServer:
 				#Check if the connection is still valid:
 				if eachClient.connection.connected:
 					#Send each a network update.
-					eachClient.connection.net_updateEvent( self.networkTick, createEntUpdates, removeEntUpdates, updatedPositions, startSoundUpdates, stopSoundUpdates, changeAnimUpdates, swapAnimUpdates )
+					eachClient.connection.net_updateEvent( self.networkTick, self.timer, createEntUpdates, removeEntUpdates, updatedPositions, startSoundUpdates, stopSoundUpdates, changeAnimUpdates, swapAnimUpdates )
 				else:
 					#Remove associated players and the client tuple.
 					self.removePlayer( eachClient )
@@ -206,7 +206,7 @@ class NetworkServer:
 				#Check if the connection is still valid:
 				if eachClient.connection.connected:
 					#Send each a network update.
-					eachClient.connection.net_updateEvent( self.networkTick, createEntUpdates, removeEntUpdates, updatedPositions, startSoundUpdates, stopSoundUpdates, changeAnimUpdates, swapAnimUpdates )
+					eachClient.connection.net_updateEvent( self.networkTick, self.timer, createEntUpdates, removeEntUpdates, updatedPositions, startSoundUpdates, stopSoundUpdates, changeAnimUpdates, swapAnimUpdates )
 					eachClient.connection.net_forceVelocities( self.networkTick, velocityTuples )
 				else:
 					#Remove associated players and the client tuple.
