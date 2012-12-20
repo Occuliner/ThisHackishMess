@@ -203,15 +203,15 @@ class NetworkClient:
 								curPos = eachEnt.getPosition()
 								deltaPos = eachTuple[1][0]*(self.timer-updateTime), eachTuple[1][1]*(self.timer-updateTime)
 								eachEnt.setPosition( ( curPos[0]+deltaPos[0], curPos[1]+deltaPos[1] ) )
-							velAtTime = eachEnt.logOfVelocities[closestTime]
-							newVel = eachEnt.body.velocity.x, eachEnt.body.velocity.y
-							newVel = newVel[0]-velAtTime[0], newVel[1]-velAtTime[1]
-							newVel = newVel[0]+eachTuple[1][0], newVel[1]+eachTuple[1][1]
-							eachEnt.body.velocity.x = newVel[0]
-							eachEnt.body.velocity.y = newVel[1]
-							for eachKey in eachEnt.logOfVelocities.keys():
-								if eachKey < closestTime:
-									del eachEnt.logOfVelocities[eachKey]
+								velAtTime = eachEnt.logOfVelocities[closestTime]
+								newVel = eachEnt.body.velocity.x, eachEnt.body.velocity.y
+								newVel = newVel[0]-velAtTime[0], newVel[1]-velAtTime[1]
+								newVel = newVel[0]+eachTuple[1][0], newVel[1]+eachTuple[1][1]
+								eachEnt.body.velocity.x = newVel[0]
+								eachEnt.body.velocity.y = newVel[1]
+								for eachKey in eachEnt.logOfVelocities.keys():
+									if eachKey < closestTime:
+										del eachEnt.logOfVelocities[eachKey]
 				if not matchFound:
 					print "WAT. RECEIVED UPDATE REFERRING TO NON-EXISTANT ENTITY."
 	
