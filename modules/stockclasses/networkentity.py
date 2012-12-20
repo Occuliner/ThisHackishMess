@@ -84,6 +84,8 @@ class NetworkEntity( pygame.sprite.DirtySprite ):
 
 	collidable = False
 
+	ignoreGravity = False
+
 	solid = False
 
 	specialCollision = None
