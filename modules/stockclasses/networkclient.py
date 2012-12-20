@@ -184,7 +184,7 @@ class NetworkClient:
 					curPos = eachEnt.getPosition()
 					deltaPos = eachTuple[1][0]*eachEnt.timeSinceLastVelUpdate, eachTuple[1][1]*eachEnt.timeSinceLastVelUpdate
 					eachEnt.setPosition( ( curPos[0]+deltaPos[0], curPos[1]+deltaPos[1] ) )
-					eachENt.timeSinceLastVelUpdate = 0.0
+					eachEnt.timeSinceLastVelUpdate = 0.0
 			if not matchFound:
 				print "WAT. RECEIVED UPDATE REFERRING TO NON-EXISTANT ENTITY."
 

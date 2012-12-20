@@ -158,7 +158,7 @@ class NetworkEntity( pygame.sprite.DirtySprite ):
 		#This is a log of positions for retroactive location correction for networking.
 		self.logOfPositions = {}
 
-		self.velocityAverage = 0.00
+		self.velocityAverage = ( 0.0, 0.0 )
 		self.velocityNum = 0
 		self.timeSinceLastVelUpdate = 0.0
 
