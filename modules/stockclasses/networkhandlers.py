@@ -30,6 +30,7 @@ class ClientHandler(pygnetic.Handler):
 		self.client = weakref.ref( client )
 
 	def net_requestInfo( self, message, **kwargs ):
+		self.client().timer = message.time
 		playState = self.client().playStateRef()
 		if not (message.levelName is "Untitled"):
 			#So, if there is a level name, load that level if found.
@@ -103,7 +104,7 @@ class ServerHandler(pygnetic.Handler):
 				self.connection.disconnect()
 				return None
 		playState = self.server.networkServerRef().playStateRef()
-		self.connection.net_requestInfo( playState.soundManager.curPlayId, playState.fileName )
+		self.connection.net_requestInfo( playState.soundManager.curPlayId, playState.fileName, self.server.networkServerRef().timer )
 		pygnetic.Handler.on_connect( self )
 
 	def net_hereIsMyInfo( self, message, **kwargs ):

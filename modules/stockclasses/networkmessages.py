@@ -23,7 +23,7 @@ import extern_modules.pygnetic as pygnetic
 
 def registerMessages():
 	#This message is sent when the host doesn't instant-kick the client, it also contains the current level name.
-	pygnetic.register( 'requestInfo', ('soundMgrCurPlayId', 'levelName') )
+	pygnetic.register( 'requestInfo', ('soundMgrCurPlayId', 'time', 'levelName') )
 
 	#This message is sent on info request
 	pygnetic.register( 'hereIsMyInfo', ('name') )
