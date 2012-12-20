@@ -158,6 +158,10 @@ class NetworkEntity( pygame.sprite.DirtySprite ):
 		#This is a log of positions for retroactive location correction for networking.
 		self.logOfPositions = {}
 
+		self.velocityAverage = 0.00
+		self.velocityNum = 0
+		self.timeSinceLastVelUpdate = 0.0
+
 	def addToGroup( self, *groups ):
 		if self.collidable:
 			for group in groups:
@@ -300,7 +304,10 @@ class NetworkEntity( pygame.sprite.DirtySprite ):
 		networkNode = self.playStateRef().networkNode
 		if networkNode.clientSidePrediction:
 			self.logOfPositions[networkNode.timer] = self.getPosition()
-
+			if self.collidable:
+				self.velocityAverage = (self.velocityAverage[0]*self.velocityNum + self.body.velocity.x)/(self.velocityNum+1), (self.velocityAverage[1]*self.velocityNum + self.body.velocity.y)/(self.velocityNum+1)
+				self.velocityNum += 1
+				self.timeSinceLastVelUpdate += dt
 
 		if len( self.groups() ) > 1:
 			raise Exception( "An instance of Entity is in more than one group, that should probably not be happening." )

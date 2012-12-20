@@ -102,6 +102,8 @@ class NetworkClient:
 							if smallestTimeDifference < 0.030:
 								posAtTime = eachEnt.logOfPositions[closestTime]
 								deltaPos = eachTuple[1][0]-posAtTime[0], eachTuple[1][1]-posAtTime[1]
+								if self.extrapolationOn and eachEnt.collidable:
+									deltaPos = deltaPos[0]-eachEnt.velocityAverage[0]*eachEnt.timeSinceLastVelUpdate, deltaPos[1]-eachEnt.velocityAverage[1]*eachEnt.timeSinceLastVelUpdate
 								curPos = eachEnt.getPosition()
 								newPos = curPos[0]+deltaPos[0], curPos[1]+deltaPos[1]
 								if deltaPos[0]**2+deltaPos[1]**2 > 1:
@@ -179,6 +181,10 @@ class NetworkClient:
 					matchFound = True
 					eachEnt.body.velocity.x = eachTuple[1][0]
 					eachEnt.body.velocity.y = eachTuple[1][1]
+					curPos = eachEnt.getPosition()
+					deltaPos = eachTuple[1][0]*eachEnt.timeSinceLastVelUpdate, eachTuple[1][1]*eachEnt.timeSinceLastVelUpdate
+					eachEnt.setPosition( ( curPos[0]+deltaPos[0], curPos[1]+deltaPos[1] ) )
+					eachENt.timeSinceLastVelUpdate = 0.0
 			if not matchFound:
 				print "WAT. RECEIVED UPDATE REFERRING TO NON-EXISTANT ENTITY."
 
