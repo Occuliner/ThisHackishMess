@@ -302,7 +302,7 @@ class NetworkEntity( pygame.sprite.DirtySprite ):
 		if networkNode.clientSidePrediction:
 			self.logOfPositions[networkNode.timer] = self.getPosition()
 			if self.collidable:
-				self.logofVelocities[networkNode.timer] = self.body.velocity.x, self.body.velocity.y
+				self.logOfVelocities[networkNode.timer] = self.body.velocity.x, self.body.velocity.y
 
 		if len( self.groups() ) > 1:
 			raise Exception( "An instance of Entity is in more than one group, that should probably not be happening." )
