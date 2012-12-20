@@ -20,6 +20,27 @@ import pygame, extern_modules.pymunk as pymunk, weakref
 from imageload import loadImage, loadImageNoAlpha
 from imageslice import sliceImage
 
+def idleCentricVelocityUpdateNoGrav( body, gravity, damping, dt ):
+	"""
+	Same as above, but without gravity.
+	"""
+	if body.force.x == 0 and body.force.y == 0:
+		pymunk.Body.update_velocity( body, 0.0, damping, dt )
+	else:
+		pymunk.Body.update_velocity( body, 0.0, 1.0, dt )
+	dx = abs(body.velocity.x)-body.xLimit
+	dy = abs(body.velocity.y)-body.yLimit
+	if dx > 0:
+		body.velocity.x -= dx
+	if dy > 0:
+		body.velocity.y -= dy
+
+def noGravVelocityUpdate( body, gravity, damping, dt ):
+	"""Standard Vel update, but without gravity."""
+	pymunk.Body.update_velocity( body, [0.0, 0.0], damping, dt )
+
+def velocityUpdateWrapped( body, gravity, damping, dt):
+	pymunk.Body.update_velocity( body, gravity, damping, dt )
 
 def idleCentricVelocityUpdate( body, gravity, damping, dt ):
 	"""
@@ -95,8 +116,14 @@ class NetworkEntity( pygame.sprite.DirtySprite ):
 				self.body = pymunk.Body( self.mass, pymunk.moment_for_circle(self.mass, 0.0, self.radius ) )
 			self.body.velocity_limit = 200
 			self.body.angular_velocity_limit = 0
-			self.velocity_func = idleCentricVelocityUpdate
-			self.body.velocity_func = idleCentricVelocityUpdate
+			if group.playState.useSuggestedGravityEntityPhysics:
+				self.velocity_func = velocityUpdateWrapped
+			else:
+				self.velocity_func = idleCentricVelocityUpdate
+				self.body.velocity_func = idleCentricVelocityUpdate
+			if self.ignoreGravity:
+				self.body.velocity_func = noGravVelocityUpdate
+				self.velocity_func = noGravVelocityUpdate
 
 			width, height = self.rect.width, self.rect.height
 			self.physicsObjects = [self.body]
