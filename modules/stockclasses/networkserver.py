@@ -208,7 +208,7 @@ class NetworkServer:
 					#Send each a network update.
 					eachClient.connection.net_updateEvent( self.networkTick, self.timer, createEntUpdates, removeEntUpdates, updatedPositions, startSoundUpdates, stopSoundUpdates, changeAnimUpdates, swapAnimUpdates )
 					#Always force the velocity AFTER an updateEvent
-					eachClient.connection.net_forceVelocities( self.networkTick, velocityTuples )
+					eachClient.connection.net_forceVelocities( self.networkTick, velocityTuples, self.timer )
 				else:
 					#Remove associated players and the client tuple.
 					self.removePlayer( eachClient )

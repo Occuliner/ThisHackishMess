@@ -98,16 +98,16 @@ class NetworkClient:
 							for each in eachEnt.logOfPositions.keys():
 								if abs( updateTime-each ) < smallestTimeDifference:
 									closestTime = each
-									smallestTimeDIfference = abs( updateTime-each )
+									smallestTimeDifference = abs( updateTime-each )
 							if smallestTimeDifference < 0.030:
 								posAtTime = eachEnt.logOfPositions[closestTime]
 								deltaPos = eachTuple[1][0]-posAtTime[0], eachTuple[1][1]-posAtTime[1]
 								if self.extrapolationOn and eachEnt.collidable:
-									deltaPos = deltaPos[0]-eachEnt.velocityAverage[0]*eachEnt.timeSinceLastVelUpdate, deltaPos[1]-eachEnt.velocityAverage[1]*eachEnt.timeSinceLastVelUpdate
+									velAtTime = eachEnt.logOfVelocities[closestTime]
+									deltaPos = deltaPos[0]-velAtTime[0]*(self.timer-updateTime), deltaPos[1]-velAtTime[1]*(self.timer-updateTime)
 								curPos = eachEnt.getPosition()
 								newPos = curPos[0]+deltaPos[0], curPos[1]+deltaPos[1]
-								if deltaPos[0]**2+deltaPos[1]**2 > 1:
-									eachEnt.setPosition( list(newPos) )
+								eachEnt.setPosition( list(newPos) )
 								for eachKey in eachEnt.logOfPositions.keys():
 									if eachKey < closestTime:
 										del eachEnt.logOfPositions[eachKey]
@@ -171,23 +171,47 @@ class NetworkClient:
 			playInst.endTime = sndMgr.curTime+eachTuple[5]
 			playInst.attemptRestart( eachSound._pygameSound )
 
-	def forceVelocities( self, entIdVelocityTuples ):
+	def forceVelocities( self, entIdVelocityTuples, updateTime ):
 		playState = self.playStateRef()
-		for eachTuple in entIdVelocityTuples:
-			eachId = eachTuple[0]
-			matchFound = False
-			for eachEnt in playState.sprites():
-				if eachEnt.id == eachId:
-					matchFound = True
-					eachEnt.body.velocity.x = eachTuple[1][0]
-					eachEnt.body.velocity.y = eachTuple[1][1]
-					curPos = eachEnt.getPosition()
-					deltaPos = eachTuple[1][0]*eachEnt.timeSinceLastVelUpdate, eachTuple[1][1]*eachEnt.timeSinceLastVelUpdate
-					eachEnt.setPosition( ( curPos[0]+deltaPos[0], curPos[1]+deltaPos[1] ) )
-					eachEnt.timeSinceLastVelUpdate = 0.0
-			if not matchFound:
-				print "WAT. RECEIVED UPDATE REFERRING TO NON-EXISTANT ENTITY."
-
+		if not self.clientSidePrediction:
+			for eachTuple in entIdVelocityTuples:
+				eachId = eachTuple[0]
+				matchFound = False
+				for eachEnt in playState.sprites():
+					if eachEnt.id == eachId:
+						matchFound = True
+						eachEnt.body.velocity.x = eachTuple[1][0]
+						eachEnt.body.velocity.y = eachTuple[1][1]
+				if not matchFound:
+					print "WAT. RECEIVED UPDATE REFERRING TO NON-EXISTANT ENTITY."
+		else:
+			for eachTuple in entIdVelocityTuples:
+				eachId = eachTuple[0]
+				matchFound = False
+				for eachEnt in playState.sprites():
+					if eachEnt.id == eachId:
+						matchFound = True
+						if len( eachEnt.logOfVelocities ) > 0:
+							smallestTimeDifference = 10000
+							closestTime = None
+							for each in eachEnt.logOfVelocities.keys():
+								if abs( updateTime-each ) < smallestTimeDifference:
+									closestTime = each
+									smallestTimeDifference = abs( updateTime-each )
+							if smallestTimeDifference < 0.030:
+								curPos = eachEnt.getPosition()
+								deltaPos = eachTuple[1][0]*(self.timer-updateTime), eachTuple[1][1]*(self.timer-updateTime)
+								eachEnt.setPosition( ( curPos[0]+deltaPos[0], curPos[1]+deltaPos[1] ) )
+							velAtTime = eachEnt.logOfVelocities[closestTime]
+							newVel = each.body.velocity.x, each.body.velocity.y
+							newVel = newVel[0]-velAtTime[0], newVel[1]-velAtTime[1]
+							newVel = newVel[0]+eachTuple[1][0], newVel[1]+eachTuple[1][1]
+							for eachKey in eachEnt.logOfVelocities.keys():
+								if eachKey < closestTime:
+									del eachEnt.logOfVelocities[eachKey]
+				if not matchFound:
+					print "WAT. RECEIVED UPDATE REFERRING TO NON-EXISTANT ENTITY."
+	
 	def disconnectAll( self ):
 		if self.connection.connected:
 			self.connection.disconnect()
