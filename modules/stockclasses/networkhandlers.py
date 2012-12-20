@@ -104,7 +104,7 @@ class ServerHandler(pygnetic.Handler):
 				self.connection.disconnect()
 				return None
 		playState = self.server.networkServerRef().playStateRef()
-		self.connection.net_requestInfo( playState.soundManager.curPlayId, playState.fileName, self.server.networkServerRef().timer )
+		self.connection.net_requestInfo( playState.soundManager.curPlayId, self.server.networkServerRef().timer, playState.fileName )
 		pygnetic.Handler.on_connect( self )
 
 	def net_hereIsMyInfo( self, message, **kwargs ):
