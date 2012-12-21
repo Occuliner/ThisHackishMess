@@ -19,7 +19,13 @@ import extern_modules.pygnetic as pygnetic, networkhandlers, weakref, random, zl
 from collections import namedtuple
 from networkupdateclasses import *
 
-ClientTuple = namedtuple( 'ClientTuple', ['name', 'connection', 'isPlayer', 'time'] )
+#ClientTuple = namedtuple( 'ClientTuple', ['name', 'connection', 'isPlayer', 'time'] )
+class ClientInfo:
+	def __init__( self, name, connection, isPlayer, time ):
+		self.name = name
+		self.connection = connection
+		self.isPlayer = isPlayer
+		self.time = time
 
 class NetworkServer:
 	def __init__( self, playState=None, host="", port=1337, con_limit=4, networkingMode=0 ):
@@ -90,7 +96,7 @@ class NetworkServer:
 		if not ( connection.address in [each.address for each in self._server.connections()] ):
 			return None
 
-		self.clients.append( ClientTuple( info.name, connection, False, info.time ) )
+		self.clients.append( ClientInfo( info.name, connection, False, info.time ) )
 
 	def sendAlreadyExistingState( self, client ):
 		playState = self.playStateRef()
@@ -165,8 +171,7 @@ class NetworkServer:
 			destGroup = getattr( self.playStateRef(), "networkPlayers" )
 			playerEntity = classDef( pos=[0,0], vel=[0,0], group=destGroup )
 			self.players[self.getPlayerKey( client )] = [ playerEntity ]
-			self.clients.remove( client )
-			self.clients.append( ClientTuple( client.name, client.connection, True, client.time ) )
+			client.isPlayer = True
 
 	def removePlayer( self, client ):
 		#Again, this can vary a lot.
