@@ -26,10 +26,10 @@ def registerMessages():
 	pygnetic.register( 'requestInfo', ('soundMgrCurPlayId', 'time', 'levelName') )
 
 	#This message is sent on info request
-	pygnetic.register( 'hereIsMyInfo', ('name') )
+	pygnetic.register( 'hereIsMyInfo', ('time', 'name') )
 
 	#This message is sent when the player hits join game.
-	pygnetic.register( 'joinGame', ('time', 'name') )
+	pygnetic.register( 'joinGame', ('name') )
 
 	#This message is sent when the host accepts the joinGame request.
 	pygnetic.register( 'acceptPlayer', ('name') )
