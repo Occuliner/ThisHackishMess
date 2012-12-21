@@ -61,7 +61,7 @@ class ClientHandler(pygnetic.Handler):
 
 		client.createEntities( message.createEnts )
 		client.removeEntities( message.removeEnts )
-		client.updatePositions( message.updatePositions, message.time )
+		client.updatePositions( message.updatePositions, message.clientTime )
 		client.startSounds( message.startSounds )
 		client.stopSounds( message.stopSounds )
 		client.swapAnims( message.swapAnims )
@@ -87,7 +87,7 @@ class ClientHandler(pygnetic.Handler):
 		self.client().forcePlayingSounds( message.soundTuples )
 
 	def net_forceVelocities( self, message, **kwargs ):
-		self.client().forceVelocities( message.entIdVelocityTuples, message.time )
+		self.client().forceVelocities( message.entIdVelocityTuples, message.clientTime )
 
 	def on_disconnect( self ):
 		pass
@@ -126,7 +126,7 @@ class ServerHandler(pygnetic.Handler):
 	def net_inputEvent( self, message, **kwargs ):
 		networkServer = self.server.networkServerRef()
 		client = networkServer.getClientByConnection( self.connection )
-		
+		client.time = message.time
 		playerKey = networkServer.getPlayerKey( client )
 		playerEntList = networkServer.players.get( playerKey, [] )
 

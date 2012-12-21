@@ -19,7 +19,7 @@ import extern_modules.pygnetic as pygnetic, networkhandlers, weakref, random, zl
 from collections import namedtuple
 from networkupdateclasses import *
 
-ClientTuple = namedtuple( 'ClientTuple', ['name', 'connection', 'isPlayer'] )
+ClientTuple = namedtuple( 'ClientTuple', ['name', 'connection', 'isPlayer', 'time'] )
 
 class NetworkServer:
 	def __init__( self, playState=None, host="", port=1337, con_limit=4, networkingMode=0 ):
@@ -118,8 +118,16 @@ class NetworkServer:
 		#Make a list of the sounds to force midplay.
 		forceSoundList  = [ (each.soundFileName, each.priority, each.loops, each.maxtime, each.fade_ms, each.endTime-playState.soundManager.curTime ) for each in playState.soundManager.playInstances ]
 
+		if self.extrapolationOn:
+			#Get velocities.
+			velocityTuples = [ (each.id, (each.body.velocity.x, each.body.velocity.y)) for each in self.playStateRef().sprites() if each.collidable ]
+
 		#Send the update
-		client.connection.net_updateEvent( self.networkTick, self.timer, createEntList, [], [], [], [], changeAnimList, [] )
+		client.connection.net_updateEvent( self.networkTick, self.timer, client.time, createEntList, [], [], [], [], changeAnimList, [] )
+
+		if self.extrapolationOn:
+			#Now force velocities.
+			client.connection.net_forceVelocities( self.networkTick, self.timer, client.time, velocityTuples )
 
 		#Now send the forceAnims.
 		client.connection.net_forceEntFrame( self.networkTick, forceAnimList )
@@ -195,7 +203,7 @@ class NetworkServer:
 				#Check if the connection is still valid:
 				if eachClient.connection.connected:
 					#Send each a network update.
-					eachClient.connection.net_updateEvent( self.networkTick, self.timer, createEntUpdates, removeEntUpdates, updatedPositions, startSoundUpdates, stopSoundUpdates, changeAnimUpdates, swapAnimUpdates )
+					eachClient.connection.net_updateEvent( self.networkTick, self.timer, eachClient.time, createEntUpdates, removeEntUpdates, updatedPositions, startSoundUpdates, stopSoundUpdates, changeAnimUpdates, swapAnimUpdates )
 				else:
 					#Remove associated players and the client tuple.
 					self.removePlayer( eachClient )
@@ -206,9 +214,9 @@ class NetworkServer:
 				#Check if the connection is still valid:
 				if eachClient.connection.connected:
 					#Send each a network update.
-					eachClient.connection.net_updateEvent( self.networkTick, self.timer, createEntUpdates, removeEntUpdates, updatedPositions, startSoundUpdates, stopSoundUpdates, changeAnimUpdates, swapAnimUpdates )
+					eachClient.connection.net_updateEvent( self.networkTick, self.timer, eachClient.time, createEntUpdates, removeEntUpdates, updatedPositions, startSoundUpdates, stopSoundUpdates, changeAnimUpdates, swapAnimUpdates )
 					#Always force the velocity AFTER an updateEvent
-					eachClient.connection.net_forceVelocities( self.networkTick, velocityTuples, self.timer )
+					eachClient.connection.net_forceVelocities( self.networkTick, self.timer, eachClient.time, velocityTuples )
 				else:
 					#Remove associated players and the client tuple.
 					self.removePlayer( eachClient )

@@ -52,7 +52,7 @@ class NetworkClient:
 
 	def sendInput( self, inputDict ):
 		if self.connection.connected and len(inputDict) > 0:
-			self.connection.net_inputEvent( self.networkTick, inputDict )
+			self.connection.net_inputEvent( self.networkTick, self.timer, inputDict )
 
 	def createEntities( self, createTuples ):
 		for eachTuple in createTuples:
@@ -108,9 +108,11 @@ class NetworkClient:
 								curPos = eachEnt.getPosition()
 								newPos = curPos[0]+deltaPos[0], curPos[1]+deltaPos[1]
 								eachEnt.setPosition( list(newPos) )
-								for eachKey in eachEnt.logOfPositions.keys():
+								for eachKey, eachVal in eachEnt.logOfPositions.iteritems():
 									if eachKey < closestTime:
 										del eachEnt.logOfPositions[eachKey]
+									elif eachKey > closestTime:
+										eachVal = eachVal[0]+deltaPos[0], eachVal[1]+deltaPos[1]
 						#eachEnt.setPosition( eachTuple[1] )
 				if not matchFound:
 					print "WAT. RECEIVED UPDATE REFERRING TO NON-EXISTANT ENTITY."
@@ -204,14 +206,20 @@ class NetworkClient:
 								deltaPos = eachTuple[1][0]*(self.timer-updateTime), eachTuple[1][1]*(self.timer-updateTime)
 								eachEnt.setPosition( ( curPos[0]+deltaPos[0], curPos[1]+deltaPos[1] ) )
 								velAtTime = eachEnt.logOfVelocities[closestTime]
-								newVel = eachEnt.body.velocity.x, eachEnt.body.velocity.y
-								newVel = newVel[0]-velAtTime[0], newVel[1]-velAtTime[1]
-								newVel = newVel[0]+eachTuple[1][0], newVel[1]+eachTuple[1][1]
-								eachEnt.body.velocity.x = newVel[0]
-								eachEnt.body.velocity.y = newVel[1]
-								for eachKey in eachEnt.logOfVelocities.keys():
+								#newVel = eachEnt.body.velocity.x, eachEnt.body.velocity.y
+								#newVel = newVel[0]-velAtTime[0], newVel[1]-velAtTime[1]
+								#newVel = newVel[0]+eachTuple[1][0], newVel[1]+eachTuple[1][1]
+								deltaVel = eachTuple[1][0]-velAtTime[0], eachTuple[1][1]-velAtTime[1]
+								eachEnt.body.velocity.x = eachEnt.body.velocity.x + deltaVel[0]
+								eachEnt.body.velocity.y = eachEnt.body.velocity.y + deltaVel[1]
+								for eachKey, eachVal in eachEnt.logOfPositions.iteritems():
+									if eachKey > closestTime:
+										eachVal = eachVal[0]+deltaPos[0], eachVal[1]+deltaPos[1]
+								for eachKey, eachVal in eachEnt.logOfPositions.iteritems():
 									if eachKey < closestTime:
 										del eachEnt.logOfVelocities[eachKey]
+									elif eachKey > closestTime:
+										eachVal = eachVal[0]+deltaVel[0], eachVal[1]+deltaVel[1]
 				if not matchFound:
 					print "WAT. RECEIVED UPDATE REFERRING TO NON-EXISTANT ENTITY."
 	
