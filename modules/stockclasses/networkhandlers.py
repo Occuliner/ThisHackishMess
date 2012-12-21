@@ -45,9 +45,9 @@ class ClientHandler(pygnetic.Handler):
 				playState.soundManager.idGen.getId()
 		playState.soundManager.curPlayId = message.soundMgrCurPlayId
 
-		self.connection.net_hereIsMyInfo( self.client().name )
+		self.connection.net_hereIsMyInfo( self.client().timer, self.client().name )
 
-		self.connection.net_joinGame( self.timer, self.client().name )
+		self.connection.net_joinGame( self.client().name )
 
 	def net_acceptPlayer( self, message, **kwargs ):
 		pass
