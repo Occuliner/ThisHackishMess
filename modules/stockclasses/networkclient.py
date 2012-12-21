@@ -108,7 +108,7 @@ class NetworkClient:
 								curPos = eachEnt.getPosition()
 								newPos = curPos[0]+deltaPos[0], curPos[1]+deltaPos[1]
 								eachEnt.setPosition( list(newPos) )
-								for eachKey, eachVal in eachEnt.logOfPositions.iteritems():
+								for eachKey, eachVal in eachEnt.logOfPositions.items():
 									if eachKey < closestTime:
 										del eachEnt.logOfPositions[eachKey]
 									elif eachKey > closestTime:
@@ -212,10 +212,10 @@ class NetworkClient:
 								deltaVel = eachTuple[1][0]-velAtTime[0], eachTuple[1][1]-velAtTime[1]
 								eachEnt.body.velocity.x = eachEnt.body.velocity.x + deltaVel[0]
 								eachEnt.body.velocity.y = eachEnt.body.velocity.y + deltaVel[1]
-								for eachKey, eachVal in eachEnt.logOfPositions.iteritems():
+								for eachKey, eachVal in eachEnt.logOfPositions.items():
 									if eachKey > closestTime:
 										eachVal = eachVal[0]+deltaPos[0], eachVal[1]+deltaPos[1]
-								for eachKey, eachVal in eachEnt.logOfPositions.iteritems():
+								for eachKey, eachVal in eachEnt.logOfPositions.items():
 									if eachKey < closestTime:
 										del eachEnt.logOfVelocities[eachKey]
 									elif eachKey > closestTime:
