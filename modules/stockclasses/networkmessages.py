@@ -29,7 +29,7 @@ def registerMessages():
 	pygnetic.register( 'hereIsMyInfo', ('name') )
 
 	#This message is sent when the player hits join game.
-	pygnetic.register( 'joinGame', ('name') )
+	pygnetic.register( 'joinGame', ('time', 'name') )
 
 	#This message is sent when the host accepts the joinGame request.
 	pygnetic.register( 'acceptPlayer', ('name') )

@@ -30,7 +30,6 @@ class ClientHandler(pygnetic.Handler):
 		self.client = weakref.ref( client )
 
 	def net_requestInfo( self, message, **kwargs ):
-		self.client().timer = message.time
 		playState = self.client().playStateRef()
 		if not (message.levelName is "Untitled"):
 			#So, if there is a level name, load that level if found.
@@ -48,7 +47,7 @@ class ClientHandler(pygnetic.Handler):
 
 		self.connection.net_hereIsMyInfo( self.client().name )
 
-		self.connection.net_joinGame( self.client().name )
+		self.connection.net_joinGame( self.timer, self.client().name )
 
 	def net_acceptPlayer( self, message, **kwargs ):
 		pass

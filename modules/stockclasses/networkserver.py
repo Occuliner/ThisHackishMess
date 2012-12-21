@@ -90,7 +90,7 @@ class NetworkServer:
 		if not ( connection.address in [each.address for each in self._server.connections()] ):
 			return None
 
-		self.clients.append( ClientTuple( info.name, connection, False ) )
+		self.clients.append( ClientTuple( info.name, connection, False, info.time ) )
 
 	def sendAlreadyExistingState( self, client ):
 		playState = self.playStateRef()
@@ -166,7 +166,7 @@ class NetworkServer:
 			playerEntity = classDef( pos=[0,0], vel=[0,0], group=destGroup )
 			self.players[self.getPlayerKey( client )] = [ playerEntity ]
 			self.clients.remove( client )
-			self.clients.append( ClientTuple( client.name, client.connection, True ) )
+			self.clients.append( ClientTuple( client.name, client.connection, True, client.time ) )
 
 	def removePlayer( self, client ):
 		#Again, this can vary a lot.
