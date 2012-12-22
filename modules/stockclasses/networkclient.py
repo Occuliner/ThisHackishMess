@@ -74,10 +74,8 @@ class NetworkClient:
 				print "WAT. RECEIVED UPDATE REFERRING TO NON-EXISTANT ENTITY."
 
 	def updatePositions( self, positionTuples, updateTime ):
-		if update is None:
-			return None
 		playState = self.playStateRef()
-		if not self.clientSidePrediction:
+		if not self.clientSidePrediction or updateTime is None:
 			for eachTuple in positionTuples:
 				eachId = eachTuple[0]
 				matchFound = False
@@ -172,7 +170,7 @@ class NetworkClient:
 
 	def forceVelocities( self, entIdVelocityTuples, updateTime ):
 		playState = self.playStateRef()
-		if not self.clientSidePrediction:
+		if not self.clientSidePrediction or self.updateTime is None:
 			for eachTuple in entIdVelocityTuples:
 				eachId = eachTuple[0]
 				matchFound = False
