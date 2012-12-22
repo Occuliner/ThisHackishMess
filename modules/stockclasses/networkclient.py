@@ -170,7 +170,7 @@ class NetworkClient:
 
 	def forceVelocities( self, entIdVelocityTuples, updateTime ):
 		playState = self.playStateRef()
-		if not self.clientSidePrediction or self.updateTime is None:
+		if not self.clientSidePrediction or updateTime is None:
 			for eachTuple in entIdVelocityTuples:
 				eachId = eachTuple[0]
 				matchFound = False
