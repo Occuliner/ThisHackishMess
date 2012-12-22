@@ -96,17 +96,24 @@ class NetworkClient:
 						if eachEnt.logOfPositions.get(updateTime) is not None:
 							posAtTime = eachEnt.logOfPositions[updateTime]
 							deltaPos = eachTuple[1][0]-posAtTime[0], eachTuple[1][1]-posAtTime[1]
-							if self.extrapolationOn and eachEnt.collidable:
-								velAtTime = eachEnt.logOfVelocities[updateTime]
-								deltaPos = deltaPos[0]-velAtTime[0]*(self.timer-updateTime), deltaPos[1]-velAtTime[1]*(self.timer-updateTime)
 							curPos = eachEnt.getPosition()
 							newPos = curPos[0]+deltaPos[0], curPos[1]+deltaPos[1]
-							eachEnt.setPosition( list(newPos) )
-							for eachKey, eachVal in eachEnt.logOfPositions.items():
-								if eachKey < updateTime:
-									del eachEnt.logOfPositions[eachKey]
-								else:
-									eachEnt.logOfPositions[eachKey] = eachVal[0]+deltaPos[0], eachVal[1]+deltaPos[1]
+							if self.extrapolationOn and eachEnt.collidable:
+								velAtTime = eachEnt.logOfVelocities[updateTime]
+								newPos = newPos[0]-velAtTime[0]*(self.timer-updateTime), newPos[1]-velAtTime[1]*(self.timer-updateTime)
+								eachEnt.setPosition( list(newPos) )
+								for eachKey, eachVal in eachEnt.logOfPositions.items():
+									if eachKey < updateTime:
+										del eachEnt.logOfPositions[eachKey]
+									else:
+										eachEnt.logOfPositions[eachKey] = eachVal[0]+deltaPos[0]-velAtTime[0]*(eachKey-updateTime), eachVal[1]+deltaPos[1]-velAtTime[1]*(eachKey-updateTime)
+							else:
+								eachEnt.setPosition( list(newPos) )
+								for eachKey, eachVal in eachEnt.logOfPositions.items():
+									if eachKey < updateTime:
+										del eachEnt.logOfPositions[eachKey]
+									else:
+										eachEnt.logOfPositions[eachKey] = eachVal[0]+deltaPos[0], eachVal[1]+deltaPos[1]
 						#eachEnt.setPosition( eachTuple[1] )
 						break
 				if not matchFound:
@@ -202,7 +209,7 @@ class NetworkClient:
 							eachEnt.body.velocity.y = eachEnt.body.velocity.y + deltaVel[1]
 							for eachKey, eachVal in eachEnt.logOfPositions.items():
 								if eachKey > updateTime:
-									eachEnt.logOfPositions[eachKey] = eachVal[0]+deltaPos[0], eachVal[1]+deltaPos[1]
+									eachEnt.logOfPositions[eachKey] = eachVal[0]+eachTuple[1][0]*(eachKey-updateTime), eachVal[1]+eachTuple[1][1]*(eachKey-updateTime)
 							for eachKey, eachVal in eachEnt.logOfVelocities.items():
 								if eachKey < updateTime:
 									del eachEnt.logOfVelocities[eachKey]
