@@ -51,7 +51,7 @@ class NetworkClient:
 		self.connection.add_handler( self.handler )
 
 	def sendInput( self, inputDict ):
-		if self.connection.connected and len(inputDict) > 0:
+		if self.connection.connected:
 			self.connection.net_inputEvent( self.networkTick, self.timer, inputDict )
 
 	def createEntities( self, createTuples ):
@@ -74,6 +74,8 @@ class NetworkClient:
 				print "WAT. RECEIVED UPDATE REFERRING TO NON-EXISTANT ENTITY."
 
 	def updatePositions( self, positionTuples, updateTime ):
+		if update is None:
+			return None
 		playState = self.playStateRef()
 		if not self.clientSidePrediction:
 			for eachTuple in positionTuples:
@@ -93,26 +95,21 @@ class NetworkClient:
 					if eachEnt.id == eachId:
 						matchFound = True
 						if len( eachEnt.logOfPositions ) > 0:
-							smallestTimeDifference = 10000
-							closestTime = None
 							for each in eachEnt.logOfPositions.keys():
-								if abs( updateTime-each ) < smallestTimeDifference:
-									closestTime = each
-									smallestTimeDifference = abs( updateTime-each )
-							if smallestTimeDifference < 0.030:
-								posAtTime = eachEnt.logOfPositions[closestTime]
-								deltaPos = eachTuple[1][0]-posAtTime[0], eachTuple[1][1]-posAtTime[1]
-								if self.extrapolationOn and eachEnt.collidable:
-									velAtTime = eachEnt.logOfVelocities[closestTime]
-									deltaPos = deltaPos[0]-velAtTime[0]*(self.timer-updateTime), deltaPos[1]-velAtTime[1]*(self.timer-updateTime)
-								curPos = eachEnt.getPosition()
-								newPos = curPos[0]+deltaPos[0], curPos[1]+deltaPos[1]
-								eachEnt.setPosition( list(newPos) )
-								for eachKey, eachVal in eachEnt.logOfPositions.items():
-									if eachKey < closestTime:
-										del eachEnt.logOfPositions[eachKey]
-									elif eachKey > closestTime:
-										eachVal = eachVal[0]+deltaPos[0], eachVal[1]+deltaPos[1]
+								if each == updateTime:
+									posAtTime = eachEnt.logOfPositions[closestTime]
+									deltaPos = eachTuple[1][0]-posAtTime[0], eachTuple[1][1]-posAtTime[1]
+									if self.extrapolationOn and eachEnt.collidable:
+										velAtTime = eachEnt.logOfVelocities[closestTime]
+										deltaPos = deltaPos[0]-velAtTime[0]*(self.timer-updateTime), deltaPos[1]-velAtTime[1]*(self.timer-updateTime)
+									curPos = eachEnt.getPosition()
+									newPos = curPos[0]+deltaPos[0], curPos[1]+deltaPos[1]
+									eachEnt.setPosition( list(newPos) )
+									for eachKey, eachVal in eachEnt.logOfPositions.items():
+										if eachKey < closestTime:
+											del eachEnt.logOfPositions[eachKey]
+										else:
+											eachEnt.logOfPositions[eachKey] = eachVal[0]+deltaPos[0], eachVal[1]+deltaPos[1]
 						#eachEnt.setPosition( eachTuple[1] )
 				if not matchFound:
 					print "WAT. RECEIVED UPDATE REFERRING TO NON-EXISTANT ENTITY."
@@ -198,28 +195,22 @@ class NetworkClient:
 							closestTime = None
 							print "Optimize me! I shouldn't do this loop for each Ent"
 							for each in eachEnt.logOfVelocities.keys():
-								if abs( updateTime-each ) < smallestTimeDifference:
-									closestTime = each
-									smallestTimeDifference = abs( updateTime-each )
-							if smallestTimeDifference < 0.030:
-								curPos = eachEnt.getPosition()
-								deltaPos = eachTuple[1][0]*(self.timer-updateTime), eachTuple[1][1]*(self.timer-updateTime)
-								eachEnt.setPosition( ( curPos[0]+deltaPos[0], curPos[1]+deltaPos[1] ) )
-								velAtTime = eachEnt.logOfVelocities[closestTime]
-								#newVel = eachEnt.body.velocity.x, eachEnt.body.velocity.y
-								#newVel = newVel[0]-velAtTime[0], newVel[1]-velAtTime[1]
-								#newVel = newVel[0]+eachTuple[1][0], newVel[1]+eachTuple[1][1]
-								deltaVel = eachTuple[1][0]-velAtTime[0], eachTuple[1][1]-velAtTime[1]
-								eachEnt.body.velocity.x = eachEnt.body.velocity.x + deltaVel[0]
-								eachEnt.body.velocity.y = eachEnt.body.velocity.y + deltaVel[1]
-								for eachKey, eachVal in eachEnt.logOfPositions.items():
-									if eachKey > closestTime:
-										eachVal = eachVal[0]+deltaPos[0], eachVal[1]+deltaPos[1]
-								for eachKey, eachVal in eachEnt.logOfPositions.items():
-									if eachKey < closestTime:
-										del eachEnt.logOfVelocities[eachKey]
-									elif eachKey > closestTime:
-										eachVal = eachVal[0]+deltaVel[0], eachVal[1]+deltaVel[1]
+								if each == updateTime:
+									curPos = eachEnt.getPosition()
+									deltaPos = eachTuple[1][0]*(self.timer-updateTime), eachTuple[1][1]*(self.timer-updateTime)
+									eachEnt.setPosition( ( curPos[0]+deltaPos[0], curPos[1]+deltaPos[1] ) )
+									velAtTime = eachEnt.logOfVelocities[closestTime]
+									deltaVel = eachTuple[1][0]-velAtTime[0], eachTuple[1][1]-velAtTime[1]
+									eachEnt.body.velocity.x = eachEnt.body.velocity.x + deltaVel[0]
+									eachEnt.body.velocity.y = eachEnt.body.velocity.y + deltaVel[1]
+									for eachKey, eachVal in eachEnt.logOfPositions.items():
+										if eachKey > closestTime:
+											eachEnt.logOfPositions[eachKey] = eachVal[0]+deltaPos[0], eachVal[1]+deltaPos[1]
+									for eachKey, eachVal in eachEnt.logOfVelocities.items():
+										if eachKey < closestTime:
+											del eachEnt.logOfVelocities[eachKey]
+										else:
+											eachEnt.logOfVelocities[eachKey] = eachVal[0]+deltaVel[0], eachVal[1]+deltaVel[1]
 				if not matchFound:
 					print "WAT. RECEIVED UPDATE REFERRING TO NON-EXISTANT ENTITY."
 	

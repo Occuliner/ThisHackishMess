@@ -129,7 +129,7 @@ class NetworkServer:
 			velocityTuples = [ (each.id, (each.body.velocity.x, each.body.velocity.y)) for each in self.playStateRef().sprites() if each.collidable ]
 
 		#Send the update
-		client.connection.net_updateEvent( self.networkTick, self.timer, client.time, createEntList, [], [], [], [], changeAnimList, [] )
+		client.connection.net_updateEvent( self.networkTick, self.timer, None, createEntList, [], [], [], [], changeAnimList, [] )
 
 		if self.extrapolationOn:
 			#Now force velocities.

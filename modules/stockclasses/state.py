@@ -252,13 +252,11 @@ class PlayState:
 
 		self.soundManager.update( dt )
 
-		if self.isHost:
+		if self.isHost or self.isClient:
 			if self.networkTicker >= int(60.0/self.networkRate):
 				self.networkNode.update( dt )
 				self.networkTicker = -1
 			self.networkTicker += 1
-		elif self.isClient:
-			self.networkNode.update( dt )
 
 	def sendInput( self, inputDict ):
 		"""Simply sets PlayState.curInputDict to a given input dictionary, 

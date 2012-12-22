@@ -125,6 +125,8 @@ class ServerHandler(pygnetic.Handler):
 	def net_inputEvent( self, message, **kwargs ):
 		networkServer = self.server.networkServerRef()
 		client = networkServer.getClientByConnection( self.connection )
+		if client is None:
+			return None
 		client.time = message.time
 		playerKey = networkServer.getPlayerKey( client )
 		playerEntList = networkServer.players.get( playerKey, [] )
