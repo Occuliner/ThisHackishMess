@@ -83,6 +83,7 @@ class NetworkClient:
 					if eachEnt.id == eachId:
 						matchFound = True
 						eachEnt.setPosition( eachTuple[1] )
+						break
 				if not matchFound:
 					print "WAT. RECEIVED UPDATE REFERRING TO NON-EXISTANT ENTITY."
 		else:
@@ -92,21 +93,20 @@ class NetworkClient:
 				for eachEnt in playState.sprites():
 					if eachEnt.id == eachId:
 						matchFound = True
-						for each in eachEnt.logOfPositions.keys():
-							if each == updateTime:
-								posAtTime = eachEnt.logOfPositions[updateTime]
-								deltaPos = eachTuple[1][0]-posAtTime[0], eachTuple[1][1]-posAtTime[1]
-								if self.extrapolationOn and eachEnt.collidable:
-									velAtTime = eachEnt.logOfVelocities[updateTime]
-									deltaPos = deltaPos[0]-velAtTime[0]*(self.timer-updateTime), deltaPos[1]-velAtTime[1]*(self.timer-updateTime)
-								curPos = eachEnt.getPosition()
-								newPos = curPos[0]+deltaPos[0], curPos[1]+deltaPos[1]
-								eachEnt.setPosition( list(newPos) )
-								for eachKey, eachVal in eachEnt.logOfPositions.items():
-									if eachKey < updateTime:
-										del eachEnt.logOfPositions[eachKey]
-									else:
-										eachEnt.logOfPositions[eachKey] = eachVal[0]+deltaPos[0], eachVal[1]+deltaPos[1]
+						if eachEnt.logOfPositions.get(updateTime) is not None:
+							posAtTime = eachEnt.logOfPositions[updateTime]
+							deltaPos = eachTuple[1][0]-posAtTime[0], eachTuple[1][1]-posAtTime[1]
+							if self.extrapolationOn and eachEnt.collidable:
+								velAtTime = eachEnt.logOfVelocities[updateTime]
+								deltaPos = deltaPos[0]-velAtTime[0]*(self.timer-updateTime), deltaPos[1]-velAtTime[1]*(self.timer-updateTime)
+							curPos = eachEnt.getPosition()
+							newPos = curPos[0]+deltaPos[0], curPos[1]+deltaPos[1]
+							eachEnt.setPosition( list(newPos) )
+							for eachKey, eachVal in eachEnt.logOfPositions.items():
+								if eachKey < updateTime:
+									del eachEnt.logOfPositions[eachKey]
+								else:
+									eachEnt.logOfPositions[eachKey] = eachVal[0]+deltaPos[0], eachVal[1]+deltaPos[1]
 						#eachEnt.setPosition( eachTuple[1] )
 						break
 				if not matchFound:
@@ -131,6 +131,7 @@ class NetworkClient:
 				if eachEnt.id == eachId:
 					matchFound = True
 					eachEnt.swapAnimation( eachTuple[1] )
+					break
 			if not matchFound:
 				print "WAT. RECEIVED UPDATE REFERRING TO NON-EXISTANT ENTITY."
 
@@ -143,6 +144,7 @@ class NetworkClient:
 				if eachEnt.id == eachId:
 					matchFound = True
 					eachEnt.changeAnimation( eachTuple[1] )
+					break
 			if not matchFound:
 				print "WAT. RECEIVED UPDATE REFERRING TO NON-EXISTANT ENTITY."
 
@@ -157,6 +159,7 @@ class NetworkClient:
 					eachEnt.frame = eachTuple[1] - 1
 					eachEnt.nextFrame()
 					eachEnt.frameTime = eachTuple[2]
+					break
 			if not matchFound:
 				print "WAT. RECEIVED UPDATE REFERRING TO NON-EXISTANT ENTITY."
 
@@ -179,6 +182,7 @@ class NetworkClient:
 						matchFound = True
 						eachEnt.body.velocity.x = eachTuple[1][0]
 						eachEnt.body.velocity.y = eachTuple[1][1]
+						break
 				if not matchFound:
 					print "WAT. RECEIVED UPDATE REFERRING TO NON-EXISTANT ENTITY."
 		else:
@@ -188,24 +192,22 @@ class NetworkClient:
 				for eachEnt in playState.sprites():
 					if eachEnt.id == eachId:
 						matchFound = True
-						print "Optimize me! I shouldn't do this loop for each Ent"
-						for each in eachEnt.logOfVelocities.keys():
-							if each == updateTime:
-								curPos = eachEnt.getPosition()
-								deltaPos = eachTuple[1][0]*(self.timer-updateTime), eachTuple[1][1]*(self.timer-updateTime)
-								eachEnt.setPosition( ( curPos[0]+deltaPos[0], curPos[1]+deltaPos[1] ) )
-								velAtTime = eachEnt.logOfVelocities[updateTime]
-								deltaVel = eachTuple[1][0]-velAtTime[0], eachTuple[1][1]-velAtTime[1]
-								eachEnt.body.velocity.x = eachEnt.body.velocity.x + deltaVel[0]
-								eachEnt.body.velocity.y = eachEnt.body.velocity.y + deltaVel[1]
-								for eachKey, eachVal in eachEnt.logOfPositions.items():
-									if eachKey > updateTime:
-										eachEnt.logOfPositions[eachKey] = eachVal[0]+deltaPos[0], eachVal[1]+deltaPos[1]
-								for eachKey, eachVal in eachEnt.logOfVelocities.items():
-									if eachKey < updateTime:
-										del eachEnt.logOfVelocities[eachKey]
-									else:
-										eachEnt.logOfVelocities[eachKey] = eachVal[0]+deltaVel[0], eachVal[1]+deltaVel[1]
+						if eachEnt.logOfVelocities.get(updateTime) is not None:
+							curPos = eachEnt.getPosition()
+							deltaPos = eachTuple[1][0]*(self.timer-updateTime), eachTuple[1][1]*(self.timer-updateTime)
+							eachEnt.setPosition( ( curPos[0]+deltaPos[0], curPos[1]+deltaPos[1] ) )
+							velAtTime = eachEnt.logOfVelocities[updateTime]
+							deltaVel = eachTuple[1][0]-velAtTime[0], eachTuple[1][1]-velAtTime[1]
+							eachEnt.body.velocity.x = eachEnt.body.velocity.x + deltaVel[0]
+							eachEnt.body.velocity.y = eachEnt.body.velocity.y + deltaVel[1]
+							for eachKey, eachVal in eachEnt.logOfPositions.items():
+								if eachKey > updateTime:
+									eachEnt.logOfPositions[eachKey] = eachVal[0]+deltaPos[0], eachVal[1]+deltaPos[1]
+							for eachKey, eachVal in eachEnt.logOfVelocities.items():
+								if eachKey < updateTime:
+									del eachEnt.logOfVelocities[eachKey]
+								else:
+									eachEnt.logOfVelocities[eachKey] = eachVal[0]+deltaVel[0], eachVal[1]+deltaVel[1]
 						break
 				if not matchFound:
 					print "WAT. RECEIVED UPDATE REFERRING TO NON-EXISTANT ENTITY."
