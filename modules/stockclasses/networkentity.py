@@ -53,6 +53,7 @@ def idleCentricVelocityUpdate( body, gravity, damping, dt ):
 	else:
 		pymunk.Body.update_velocity( body, gravity, 1.0, dt )
 
+
 class NetworkEntity( pygame.sprite.DirtySprite ):
 	
 	#If this is true on an entity, then the Entity cannot be removed from the Entity Edit Menu.

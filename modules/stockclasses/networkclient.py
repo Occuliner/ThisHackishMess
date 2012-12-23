@@ -82,6 +82,8 @@ class NetworkClient:
 				for eachEnt in playState.sprites():
 					if eachEnt.id == eachId:
 						matchFound = True
+						if eachEnt.collidable:
+							eachEnt.body.activate()
 						eachEnt.setPosition( eachTuple[1] )
 						break
 				if not matchFound:
@@ -101,6 +103,7 @@ class NetworkClient:
 							if self.extrapolationOn and eachEnt.collidable:
 								velAtTime = eachEnt.logOfVelocities[updateTime]
 								newPos = newPos[0]-velAtTime[0]*(self.timer-updateTime), newPos[1]-velAtTime[1]*(self.timer-updateTime)
+								eachEnt.body.activate()
 								eachEnt.setPosition( list(newPos) )
 								for eachKey, eachVal in eachEnt.logOfPositions.items():
 									if eachKey < updateTime:
@@ -108,6 +111,8 @@ class NetworkClient:
 									else:
 										eachEnt.logOfPositions[eachKey] = eachVal[0]+deltaPos[0]-velAtTime[0]*(eachKey-updateTime), eachVal[1]+deltaPos[1]-velAtTime[1]*(eachKey-updateTime)
 							else:
+								if eachEnt.collidable:
+									eachEnt.body.activate()
 								eachEnt.setPosition( list(newPos) )
 								for eachKey, eachVal in eachEnt.logOfPositions.items():
 									if eachKey < updateTime:
@@ -202,6 +207,8 @@ class NetworkClient:
 						if eachEnt.logOfVelocities.get(updateTime) is not None:
 							curPos = eachEnt.getPosition()
 							deltaPos = eachTuple[1][0]*(self.timer-updateTime), eachTuple[1][1]*(self.timer-updateTime)
+							if eachEnt.collidable:
+								eachEnt.body.activate()
 							eachEnt.setPosition( ( curPos[0]+deltaPos[0], curPos[1]+deltaPos[1] ) )
 							velAtTime = eachEnt.logOfVelocities[updateTime]
 							deltaVel = eachTuple[1][0]-velAtTime[0], eachTuple[1][1]-velAtTime[1]
