@@ -90,6 +90,7 @@ class PlayState:
 		self.amountOfEntsOnLoad = None
 
 		self.hardBlockInput = False
+		self.inputDictLog = []
 
 		#These to variables are the displacement from the state's (0,0) and the screen's (0,0), so they can be used for panning.
 		self.panX, self.panY = 0, 0
@@ -227,15 +228,28 @@ class PlayState:
 			return None
 
 		if not self.hardBlockInput:
-			if self.playersGroup is not None and len( self.curInputDict ) > 0:
-				for eachPlayer in self.playersGroup.sprites():
-					eachPlayer.sendInput( self.curInputDict )
-			
-			for eachElement in self.hudList:
-				eachElement.sendInput( self.curInputDict )
+			#I'm doing the same thing even if the host or client is the same, to force identical player behaviour for either.
+			if self.isClient or self.isHost:
+				self.inputDictLog.append( self.curInputDict )
+				if self.networkTicker >= int(60.0/self.networkRate):
+					for eachDict in self.inputDictLog:
+						if self.playersGroup is not None and len( eachDict ) > 0:
+							for eachPlayer in self.playersGroup.sprites():
+								eachPlayer.sendInput( eachDict )
+					
+						for eachElement in self.hudList:
+							eachElement.sendInput( eachDict )
+					self.inputDictLog = []
+				if self.isClient:
+					self.networkNode.sendInput( self.curInputDict )
+			else:
+				if self.playersGroup is not None and len( self.curInputDict ) > 0:
+					for eachPlayer in self.playersGroup.sprites():
+						eachPlayer.sendInput( self.curInputDict )
+				
+				for eachElement in self.hudList:
+					eachElement.sendInput( self.curInputDict )
 
-			if self.isClient:
-				self.networkNode.sendInput( self.curInputDict )
 		self.curInputDict = {}
 		
 		
