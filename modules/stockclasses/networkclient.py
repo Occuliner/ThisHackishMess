@@ -97,17 +97,22 @@ class NetworkClient:
 						matchFound = True
 						if eachEnt.logOfPositions.get(updateTime) is not None:
 							posAtTime = eachEnt.logOfPositions[updateTime]
-							deltaPos = eachTuple[1][0]-posAtTime[0], eachTuple[1][1]-posAtTime[1]
-							curPos = eachEnt.getPosition()
-							newPos = curPos[0]+deltaPos[0], curPos[1]+deltaPos[1]
-							if eachEnt.collidable:
-								eachEnt.body.activate()
-							eachEnt.setPosition( list(newPos) )
-							for eachKey, eachVal in eachEnt.logOfPositions.items():
-								if eachKey < updateTime:
-									del eachEnt.logOfPositions[eachKey]
-								else:
-									eachEnt.logOfPositions[eachKey] = eachVal[0]+deltaPos[0], eachVal[1]+deltaPos[1]
+							if ( int( posAtTime[0] ), int( posAtTime[1] ) ) != eachTuple[1]:
+								deltaPos = eachTuple[1][0]-posAtTime[0], eachTuple[1][1]-posAtTime[1]
+								curPos = eachEnt.getPosition()
+								newPos = curPos[0]+deltaPos[0], curPos[1]+deltaPos[1]
+								if eachEnt.collidable:
+									eachEnt.body.activate()
+								eachEnt.setPosition( list(newPos) )
+								for eachKey, eachVal in eachEnt.logOfPositions.items():
+									if eachKey < updateTime:
+										del eachEnt.logOfPositions[eachKey]
+									else:
+										eachEnt.logOfPositions[eachKey] = eachVal[0]+deltaPos[0], eachVal[1]+deltaPos[1]
+							else:
+								for eachKey, eachVal in eachEnt.logOfPositions.items():
+									if eachKey < updateTime:
+										del eachEnt.logOfPositions[eachKey]
 						#eachEnt.setPosition( eachTuple[1] )
 						break
 				if not matchFound:
