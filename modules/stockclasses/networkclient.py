@@ -84,7 +84,7 @@ class NetworkClient:
 		#Get the starts, I probably need to convert these starts to space co-ords. As the poly one gets the points with respecct to the body location
 		if type( eachEnt.shape ) == pymunk.Poly:
 			polyPoints = eachEnt.shape.get_points()
-			axis = eachEnt.body.velocity.perpendiular()
+			axis = eachEnt.body.velocity.perpendicular()
 			start1Proj, start2Proj = pymunk.Vec2d(0,0), pymunk.Vec2d(0,0)
 			start1, start2 = None, None
 			if eachEnt.shape.velocity.y == 0:
@@ -106,8 +106,8 @@ class NetworkClient:
 						start2Porj = projection
 						start2 = eachPoint
 		elif type( eachEnt.Shape ) == pymunk.Circle:
-			start1 = eachEnt.body.velocity.perpendiular()*(float(eachEnt.shape.radius)/eachEnt.body.velocity.get_length())
-			start2 = eachEnt.body.velocity.perpendiular()*-(float(eachEnt.shape.radius)/eachEnt.body.velocity.get_length())
+			start1 = eachEnt.body.velocity.perpendicular()*(float(eachEnt.shape.radius)/eachEnt.body.velocity.get_length())
+			start2 = eachEnt.body.velocity.perpendicular()*-(float(eachEnt.shape.radius)/eachEnt.body.velocity.get_length())
 		else:
 			print "Client resimulation doesn't support type: " + eachShape.__class__.__name__
 
