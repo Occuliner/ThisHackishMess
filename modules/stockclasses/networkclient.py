@@ -86,14 +86,14 @@ class NetworkClient:
 			polyPoints = eachEnt.shape.get_points()
 			axis = eachEnt.body.velocity.perpendicular()
 			start1Proj, start2Proj = pymunk.Vec2d(0,0), pymunk.Vec2d(0,0)
-			start1, start2 = None, None
+			start1, start2 = (0,0), (0,0)
 			if eachEnt.body.velocity.y == 0:
 				for eachPoint in polyPoints:
 					projection = eachPoint.projection( axis )
 					if projection.x < 0 and projection.get_length() > start1Proj.get_length():
 						start1Proj = projection
 						start1 = eachPoint
-					elif projection.x > 0 and projection.get_length() > start2Pro.get_length():
+					elif projection.x > 0 and projection.get_length() > start2Proj.get_length():
 						start2Porj = projection
 						start2 = eachPoint
 			else:
@@ -102,7 +102,7 @@ class NetworkClient:
 					if projection.y < 0 and projection.get_length() > start1Proj.get_length():
 						start1Proj = projection
 						start1 = eachPoint
-					elif projection.y > 0 and projection.get_length() > start2Pro.get_length():
+					elif projection.y > 0 and projection.get_length() > start2Proj.get_length():
 						start2Porj = projection
 						start2 = eachPoint
 		elif type( eachEnt.Shape ) == pymunk.Circle:
@@ -139,8 +139,8 @@ class NetworkClient:
 					closestQuery = eachResult
 
 		if closestQuery is None:
-			#In this scenario, nothing was hit at all, clip the ent by deltaPos.
-			eachEnt.setPosition( entPos[0]+deltaPos[0], entPos[1]+deltaPos[1] )
+			#In this scenario, nothing was hit at all, return the original deltaPos
+			return deltaPos
 		else:
 			point = closestQuery.get_hit_point()
 			#Now I need to figure out what side hits this point.
