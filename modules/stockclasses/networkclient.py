@@ -271,13 +271,13 @@ class NetworkClient:
 					deltaPos = eachTuple[1][0]-posAtTime[0], eachTuple[1][1]-posAtTime[1]
 					#if ( int( posAtTime[0] ), int( posAtTime[1] ) ) != eachTuple[1]:
 					if deltaPos[0] > 1 or deltaPos[1] > 1:
-						#print "Yay", deltaPos,
+						print "Yay", deltaPos,
 						curPos = eachEnt.getPosition()
 						newPos = curPos[0]+deltaPos[0], curPos[1]+deltaPos[1]
 						#Here I'm going to do the resimulation.
 						if self.resimulationMethod is 1 and eachEnt.collidable and newPos!=curPos:
 							newDelta = self.resimulationUsingSweeps( eachEnt, deltaPos )
-							#print newDelta
+							print newDelta
 							newPos = curPos[0]+newDelta[0], curPos[1]+newDelta[1]
 							if eachEnt.collidable:
 								eachEnt.body.activate()
@@ -340,7 +340,7 @@ class NetworkClient:
 		for eachTuple in entIdFrameTuples:
 			eachId = eachTuple[0]
 			eachEnt = self.findEntById( eachId )
-			if eacheNt is None:
+			if eachEnt is None:
 				return None
 			eachEnt.frame = eachTuple[1] - 1
 			eachEnt.nextFrame()
@@ -383,7 +383,7 @@ class NetworkClient:
 						for eachKey, eachVal in eachEnt.logOfPositions.items():
 							if eachKey > updateTime:
 								#eachEnt.logOfPositions[eachKey] = eachVal[0]+deltaVel[0]*(eachKey-updateTime), eachVal[1]+deltaVel[1]*(eachKey-updateTime)
-								ratio = float(eachKey-updateTime)/(eachkey-self.timer)
+								ratio = float(eachKey-updateTime)/(eachKey-self.timer)
 								eachEnt.logOfPositions[eachKey] = eachVal[0]+newDelta[0]*ratio, eachVal[1]+newDelta[1]*ratio
 						for eachKey, eachVal in eachEnt.logOfVelocities.items():
 							if eachKey < updateTime:
