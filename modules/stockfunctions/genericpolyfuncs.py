@@ -28,7 +28,7 @@ def getExtremesAlongAxis( polyPoints, axis, default ):
 	extreme1Proj, extreme2Proj = pymunk.Vec2d(0,0), pymunk.Vec2d(0,0)
 	extreme1, extreme2 =  list( default ), list( default )
 	midPoint = pymunk.Vec2d( getMidOfPoints( polyPoints ) )
-	if eachEnt.body.velocity.y == 0:
+	if axis.y == 0:
 		for eachPoint in polyPoints:
 			projection = (eachPoint-midPoint).projection( axis )
 			if projection.x < 0 and projection.get_length() > extreme1Proj.get_length():
