@@ -87,7 +87,7 @@ class NetworkClient:
 			axis = eachEnt.body.velocity.perpendicular()
 			start1Proj, start2Proj = pymunk.Vec2d(0,0), pymunk.Vec2d(0,0)
 			start1, start2 = None, None
-			if eachEnt.shape.velocity.y == 0:
+			if eachEnt.body.velocity.y == 0:
 				for eachPoint in polyPoints:
 					projection = eachPoint.projection( axis )
 					if projection.x < 0 and projection.get_length() > start1Proj.get_length():
