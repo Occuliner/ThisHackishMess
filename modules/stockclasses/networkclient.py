@@ -83,7 +83,7 @@ class NetworkClient:
 
 		#Get the starts, I probably need to convert these starts to space co-ords. As the poly one gets the points with respecct to the body location
 		if type( eachEnt.shape ) == pymunk.Poly:
-			polyPoints = eachEnt.shapes.get_points()
+			polyPoints = eachEnt.shape.get_points()
 			axis = eachEnt.body.velocity.perpendiular()
 			start1Proj, start2Proj = pymunk.Vec2d(0,0), pymunk.Vec2d(0,0)
 			start1, start2 = None, None
