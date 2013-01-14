@@ -398,7 +398,9 @@ class NetworkClient:
 						eachEnt.setPosition( ( curPos[0]+newDelta[0], curPos[1]+newDelta[1] ) )
 						for eachKey, eachVal in eachEnt.logOfPositions.items():
 							if eachKey > updateTime:
-								eachEnt.logOfPositions[eachKey] = eachVal[0]+deltaVel[0]*(eachKey-updateTime), eachVal[1]+deltaVel[1]*(eachKey-updateTime)
+								#eachEnt.logOfPositions[eachKey] = eachVal[0]+deltaVel[0]*(eachKey-updateTime), eachVal[1]+deltaVel[1]*(eachKey-updateTime)
+								ratio = float(eachKey-updateTime)/(eachkey-self.timer)
+								eachEnt.logOfPositions[eachKey] = eachVal[0]+newDelta[0]*ratio, eachVal[1]+newDelta[1]*ratio
 						for eachKey, eachVal in eachEnt.logOfVelocities.items():
 							if eachKey < updateTime:
 								del eachEnt.logOfVelocities[eachKey]
