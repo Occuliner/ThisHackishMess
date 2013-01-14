@@ -35,7 +35,7 @@ def getExtremesAlongAxis( polyPoints, axis, default ):
 				extreme1Proj = projection
 				extreme1 = eachPoint
 			elif projection.x > 0 and projection.get_length() > extreme2Proj.get_length():
-				extreme2Porj = projection
+				extreme2Proj = projection
 				extreme2 = eachPoint
 	else:
 		for eachPoint in polyPoints:
@@ -44,6 +44,6 @@ def getExtremesAlongAxis( polyPoints, axis, default ):
 				extreme1Proj = projection
 				extreme1 = eachPoint
 			elif projection.y > 0 and projection.get_length() > extreme2Proj.get_length():
-				extreme2Porj = projection
+				extreme2Proj = projection
 				extreme2 = eachPoint
 	return extreme1, extreme2
