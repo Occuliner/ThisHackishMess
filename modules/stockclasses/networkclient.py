@@ -18,7 +18,7 @@
 import extern_modules.pygnetic as pygnetic, networkhandlers, weakref, extern_modules.pymunk as pymunk
 
 class NetworkClient:
-	def __init__( self, playState=None, networkEntsClassDefs=None, conn_limit=1, networkingMode=0, clientSidePrediction=True, resimulationMethod=1 *args, **kwargs ):
+	def __init__( self, playState=None, networkEntsClassDefs=None, conn_limit=1, networkingMode=0, clientSidePrediction=True, resimulationMethod=1, *args, **kwargs ):
 		self._client = pygnetic.Client( conn_limit, *args, **kwargs )
 		
 		self.playStateRef = weakref.ref( playState )
