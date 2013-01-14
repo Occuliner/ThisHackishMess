@@ -16,6 +16,7 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import extern_modules.pygnetic as pygnetic, networkhandlers, weakref, extern_modules.pymunk as pymunk
+from genericpolyfuncs import getExtremesAlongAxis
 
 class NetworkClient:
 	def __init__( self, playState=None, networkEntsClassDefs=None, conn_limit=1, networkingMode=0, clientSidePrediction=True, resimulationMethod=1, *args, **kwargs ):
@@ -85,26 +86,7 @@ class NetworkClient:
 		if type( eachEnt.shape ) == pymunk.Poly:
 			polyPoints = eachEnt.shape.get_points()
 			axis = eachEnt.body.velocity.perpendicular()
-			start1Proj, start2Proj = pymunk.Vec2d(0,0), pymunk.Vec2d(0,0)
-			start1, start2 = (0,0), (0,0)
-			if eachEnt.body.velocity.y == 0:
-				for eachPoint in polyPoints:
-					projection = eachPoint.projection( axis )
-					if projection.x < 0 and projection.get_length() > start1Proj.get_length():
-						start1Proj = projection
-						start1 = eachPoint
-					elif projection.x > 0 and projection.get_length() > start2Proj.get_length():
-						start2Porj = projection
-						start2 = eachPoint
-			else:
-				for eachPoint in polyPoints:
-					projection = eachPoint.projection( axis )
-					if projection.y < 0 and projection.get_length() > start1Proj.get_length():
-						start1Proj = projection
-						start1 = eachPoint
-					elif projection.y > 0 and projection.get_length() > start2Proj.get_length():
-						start2Porj = projection
-						start2 = eachPoint
+			start1, start2 = getExtremesAlongAxis( polyPoints, axis, eachEnt.getPosition() )
 		elif type( eachEnt.Shape ) == pymunk.Circle:
 			start1 = eachEnt.body.velocity.perpendicular()*(float(eachEnt.shape.radius)/eachEnt.body.velocity.get_length())
 			start2 = eachEnt.body.velocity.perpendicular()*-(float(eachEnt.shape.radius)/eachEnt.body.velocity.get_length())
@@ -287,13 +269,16 @@ class NetworkClient:
 					eachEnt.body.activate()
 				if eachEnt.logOfPositions.get(updateTime) is not None:
 					posAtTime = eachEnt.logOfPositions[updateTime]
-					if ( int( posAtTime[0] ), int( posAtTime[1] ) ) != eachTuple[1]:
-						deltaPos = eachTuple[1][0]-posAtTime[0], eachTuple[1][1]-posAtTime[1]
+					deltaPos = eachTuple[1][0]-posAtTime[0], eachTuple[1][1]-posAtTime[1]
+					#if ( int( posAtTime[0] ), int( posAtTime[1] ) ) != eachTuple[1]:
+					if deltaPos[0] > 1 or deltaPos[1] > 1:
+						#print "Yay", deltaPos,
 						curPos = eachEnt.getPosition()
 						newPos = curPos[0]+deltaPos[0], curPos[1]+deltaPos[1]
 						#Here I'm going to do the resimulation.
 						if self.resimulationMethod is 1 and eachEnt.collidable and newPos!=curPos:
 							newDelta = self.resimulationUsingSweeps( eachEnt, deltaPos )
+							#print newDelta
 							newPos = curPos[0]+newDelta[0], curPos[1]+newDelta[1]
 							if eachEnt.collidable:
 								eachEnt.body.activate()
