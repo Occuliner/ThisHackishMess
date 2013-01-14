@@ -224,8 +224,7 @@ class NetworkClient:
 					elif cRight:
 						dx = point[0]-right
 						dy = (float(deltaPos[1])/deltaPos[1])*dx
-
-				newDelta = int(dx), int(dy)
+					newDelta = int(dx), int(dy)
 
 		return newDelta
 
