@@ -370,6 +370,8 @@ class NetworkClient:
 				eachEnt = self.findEntById( eachId )
 				velAtTime = eachEnt.logOfVelocities.get(updateTime)
 				curPos = eachEnt.getPosition()
+				if velAtTime is None:
+					continue
 				deltaVel = eachTuple[1][0]-velAtTime[0], eachTuple[1][1]-velAtTime[1]
 				eachEnt.body.velocity.x = eachEnt.body.velocity.x + deltaVel[0]
 				eachEnt.body.velocity.y = eachEnt.body.velocity.y + deltaVel[1]
