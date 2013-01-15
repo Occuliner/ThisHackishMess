@@ -271,13 +271,12 @@ class NetworkClient:
 					deltaPos = eachTuple[1][0]-posAtTime[0], eachTuple[1][1]-posAtTime[1]
 					#if ( int( posAtTime[0] ), int( posAtTime[1] ) ) != eachTuple[1]:
 					if deltaPos[0] > 1 or deltaPos[1] > 1:
-						print "Yay", deltaPos,
 						curPos = eachEnt.getPosition()
 						newPos = curPos[0]+deltaPos[0], curPos[1]+deltaPos[1]
 						#Here I'm going to do the resimulation.
 						if self.resimulationMethod is 1 and eachEnt.collidable and newPos!=curPos:
 							newDelta = self.resimulationUsingSweeps( eachEnt, deltaPos )
-							print newDelta
+							#print "Yay", deltaPos, newDelta
 							newPos = curPos[0]+newDelta[0], curPos[1]+newDelta[1]
 							if eachEnt.collidable:
 								eachEnt.body.activate()
@@ -371,16 +370,19 @@ class NetworkClient:
 				velAtTime = eachEnt.logOfVelocities.get(updateTime)
 				curPos = eachEnt.getPosition()
 				if velAtTime is None:
+					#print "No vel..."
 					continue
 				deltaVel = eachTuple[1][0]-velAtTime[0], eachTuple[1][1]-velAtTime[1]
 				eachEnt.body.velocity.x = eachEnt.body.velocity.x + deltaVel[0]
 				eachEnt.body.velocity.y = eachEnt.body.velocity.y + deltaVel[1]
 				deltaPos = deltaVel[0]*(self.timer-updateTime), deltaVel[1]*(self.timer-updateTime)
+				#print "Yay!"
 				if deltaPos[0] > 1 or deltaPos[1] > 1:
 					if self.resimulationMethod is 1 and eachEnt.collidable:
 						if eachEnt.collidable:
 							eachEnt.body.activate()
 						newDelta = self.resimulationUsingSweeps( eachEnt, deltaPos )
+						#print "Nay", deltaPos, newDelta
 						eachEnt.setPosition( ( curPos[0]+newDelta[0], curPos[1]+newDelta[1] ) )
 						for eachKey, eachVal in eachEnt.logOfPositions.items():
 							if eachKey > updateTime:
