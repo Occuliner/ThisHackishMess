@@ -274,6 +274,7 @@ class Entity( pygame.sprite.DirtySprite ):
 
 	def addToGroup( self, *groups ):
 		self.id = groups[0].playState.idSource.getId()
+		self.playStateRef = weakref.ref( groups[0].playState )
 		if self.collidable:
 			for group in groups:
 				group.playState.space.add( self.physicsObjects )
