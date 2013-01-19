@@ -220,9 +220,9 @@ class EntityEditState( MenuState ):
 					destGroup = getattr( self.menu.playState, classDef.playStateGroup )
 					dest = click[0]-self.menu.playState.panX, click[1]-self.menu.playState.panY
 					if self.snapToGrid:
-						if hasattr( classDef, 'wbWidth' ):
+						if classDef.wbWidth is not None:
 							dest = gridRound( dest, classDef.wbWidth, classDef.wbHeight )
-						elif hasattr( classDef, 'bWidth' ):
+						elif classDef.bWidth is not None:
 							dest = gridRound( dest, classDef.bWidth, classDef.bHeight )
 						else:
 							dest = gridRound( dest, classDef.width, classDef.height )
