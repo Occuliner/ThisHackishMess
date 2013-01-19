@@ -83,6 +83,16 @@ class ScrollNextButton( Button ):
 			if self.parentState.curPage < max( self.parentState.pages.keys() ):
 				self.parentState.repage( self.parentState.curPage + 1 )
 
+class SnapToGridButtonEnt( Button ):
+	image = loadImage( "gridbutton.png", 2 )
+	def __init__( self, menu=None ):
+		Button.__init__( self, None, None, menu )
+		self.rect = self.image.get_rect()
+		self.rect.topleft = ( 114, 338 )
+	def push( self, clickKey, click ):
+		if "up" in clickKey:
+			self.parentState.toggleSnapToGrid()
+
 class EntityEditState( MenuState ):
 	"""EntityEditState is a MenuState class that creates Entity-placing functionality,\n""" \
 	"""to put dynamic objects into the game's playState.\n""" \
@@ -102,6 +112,9 @@ class EntityEditState( MenuState ):
 
 		self.scrollBackButton = ScrollBackButton( self )
 		self.addButton( self.scrollBackButton )
+
+		self.snapToGridButton = SnapToGridButtonEnt( self )
+		self.addButton( self.snapToGridButton )
 		
 		self.curEntNum = 0
 		self.xPos = 0
@@ -114,36 +127,34 @@ class EntityEditState( MenuState ):
 		self.maxPage = 0
 		self.generateButtons()
 
-		self.selectedButton = self.buttons[self.entNum+2]
+		self.snapToGrid = False
+		self.gridButtonSelectionBox = None
+
+		self.selectedButton = self.buttons[self.entNum+3]
 		self.entSelectionBox = SelectionBox( self.selectedButton.rect, self )
 		self.addSprite( self.entSelectionBox )
 
-		#curEntNum = 0
-		#xPos = 0
-		#yPos = 0
-		#tallest = 0
-		#for eachEnt in self.menu.masterEntSet.getEnts():
-		#	position = ( xPos + 21, yPos + 30 )
-		#	self.addButton( EntButton( eachEnt, curEntNum, position, self ) )
-		#	xPos += eachEnt.width
-		#	tallest = max( tallest, eachEnt.height )
-		#	if xPos > 108:
-		#		xPos = 0
-		#		yPos += tallest
-		#	curEntNum += 1
-		#
 		self.curGrabbedEnt = None
 		self.lastMouseSpot = ( 0, 0 )
+		self.whereEntWasGrabbed = None
+
+	def toggleSnapToGrid( self ):
+		self.snapToGrid = not self.snapToGrid
+		if self.gridButtonSelectionBox is None:
+			self.gridButtonSelectionBox = SelectionBox( self.snapToGridButton.rect, self )
+			self.addSprite( self.gridButtonSelectionBox )
+		else:
+			self.removeSprite( self.gridButtonSelectionBox )
+			self.gridButtonSelectionBox = None
+		self.menu.loadMenuState( self )
 
 	def generateButtons( self ):
 		newEnts = self.menu.masterEntSet.getEnts()
 		if len( newEnts ) == len( self.processedEnts ):
 			return None
 		for eachEnt in [ each for each in newEnts if each not in self.processedEnts ]:
-		#for eachEnt in newEnts:
 			position = ( self.xPos + 21, self.yPos + 30 )
 			givenButton = EntButton( eachEnt, self.curEntNum, position, self )
-			#self.addButton( givenEnt )
 			self.processedEnts.append( eachEnt )
 			if self.pages.has_key( self.maxPage ):
 				self.pages[self.maxPage].append( givenButton )
@@ -199,29 +210,44 @@ class EntityEditState( MenuState ):
 		if click is not None:
 			if clickKey is 'mouse1down':
 				self.curGrabbedEnt = self.getPressedEnt( curMousePos )
+				if self.curGrabbedEnt is not None:
+					entPos = self.curGrabbedEnt.getPosition()
+					self.whereEntWasGrabbed = curMousePos[0] - entPos[0], curMousePos[1] - entPos[1]
 
 			elif clickKey is 'mouse1up':
 				if self.getPressedEnt( click ) == None and self.curGrabbedEnt == None:
 					classDef = self.processedEnts[self.entNum]
 					destGroup = getattr( self.menu.playState, classDef.playStateGroup )
 					dest = click[0]-self.menu.playState.panX, click[1]-self.menu.playState.panY
+					if self.snapToGrid:
+						if hasattr( classDef, 'wbWidth' ):
+							dest = gridRound( dest, classDef.wbWidth, classDef.wbHeight )
+						elif hasattr( classDef, 'bWidth' ):
+							dest = gridRound( dest, classDef.bWidth, classDef.bHeight )
+						else:
+							dest = gridRound( dest, classDef.width, classDef.height )
 					classDef( dest, vel=[0,0], group=destGroup )
 				self.curGrabbedEnt = None
+				self.whereEntWasGrabbed = None
 			
 			elif clickKey is 'mouse3up':
 				anEnt = self.getPressedEnt( click )
 				if anEnt is not None:
 					anEnt.kill()
+				self.whereEntWasGrabbed = None
 
 		elif curMousePos is not None:
-			deltaPos = curMousePos[0] - self.lastMouseSpot[0], curMousePos[1] - self.lastMouseSpot[1]
 			if self.curGrabbedEnt is not None:
-				if self.curGrabbedEnt.collidable:
-					self.curGrabbedEnt.body.position[0] += deltaPos[0]
-					self.curGrabbedEnt.body.position[1] += deltaPos[1]
-				else:
-					self.curGrabbedEnt.rect.x += deltaPos[0]
-					self.curGrabbedEnt.rect.y += deltaPos[1]
+				curEnt = self.curGrabbedEnt
+				newPos = curMousePos[0]-self.whereEntWasGrabbed[0], curMousePos[1]-self.whereEntWasGrabbed[1]
+				if self.snapToGrid:
+					if curEnt.wbWidth is not None:
+						newPos = gridRound( newPos, curEnt.wbWidth, curEnt.wbHeight )
+					elif curEnt.bWidth is not None:
+						newPos = gridRound( newPos, curEnt.bWidth, curEnt.bHeight )
+					else:
+						newPos = gridRound( newPos, curEnt.width, curEnt.height )
+				curEnt.setPosition( newPos )
 			self.lastMouseSpot = curMousePos
 				
 				
