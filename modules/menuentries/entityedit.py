@@ -256,11 +256,12 @@ class EntityEditState( MenuState ):
 					else:
 						gridX = classDef.width
 						gridY = classDef.height
+					if self.snapToGrid or self.gridFill:
+						dest = gridRound( dest, gridX, gridY )
 					if not self.gridFill:
-						if self.snapToGrid:
-							dest = gridRound( dest, gridX, gridY )
 						classDef( dest, vel=[0,0], group=destGroup )
 					else:
+						self.gridFillStart = gridRound( self.gridFillStart, gridX, gridY )
 						for x in xrange( min( self.gridFillStart[0], dest[0] ), max( self.gridFillStart[0], dest[0] ), gridX ):
 							for y in xrange( min( self.gridFillStart[1], dest[1] ), max( self.gridFillStart[1], dest[1] ), gridY ):
 								classDef( (x,y), vel=[0,0], group=destGroup )
