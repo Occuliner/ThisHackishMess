@@ -93,6 +93,16 @@ class SnapToGridButtonEnt( Button ):
 		if "up" in clickKey:
 			self.parentState.toggleSnapToGrid()
 
+class GridFillButtonEnt( Button ):
+	image = loadImage( "gridfillbutton.png", 2 )
+	def __init__( self, menu=None ):
+		Button.__init__( self, None, None, menu )
+		self.rect = self.image.get_rect()
+		self.rect.topleft = ( 84, 338 )
+	def push( self, clickKey, click ):
+		if "up" in clickKey:
+			self.parentState.toggleGridFill()
+
 class EntityEditState( MenuState ):
 	"""EntityEditState is a MenuState class that creates Entity-placing functionality,\n""" \
 	"""to put dynamic objects into the game's playState.\n""" \
@@ -115,6 +125,9 @@ class EntityEditState( MenuState ):
 
 		self.snapToGridButton = SnapToGridButtonEnt( self )
 		self.addButton( self.snapToGridButton )
+
+		self.gridFillButton = GridFillButtonEnt( self )
+		self.addButton( self.gridFillButton )
 		
 		self.curEntNum = 0
 		self.xPos = 0
@@ -130,7 +143,11 @@ class EntityEditState( MenuState ):
 		self.snapToGrid = False
 		self.gridButtonSelectionBox = None
 
-		self.selectedButton = self.buttons[self.entNum+3]
+		self.gridFill = False
+		self.gridFillButtonSelectionBox = None
+		self.gridFillStart = None
+
+		self.selectedButton = self.buttons[self.entNum+4]
 		self.entSelectionBox = SelectionBox( self.selectedButton.rect, self )
 		self.addSprite( self.entSelectionBox )
 
@@ -146,6 +163,16 @@ class EntityEditState( MenuState ):
 		else:
 			self.removeSprite( self.gridButtonSelectionBox )
 			self.gridButtonSelectionBox = None
+		self.menu.loadMenuState( self )
+
+	def toggleGridFill( self ):
+		self.gridFill = not self.gridFill
+		if self.gridFillButtonSelectionBox is None:
+			self.gridFillButtonSelectionBox = SelectionBox( self.gridFillButton.rect, self )
+			self.addSprite( self.gridFillButtonSelectionBox )
+		else:
+			self.removeSprite( self.gridFillButtonSelectionBox )
+			self.gridFillButtonSelectionBox = None
 		self.menu.loadMenuState( self )
 
 	def generateButtons( self ):
@@ -213,23 +240,33 @@ class EntityEditState( MenuState ):
 				if self.curGrabbedEnt is not None:
 					entPos = self.curGrabbedEnt.getPosition()
 					self.whereEntWasGrabbed = curMousePos[0] - entPos[0], curMousePos[1] - entPos[1]
-
+				if self.gridFill:
+					self.gridFillStart = curMousePos[0]-self.menu.playState.panX, curMousePos[1]-self.menu.playState.panY
 			elif clickKey is 'mouse1up':
 				if self.getPressedEnt( click ) == None and self.curGrabbedEnt == None:
 					classDef = self.processedEnts[self.entNum]
 					destGroup = getattr( self.menu.playState, classDef.playStateGroup )
 					dest = click[0]-self.menu.playState.panX, click[1]-self.menu.playState.panY
-					if self.snapToGrid:
-						if classDef.wbWidth is not None:
-							dest = gridRound( dest, classDef.wbWidth, classDef.wbHeight )
-						elif classDef.bWidth is not None:
-							dest = gridRound( dest, classDef.bWidth, classDef.bHeight )
-						else:
-							dest = gridRound( dest, classDef.width, classDef.height )
-					classDef( dest, vel=[0,0], group=destGroup )
+					if classDef.wbWidth is not None:
+						gridX = classDef.wbWidth
+						gridY = classDef.wbHeight
+					elif classDef.bWidth is not None:
+						gridX = classDef.bWidth
+						gridY = classDef.bHeight
+					else:
+						gridX = classDef.width
+						gridY = classDef.height
+					if not self.gridFill:
+						if self.snapToGrid:
+							dest = gridRound( dest, gridX, gridY )
+						classDef( dest, vel=[0,0], group=destGroup )
+					else:
+						for x in xrange( min( self.gridFillStart[0], dest[0] ), max( self.gridFillStart[0], dest[0] ), gridX ):
+							for y in xrange( min( self.gridFillStart[1], dest[1] ), max( self.gridFillStart[1], dest[1] ), gridY ):
+								classDef( (x,y), vel=[0,0], group=destGroup )
 				self.curGrabbedEnt = None
 				self.whereEntWasGrabbed = None
-			
+				self.gridFillStart = None
 			elif clickKey is 'mouse3up':
 				anEnt = self.getPressedEnt( click )
 				if anEnt is not None:

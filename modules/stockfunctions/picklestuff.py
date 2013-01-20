@@ -15,7 +15,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import cPickle, os, pygame, zlib, gzip, collections, weakref, state
+import cPickle, os, pygame, zlib, gzip, collections, weakref, state, sys
 #import msgpack
 
 from imageload import loadImage, loadImageNoAlpha
@@ -62,42 +62,58 @@ def loadObjectFromFile( fileName ):
 	
 
 def dumpPlayState( givenState, fileName, saveHud=False ):
-	#Store all the Floor layers.
-	floorImageBuffers = [ ( makeImageBuffer( each.image ), each.rect.topleft ) for each in givenState.floor.layers ]
+	#To avoid crashers of anykind when saving. Everything is in a try block.
+	try:
+		#Store all the Floor layers.
+		floorImageBuffers = [ ( makeImageBuffer( each.image ), each.rect.topleft ) for each in givenState.floor.layers ]
 
-	#Make the sound State picklable.
-	givenState.soundManager.makePicklable()
-
-	#Make a list representing all the boundaries.
-	bndList = [ ( (each.a.x, each.a.y), (each.b.x, each.b.y) ) for each in givenState.boundaries ]
-
-	if saveHud:
-		#Make the hudElements picklable.
-		hudList = [ each.makePicklable() for each in givenState.hudList ]
-	else:
-		hudList = []
-
-	#Create the StateStoreTuple, this will store all the data, and be serialized.
-	stateTuple = StateStoreTuple( [], floorImageBuffers, givenState.soundManager, hudList, bndList )
-
-	for eachSprite in givenState.sprites():
-		#Create EntityGhost.
-		ghost = EntityGhost( eachSprite )
-		#Add the the ghost list.
-		stateTuple.entityGhostList.append( ghost )
-
+		#Make the sound State picklable.
+		givenState.soundManager.makePicklable()
 	
-	writeObjectToFile( stateTuple, fileName )
+		#Make a list representing all the boundaries.
+		bndList = [ ( (each.a.x, each.a.y), (each.b.x, each.b.y) ) for each in givenState.boundaries ]
+	
+		if saveHud:
+			#Make the hudElements picklable.
+			hudList = [ each.makePicklable() for each in givenState.hudList ]
+		else:
+			hudList = []
+	
+		#Create the StateStoreTuple, this will store all the data, and be serialized.
+		stateTuple = StateStoreTuple( [], floorImageBuffers, givenState.soundManager, hudList, bndList )
+	
+		for eachSprite in givenState.sprites():
+			#Create EntityGhost.
+			ghost = EntityGhost( eachSprite )
+			#Add the the ghost list.
+			stateTuple.entityGhostList.append( ghost )
+	
+		
+		writeObjectToFile( stateTuple, fileName )
+		
+		#Make the soundState unpicklable
+		givenState.soundManager.makeUnpicklable( givenState )
+	
+		if saveHud:
+			#Make the hud elements unpicklable
+			[ each.makeUnpicklable( givenState ) for each in givenState.hudList ]
+	
+		#Set the filename property
+		givenState.fileName = fileName
 
-	#Make the soundState unpicklable
-	givenState.soundManager.makeUnpicklable( givenState )
+	except:
+		print "Saving failed apparently: " + sys.exc_info()[0]
 
-	if saveHud:
-		#Make the hud elements unpicklable
-		[ each.makeUnpicklable( givenState ) for each in givenState.hudList ]
+		#I think it's safe to just unpicklablize the sounds and hud elements, even if some aren't picklable.
+		
+		#Make the soundState unpicklable
+		givenState.soundManager.makeUnpicklable( givenState )
+	
+		if saveHud:
+			#Make the hud elements unpicklable
+			[ each.makeUnpicklable( givenState ) for each in givenState.hudList ]
 
-	#Set the filename property
-	givenState.fileName = fileName
+		
 
 def loadPlayState( fileName, curTileSet, classDefs, networkServer=None, networkClient=None, loadHud=False ):
 	#Get the StateStoreTuple.
