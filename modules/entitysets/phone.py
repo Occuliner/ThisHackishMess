@@ -23,32 +23,29 @@ from masterentityset import *
 
 import math
 
-class Anvil( Entity ):
-	width = 32
-	height = 22
+class Phone( Entity ):
+	width = 18
+	height = 18
 
 	playStateGroup = "genericStuffGroup"
 	setName = "genericstuff"
 
-	sheetFileName = "anvil.png"
-	sheet = loadImage( sheetFileName, 2 )
+	sheetFileName = "phone.png"
+	sheet = loadImageNoAlpha( sheetFileName, 2 )
 	specialCollision = None
-	collidable = True
-	solid = True
-	mass = 2000000000
 	scale = 2
 
 	instanceSpecificVars = None
 	
 	def __init__( self, pos = [0,0], vel = [0,0], group=None, **kwargs ):
 		Entity.__init__( self, pos, [0,0], None, group, pygame.Rect( 0, 0, self.width, self.height ), animated=False, **kwargs )
-		if Anvil.instanceSpecificVars is None:
+		if Phone.instanceSpecificVars is None:
 			attrList = list( self.__dict__.keys() )
-		if Anvil.instanceSpecificVars is None:
-			Anvil.instanceSpecificVars = dict( [ ( eachKey, eachVal ) for eachKey, eachVal in self.__dict__.items() if eachKey not in attrList ] )
+		if Phone.instanceSpecificVars is None:
+			Phone.instanceSpecificVars = dict( [ ( eachKey, eachVal ) for eachKey, eachVal in self.__dict__.items() if eachKey not in attrList ] )
 	
 	def update( self, dt ):
 		Entity.update( self, dt )
 		
 
-MasterEntitySet.entsToLoad.append( Anvil )
+MasterEntitySet.entsToLoad.append( Phone )

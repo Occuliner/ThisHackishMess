@@ -21,34 +21,52 @@ from pygame.locals import *
 
 from masterentityset import *
 
-import math
-
-class Anvil( Entity ):
-	width = 32
-	height = 22
+class Chair( Entity ):
+	width = 24
+	height = 46
 
 	playStateGroup = "genericStuffGroup"
 	setName = "genericstuff"
 
-	sheetFileName = "anvil.png"
-	sheet = loadImage( sheetFileName, 2 )
+	sheetFileName = "chair.png"
+	colourKey = pygame.Color( 255, 0, 255 )
+	sheet = loadImageNoAlpha( sheetFileName, 2 )
+	sheet.set_colorkey( colourKey )
+
 	specialCollision = None
 	collidable = True
 	solid = True
-	mass = 2000000000
+	mass = 9e9
 	scale = 2
 
+	wbdx = 0
+	wbdy = 34
+	wbWidth = 24
+	wbHeight = 6
+
 	instanceSpecificVars = None
+
+	forceUseRect = True
 	
 	def __init__( self, pos = [0,0], vel = [0,0], group=None, **kwargs ):
-		Entity.__init__( self, pos, [0,0], None, group, pygame.Rect( 0, 0, self.width, self.height ), animated=False, **kwargs )
-		if Anvil.instanceSpecificVars is None:
+		Entity.__init__( self, pos, [0,0], None, group, pygame.Rect( 0, 0, self.width, self.height ), animated=True, **kwargs )
+		self.animations['left'] = { 'fps': 1, 'frames':[3] }
+		self.animations['right'] = { 'fps': 1, 'frames':[1] }
+		self.animations['forward'] = { 'fps': 1, 'frames':[0] }
+		self.animations['backward'] = { 'fps': 1, 'frames':[2] }
+		self.changeAnimation('left')
+		if Chair.instanceSpecificVars is None:
 			attrList = list( self.__dict__.keys() )
-		if Anvil.instanceSpecificVars is None:
-			Anvil.instanceSpecificVars = dict( [ ( eachKey, eachVal ) for eachKey, eachVal in self.__dict__.items() if eachKey not in attrList ] )
+		self.oldTag= 'left'
+		self.tags['direction'] = 'left'
+		if Chair.instanceSpecificVars is None:
+			Chair.instanceSpecificVars = dict( [ ( eachKey, eachVal ) for eachKey, eachVal in self.__dict__.items() if eachKey not in attrList ] )
 	
 	def update( self, dt ):
+		curTag = self.tags.get('direction')
+		if curTag != self.oldTag and curTag in ( 'left', 'right', 'forward', 'backward' ):
+			self.changeAnimation(curTag)
+			self.oldTag = curTag
 		Entity.update( self, dt )
-		
 
-MasterEntitySet.entsToLoad.append( Anvil )
+MasterEntitySet.entsToLoad.append( Chair )
