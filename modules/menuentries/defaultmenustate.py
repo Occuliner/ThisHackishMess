@@ -47,31 +47,31 @@ from networkbuttons import ConnectToButton, HostButton
 from pausestart import PauseStartButton
 
 class DefaultMenuState( MenuState ):
-	"""The DefaultMenuState is the class for the default MenuState.\n""" \
-	"""Shocking, I know."""
-	floorEditButton = FloorEditButton()
+    """The DefaultMenuState is the class for the default MenuState.\n""" \
+    """Shocking, I know."""
+    floorEditButton = FloorEditButton()
 
-	entityEditButton = EntityEditButton()
+    entityEditButton = EntityEditButton()
 
-	saveMapButton = SaveMapButton()
+    saveMapButton = SaveMapButton()
 
-	loadMapButton = LoadMapButton()
+    loadMapButton = LoadMapButton()
 
-	tagEditButton = TagEditButton()
+    tagEditButton = TagEditButton()
 
-	boundEditButton = BoundaryEditButton()
+    boundEditButton = BoundaryEditButton()
 
-	physicsVisButton = PhysicsVisButton()
+    physicsVisButton = PhysicsVisButton()
 
-	sensorEditButton = SensorEditButton()
+    sensorEditButton = SensorEditButton()
 
-	connectToButton = ConnectToButton()
+    connectToButton = ConnectToButton()
 
-	hostButton = HostButton()
+    hostButton = HostButton()
 
-	pauseStartButton = PauseStartButton()
+    pauseStartButton = PauseStartButton()
 
-	panel = StaticImage( loadImage("devmenu.png", 2), (10, 10) )
+    panel = StaticImage( loadImage("devmenu.png", 2), (10, 10) )
 
-	def __init__( self, menu, sprites=[panel, floorEditButton, entityEditButton, saveMapButton, loadMapButton, tagEditButton, boundEditButton, physicsVisButton, sensorEditButton, connectToButton, hostButton, pauseStartButton] ):
-		MenuState.__init__( self, menu, sprites )
+    def __init__( self, menu, sprites=[panel, floorEditButton, entityEditButton, saveMapButton, loadMapButton, tagEditButton, boundEditButton, physicsVisButton, sensorEditButton, connectToButton, hostButton, pauseStartButton] ):
+        MenuState.__init__( self, menu, sprites )

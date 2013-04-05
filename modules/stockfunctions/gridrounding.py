@@ -18,22 +18,22 @@
 """This file defines the gridRound function. See it's docstring for more details."""
 
 def gridRound( pos, w, h, roundToTopLeft=True, trueRounding=False ):
-	"""gridRound( pos, w, h, roundToTopLeft=True )\n""" \
-	"""This function rounds a given pos variable to the nearest lower or upper multiples \n""" \
-	""" of w and h in their respective directions. roundToTopLeft=True means it rounds towards the topleft. \n""" \
-	""" trueRounding means round to the closest corner, not topleft or bottomright."""
+    """gridRound( pos, w, h, roundToTopLeft=True )\n""" \
+    """This function rounds a given pos variable to the nearest lower or upper multiples \n""" \
+    """ of w and h in their respective directions. roundToTopLeft=True means it rounds towards the topleft. \n""" \
+    """ trueRounding means round to the closest corner, not topleft or bottomright."""
 
-	xRemainder, yRemainder = pos[0]%w, pos[1]%h
-	
-	newPosition = [ pos[0] - xRemainder, pos[1] - yRemainder ]
+    xRemainder, yRemainder = pos[0]%w, pos[1]%h
+    
+    newPosition = [ pos[0] - xRemainder, pos[1] - yRemainder ]
 
-	if trueRounding:
-		if float(xRemainder)/w > 0.5:
-			newPosition[0] += w
-		if float(yRemainder)/h > 0.5:
-			newPosition[1] += h
-	elif not roundToTopLeft:
-		newPosition[0] += w
-		newPosition[1] += h
-	
-	return newPosition
+    if trueRounding:
+        if float(xRemainder)/w > 0.5:
+            newPosition[0] += w
+        if float(yRemainder)/h > 0.5:
+            newPosition[1] += h
+    elif not roundToTopLeft:
+        newPosition[0] += w
+        newPosition[1] += h
+    
+    return newPosition

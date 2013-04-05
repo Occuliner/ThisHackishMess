@@ -20,18 +20,18 @@ from imageload import loadImage
 from button import Button
 
 class PhysicsVisButton( Button ):
-	image = loadImage("physicsvis.png",2)
-	def __init__( self, menu=None ):
-		Button.__init__( self, None, None, menu )
-		self.rect = self.image.get_rect()
-		self.rect.topleft = ( 30, 370 )
-		self.on = False
-	def push( self, clickKey, click ):
-		if "up" in clickKey:
-			if not self.on:
-				self.on = True
-				self.parentState.menu.playState.lineVisualiser.renderLines = True
-				self.parentState.menu.playState.lineVisualiser.renderPhysicsLines = True
-			elif self.on:
-				self.on = False
-				self.parentState.menu.playState.lineVisualiser.forceNoRender = True
+    image = loadImage("physicsvis.png",2)
+    def __init__( self, menu=None ):
+        Button.__init__( self, None, None, menu )
+        self.rect = self.image.get_rect()
+        self.rect.topleft = ( 30, 370 )
+        self.on = False
+    def push( self, clickKey, click ):
+        if "up" in clickKey:
+            if not self.on:
+                self.on = True
+                self.parentState.menu.playState.lineVisualiser.renderLines = True
+                self.parentState.menu.playState.lineVisualiser.renderPhysicsLines = True
+            elif self.on:
+                self.on = False
+                self.parentState.menu.playState.lineVisualiser.forceNoRender = True

@@ -19,4 +19,4 @@ import pygame
 from pygame.locals import *
 
 def scaleSurface( surf, proportion ):
-	return pygame.transform.scale( surf, ( int( surf.get_width()*proportion ), int( surf.get_height()*proportion ) ) )
+    return pygame.transform.scale( surf, ( int( surf.get_width()*proportion ), int( surf.get_height()*proportion ) ) )

@@ -22,18 +22,18 @@ from mindlessentholder import *
 import pygame
 
 class PureSensorNetwork( NetworkEntity ):
-	setName = "pureSensors"
-	playStateGroup = "genericStuffGroup"
-	solid = False
-	mass = 20
-	pureSensor = True
-	sheet = pygame.Surface( ( 1, 1 ) ).convert_alpha()
-	sheet.fill( pygame.Color( 0, 0, 0, 0 ) )
-	sheetFileName = None
-	notDirectlyRemovable = True
+    setName = "pureSensors"
+    playStateGroup = "genericStuffGroup"
+    solid = False
+    mass = 20
+    pureSensor = True
+    sheet = pygame.Surface( ( 1, 1 ) ).convert_alpha()
+    sheet.fill( pygame.Color( 0, 0, 0, 0 ) )
+    sheetFileName = None
+    notDirectlyRemovable = True
 
-	def __init__( self, pos=[0,0], vel=[0,0], group=None, width=0, height=0, **kwargs ):
-		NetworkEntity.__init__( self, pos, [0,0], None, group, pygame.Rect( 0, 0, width, height ), animated=False, **kwargs )
-		self.visible = 0
+    def __init__( self, pos=[0,0], vel=[0,0], group=None, width=0, height=0, **kwargs ):
+        NetworkEntity.__init__( self, pos, [0,0], None, group, pygame.Rect( 0, 0, width, height ), animated=False, **kwargs )
+        self.visible = 0
 
 MindlessEntHolder.dictOfEnts["PureSensorNetwork"] = PureSensorNetwork

@@ -24,11 +24,11 @@ from mastertileset import *
 import pygame
 
 class DevDraftSet( TileGroup ):
-	name = "DevDraftSet"
-	a = 1
-	def __init__( self ):
-		sheetImage = loadImageNoAlpha( "devtileset.png", 2 )
-		sheetImage.set_colorkey( pygame.Color( 255, 0, 255 ) )
-		self.tiles = TileGroup.createFromSheet( self, sheetImage, size=( 40, 40 ), kickUpBreak=1, solidList = [] )
+    name = "DevDraftSet"
+    a = 1
+    def __init__( self ):
+        sheetImage = loadImageNoAlpha( "devtileset.png", 2 )
+        sheetImage.set_colorkey( pygame.Color( 255, 0, 255 ) )
+        self.tiles = TileGroup.createFromSheet( self, sheetImage, size=( 40, 40 ), kickUpBreak=1, solidList = [] )
 
 MasterTileSet.tileSetsToLoad.append( DevDraftSet )

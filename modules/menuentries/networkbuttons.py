@@ -19,27 +19,27 @@ from button import Button
 from imageload import loadImage
 
 class ConnectToButton( Button ):
-	image = loadImage( "connectbutton.png", 2 )
-	rect = image.get_rect()
-	rect.topleft = ( 24, 164 )
-	def __init__( self, menu=None ):
-		Button.__init__( self, None, None, menu )
+    image = loadImage( "connectbutton.png", 2 )
+    rect = image.get_rect()
+    rect.topleft = ( 24, 164 )
+    def __init__( self, menu=None ):
+        Button.__init__( self, None, None, menu )
 
-	def push( self, clickKey, click ):
-		if "up" in clickKey:
-			self.parentState.menu.playState.connectToGame()
-			#aBoundEditState = SensorEditState( self.parentState.menu )
-			#self.parentState.menu.loadMenuState( aBoundEditState )
+    def push( self, clickKey, click ):
+        if "up" in clickKey:
+            self.parentState.menu.playState.connectToGame()
+            #aBoundEditState = SensorEditState( self.parentState.menu )
+            #self.parentState.menu.loadMenuState( aBoundEditState )
 
 class HostButton( Button ):
-	image = loadImage( "hostbutton.png", 2 )
-	rect = image.get_rect()
-	rect.topleft = ( 24, 184 )
-	def __init__( self, menu=None ):
-		Button.__init__( self, None, None, menu )
+    image = loadImage( "hostbutton.png", 2 )
+    rect = image.get_rect()
+    rect.topleft = ( 24, 184 )
+    def __init__( self, menu=None ):
+        Button.__init__( self, None, None, menu )
 
-	def push( self, clickKey, click ):
-		if "up" in clickKey:
-			self.parentState.menu.playState.hostGame()
-			#aBoundEditState = SensorEditState( self.parentState.menu )
-			#self.parentState.menu.loadMenuState( aBoundEditState )
+    def push( self, clickKey, click ):
+        if "up" in clickKey:
+            self.parentState.menu.playState.hostGame()
+            #aBoundEditState = SensorEditState( self.parentState.menu )
+            #self.parentState.menu.loadMenuState( aBoundEditState )

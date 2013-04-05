@@ -54,14 +54,14 @@ done = False
 white = pygame.Color( 255, 255, 255 )
 
 #
-#	Set Up the PlayState!
+#    Set Up the PlayState!
 #
 
 currentState = PlayState()
 
 #
-#	This import seems pointless, but without there won't actually be any 
-#	tiles placed in MasterTileSet, causing the Floor() call later to fail.
+#    This import seems pointless, but without there won't actually be any 
+#    tiles placed in MasterTileSet, causing the Floor() call later to fail.
 #
 from modules.tilesets.devtileset import DevDraftSet
 
@@ -109,133 +109,133 @@ panU, panD, panL, panR = False, False, False, False
 
 #
 #
-#	Game Loop!
+#    Game Loop!
 #
 #
 
 timer.tick( 60 )
 while not done:
 
-	screen.fill( white )
+    screen.fill( white )
 
-	currentState.update( float(timer.get_time())/1000 )
+    currentState.update( float(timer.get_time())/1000 )
 
-	updatedArea.extend( currentState.draw( screen ) )
-	
-	theDevMenu.update( float(timer.get_time())/1000 )
-	updatedArea.extend( theDevMenu.draw( screen ) )
+    updatedArea.extend( currentState.draw( screen ) )
+    
+    theDevMenu.update( float(timer.get_time())/1000 )
+    updatedArea.extend( theDevMenu.draw( screen ) )
 
 
-	for event in pygame.event.get():
-		if event.type == QUIT:
-			if currentState.isHost or currentState.isClient:
-				currentState.networkNode.disconnectAll()
-			pygame.quit()
-			sys.exit()
-		elif event.type == KEYDOWN:
-			if event.key == K_UP:
-				inputDict['K_UP'] = 'down'
-			elif event.key == K_LEFT:
-				inputDict['K_LEFT'] = 'down'
-			elif event.key == K_RIGHT:
-				inputDict['K_RIGHT'] = 'down'
-			elif event.key == K_DOWN:
-				inputDict['K_DOWN'] = 'down'
-			elif event.key == K_TAB:
-				
-				#OPEN PANEL
-				
-				theDevMenu.toggle()	
-				#pass
+    for event in pygame.event.get():
+        if event.type == QUIT:
+            if currentState.isHost or currentState.isClient:
+                currentState.networkNode.disconnectAll()
+            pygame.quit()
+            sys.exit()
+        elif event.type == KEYDOWN:
+            if event.key == K_UP:
+                inputDict['K_UP'] = 'down'
+            elif event.key == K_LEFT:
+                inputDict['K_LEFT'] = 'down'
+            elif event.key == K_RIGHT:
+                inputDict['K_RIGHT'] = 'down'
+            elif event.key == K_DOWN:
+                inputDict['K_DOWN'] = 'down'
+            elif event.key == K_TAB:
+                
+                #OPEN PANEL
+                
+                theDevMenu.toggle()    
+                #pass
 
-				#theYasb.nextFrame()
+                #theYasb.nextFrame()
 
-			elif event.key in [ K_LSHIFT, K_RSHIFT ]:
-				shiftHeld = True
-			elif event.key == K_w and shiftHeld and theDevMenu.open:
-				panU = True
-			elif event.key == K_a and shiftHeld and theDevMenu.open:
-				panL = True
-			elif event.key == K_d and shiftHeld and theDevMenu.open:
-				panR = True
-			elif event.key == K_s and shiftHeld and theDevMenu.open:
-				panD = True
-			
-		elif event.type == KEYUP:
-			if event.key == K_LEFT:
-				inputDict['K_LEFT'] = 'up'
-			elif event.key == K_RIGHT:
-				inputDict['K_RIGHT'] = 'up'
-			elif event.key == K_UP:
-				inputDict['K_UP'] = 'up'
-			elif event.key == K_DOWN:
-				inputDict['K_DOWN'] = 'up'
-			elif event.key in [ K_LSHIFT, K_RSHIFT ]:
-				shiftHeld = False
-			elif event.key == K_BACKSPACE:
-				#objgraph.show_most_common_types(limit=300)
-				#print len( currentState.space.shapes )
-				theDevMenu.menuState.deleteLastChar = True
-			elif theDevMenu.menuState.keyboardEnabled:
-				if 0 <= event.key < 256:
-					if shiftHeld:
-						someChr = chr( event.key ).upper()
-						if someChr == ";":
-							someChr = ":"
-					else:
-						someChr = chr( event.key )
-					if someChr.isalnum() or someChr == ":":
-						theDevMenu.menuState.keyboardInput( someChr )
+            elif event.key in [ K_LSHIFT, K_RSHIFT ]:
+                shiftHeld = True
+            elif event.key == K_w and shiftHeld and theDevMenu.open:
+                panU = True
+            elif event.key == K_a and shiftHeld and theDevMenu.open:
+                panL = True
+            elif event.key == K_d and shiftHeld and theDevMenu.open:
+                panR = True
+            elif event.key == K_s and shiftHeld and theDevMenu.open:
+                panD = True
+            
+        elif event.type == KEYUP:
+            if event.key == K_LEFT:
+                inputDict['K_LEFT'] = 'up'
+            elif event.key == K_RIGHT:
+                inputDict['K_RIGHT'] = 'up'
+            elif event.key == K_UP:
+                inputDict['K_UP'] = 'up'
+            elif event.key == K_DOWN:
+                inputDict['K_DOWN'] = 'up'
+            elif event.key in [ K_LSHIFT, K_RSHIFT ]:
+                shiftHeld = False
+            elif event.key == K_BACKSPACE:
+                #objgraph.show_most_common_types(limit=300)
+                #print len( currentState.space.shapes )
+                theDevMenu.menuState.deleteLastChar = True
+            elif theDevMenu.menuState.keyboardEnabled:
+                if 0 <= event.key < 256:
+                    if shiftHeld:
+                        someChr = chr( event.key ).upper()
+                        if someChr == ";":
+                            someChr = ":"
+                    else:
+                        someChr = chr( event.key )
+                    if someChr.isalnum() or someChr == ":":
+                        theDevMenu.menuState.keyboardInput( someChr )
 
-			elif event.key == K_w:
-				panU = False
-			elif event.key == K_a:
-				panL = False
-			elif event.key == K_d:
-				panR = False
-			elif event.key == K_s:
-				panD = False
-			
-		elif event.type == MOUSEBUTTONDOWN:
-			curMousePos = event.pos[0] + currentState.panX, event.pos[1] + currentState.panY
-			if event.button == 1 and theDevMenu.open:
-				theDevMenu.clicks['mouse1down'].append( event.pos )
-			elif event.button == 2 and theDevMenu.open:
-				theDevMenu.clicks['mouse2down'].append( event.pos )
-			elif event.button == 3 and theDevMenu.open:
-				theDevMenu.clicks['mouse3down'].append( event.pos )
-		
-		elif event.type == MOUSEBUTTONUP:
-			theDevMenu.draggingMenu = False
-			theDevMenu.draggedSpot = [0,0]
-			curMousePos = event.pos[0] + currentState.panX, event.pos[1] + currentState.panY
-			if event.button == 1 and theDevMenu.open:
-				theDevMenu.clicks['mouse1up'].append( event.pos )
-			elif event.button == 2 and theDevMenu.open:
-				theDevMenu.clicks['mouse2up'].append( event.pos )
-			elif event.button == 3 and theDevMenu.open:
-				theDevMenu.clicks['mouse3up'].append( event.pos )
+            elif event.key == K_w:
+                panU = False
+            elif event.key == K_a:
+                panL = False
+            elif event.key == K_d:
+                panR = False
+            elif event.key == K_s:
+                panD = False
+            
+        elif event.type == MOUSEBUTTONDOWN:
+            curMousePos = event.pos[0] + currentState.panX, event.pos[1] + currentState.panY
+            if event.button == 1 and theDevMenu.open:
+                theDevMenu.clicks['mouse1down'].append( event.pos )
+            elif event.button == 2 and theDevMenu.open:
+                theDevMenu.clicks['mouse2down'].append( event.pos )
+            elif event.button == 3 and theDevMenu.open:
+                theDevMenu.clicks['mouse3down'].append( event.pos )
+        
+        elif event.type == MOUSEBUTTONUP:
+            theDevMenu.draggingMenu = False
+            theDevMenu.draggedSpot = [0,0]
+            curMousePos = event.pos[0] + currentState.panX, event.pos[1] + currentState.panY
+            if event.button == 1 and theDevMenu.open:
+                theDevMenu.clicks['mouse1up'].append( event.pos )
+            elif event.button == 2 and theDevMenu.open:
+                theDevMenu.clicks['mouse2up'].append( event.pos )
+            elif event.button == 3 and theDevMenu.open:
+                theDevMenu.clicks['mouse3up'].append( event.pos )
 
-	currentState.sendInput( inputDict )
-	
-	inputDict = {}
-	
-	if panU:
-		currentState.panY += 2
-	if panD:
-		currentState.panY -= 2
-	if panR:
-		currentState.panX -= 2
-	if panL:
-		currentState.panX += 2
+    currentState.sendInput( inputDict )
+    
+    inputDict = {}
+    
+    if panU:
+        currentState.panY += 2
+    if panD:
+        currentState.panY -= 2
+    if panR:
+        currentState.panX -= 2
+    if panL:
+        currentState.panX += 2
 
-	pygame.display.update( updatedArea )
-	#pygame.display.update( )
+    pygame.display.update( updatedArea )
+    #pygame.display.update( )
 
-	updatedArea = []
+    updatedArea = []
 
-	timeTillFpsPrint -= float(timer.get_time())/1000
-	if timeTillFpsPrint < 0:
-		print timer.get_fps()
-		timeTillFpsPrint = 2.0
-	timer.tick( 60 )
+    timeTillFpsPrint -= float(timer.get_time())/1000
+    if timeTillFpsPrint < 0:
+        print timer.get_fps()
+        timeTillFpsPrint = 2.0
+    timer.tick( 60 )

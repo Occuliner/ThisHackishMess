@@ -19,31 +19,31 @@
 import extern_modules.pymunk as pymunk
 
 def getMidOfPoints( polyPoints ):
-	numOf = len(polyPoints)
-	midX = float(sum([ each[0] for each in polyPoints ]))/numOf
-	midY = float(sum([ each[1] for each in polyPoints ]))/numOf
-	return midX, midY
+    numOf = len(polyPoints)
+    midX = float(sum([ each[0] for each in polyPoints ]))/numOf
+    midY = float(sum([ each[1] for each in polyPoints ]))/numOf
+    return midX, midY
 
 def getExtremesAlongAxis( polyPoints, axis, default ):
-	extreme1Proj, extreme2Proj = pymunk.Vec2d(0,0), pymunk.Vec2d(0,0)
-	extreme1, extreme2 =  list( default ), list( default )
-	midPoint = pymunk.Vec2d( getMidOfPoints( polyPoints ) )
-	if axis.y == 0:
-		for eachPoint in polyPoints:
-			projection = (eachPoint-midPoint).projection( axis )
-			if projection.x < 0 and projection.get_length() > extreme1Proj.get_length():
-				extreme1Proj = projection
-				extreme1 = eachPoint
-			elif projection.x > 0 and projection.get_length() > extreme2Proj.get_length():
-				extreme2Proj = projection
-				extreme2 = eachPoint
-	else:
-		for eachPoint in polyPoints:
-			projection = (eachPoint-midPoint).projection( axis )
-			if projection.y < 0 and projection.get_length() > extreme1Proj.get_length():
-				extreme1Proj = projection
-				extreme1 = eachPoint
-			elif projection.y > 0 and projection.get_length() > extreme2Proj.get_length():
-				extreme2Proj = projection
-				extreme2 = eachPoint
-	return extreme1, extreme2
+    extreme1Proj, extreme2Proj = pymunk.Vec2d(0,0), pymunk.Vec2d(0,0)
+    extreme1, extreme2 =  list( default ), list( default )
+    midPoint = pymunk.Vec2d( getMidOfPoints( polyPoints ) )
+    if axis.y == 0:
+        for eachPoint in polyPoints:
+            projection = (eachPoint-midPoint).projection( axis )
+            if projection.x < 0 and projection.get_length() > extreme1Proj.get_length():
+                extreme1Proj = projection
+                extreme1 = eachPoint
+            elif projection.x > 0 and projection.get_length() > extreme2Proj.get_length():
+                extreme2Proj = projection
+                extreme2 = eachPoint
+    else:
+        for eachPoint in polyPoints:
+            projection = (eachPoint-midPoint).projection( axis )
+            if projection.y < 0 and projection.get_length() > extreme1Proj.get_length():
+                extreme1Proj = projection
+                extreme1 = eachPoint
+            elif projection.y > 0 and projection.get_length() > extreme2Proj.get_length():
+                extreme2Proj = projection
+                extreme2 = eachPoint
+    return extreme1, extreme2

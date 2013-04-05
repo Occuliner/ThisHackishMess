@@ -22,16 +22,16 @@ import pygame
 red = pygame.Color( 255, 0, 0 )
 
 class Button( StaticImage ):
-	"""The Button class is a simple class for generating DevMenu buttons\n""" \
-	"""or for extension to create more specific Button classes."""
-	button = True
-	
-	def __init__( self, image, pos, parentState=None, fixed=False ):
-		StaticImage.__init__( self, image, pos, parentState, fixed )
-		#self.parentState = parentState
-	def emptyCallback( self, clickKey ):
-		"""Does absolutely nothing! Button.push defaults to this. push()\n""" \
-		"""being any given Button's effect when clicked on."""
-		pass
+    """The Button class is a simple class for generating DevMenu buttons\n""" \
+    """or for extension to create more specific Button classes."""
+    button = True
+    
+    def __init__( self, image, pos, parentState=None, fixed=False ):
+        StaticImage.__init__( self, image, pos, parentState, fixed )
+        #self.parentState = parentState
+    def emptyCallback( self, clickKey ):
+        """Does absolutely nothing! Button.push defaults to this. push()\n""" \
+        """being any given Button's effect when clicked on."""
+        pass
 
-	push = emptyCallback
+    push = emptyCallback

@@ -22,18 +22,18 @@ import pygame
 #from pygame.locals import *
 
 class StaticImage( pygame.sprite.Sprite ):
-	"""The StaticImage class, used for any random visual element in the DevMenu.\n""" \
-	"""Mainly just extended on by Button, which is in turn extended on by other class types."""
-	button = False
-	def __init__( self, image, pos, parentState=None, fixed=False ):
-		pygame.sprite.Sprite.__init__( self )
-		if image is not None:
-			self.image = image
-		if pos is not None:	
-			self.rect = self.image.get_rect()
-			self.rect.topleft = pos
-		if parentState is not None:
-			self.parentState = parentState
-		self.classUpdated = False
-		self.fixed = fixed
+    """The StaticImage class, used for any random visual element in the DevMenu.\n""" \
+    """Mainly just extended on by Button, which is in turn extended on by other class types."""
+    button = False
+    def __init__( self, image, pos, parentState=None, fixed=False ):
+        pygame.sprite.Sprite.__init__( self )
+        if image is not None:
+            self.image = image
+        if pos is not None:    
+            self.rect = self.image.get_rect()
+            self.rect.topleft = pos
+        if parentState is not None:
+            self.parentState = parentState
+        self.classUpdated = False
+        self.fixed = fixed
 

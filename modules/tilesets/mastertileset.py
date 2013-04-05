@@ -18,24 +18,24 @@
 from tilegroup import *
 
 class MasterTileSet( TileGroup ):
-	#tileSetClasses = []
-	tileSetsToLoad = []
-	def __init__( self ):
-		self.individualSets = {}
+    #tileSetClasses = []
+    tileSetsToLoad = []
+    def __init__( self ):
+        self.individualSets = {}
 
-		self.updateSets()
+        self.updateSets()
 
-	def addSet( self, tileSet ):
-		
-		self.individualSets[tileSet.name] = tileSet.tiles
+    def addSet( self, tileSet ):
+        
+        self.individualSets[tileSet.name] = tileSet.tiles
 
-	def getTiles( self ):
-		returnList = []
-		for eachKey, eachVal in self.individualSets.items():
-			returnList.extend( eachVal )
-		return returnList
+    def getTiles( self ):
+        returnList = []
+        for eachKey, eachVal in self.individualSets.items():
+            returnList.extend( eachVal )
+        return returnList
 
-	def updateSets( self ):
-		for eachClass in self.tileSetsToLoad:
-			self.addSet( eachClass() )
-			self.tileSetsToLoad.remove( eachClass )
+    def updateSets( self ):
+        for eachClass in self.tileSetsToLoad:
+            self.addSet( eachClass() )
+            self.tileSetsToLoad.remove( eachClass )

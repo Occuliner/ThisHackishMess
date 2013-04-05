@@ -20,8 +20,8 @@ from imageload import *
 from networkentity import *
 
 class TestEnt( NetworkEntity ):
-	#sheet = loadImage( MAKEADAMNIMAGECONNOR )
-	#rect = pygame.Rect( MAKEADAMNIMAGECONNOR )
-	
-	def __init__( self, group, pos = [0,0], vel = [0,0]):
-		NetworkEntity.__init__( self, pos, vel, image=None, group=group, rect=None, animated=None )
+    #sheet = loadImage( MAKEADAMNIMAGECONNOR )
+    #rect = pygame.Rect( MAKEADAMNIMAGECONNOR )
+    
+    def __init__( self, group, pos = [0,0], vel = [0,0]):
+        NetworkEntity.__init__( self, pos, vel, image=None, group=group, rect=None, animated=None )

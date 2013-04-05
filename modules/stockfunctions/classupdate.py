@@ -16,10 +16,10 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 def classUpdateInPlace( givenObject, givenGlobals, givenLocals ):
-	theClass = eval( givenObject.__class__.__name__, givenGlobals, givenLocals )
-	if theClass is not givenObject.__class__:
-		givenObject.__class__ = theClass
-		givenObject.classUpdated = True
-		print "An instance of: " + theClass.__name__ + " updated!"
+    theClass = eval( givenObject.__class__.__name__, givenGlobals, givenLocals )
+    if theClass is not givenObject.__class__:
+        givenObject.__class__ = theClass
+        givenObject.classUpdated = True
+        print "An instance of: " + theClass.__name__ + " updated!"
 
 

@@ -22,10 +22,10 @@ from imageload import *
 from mastertileset import *
 
 class TestTileSet( TileGroup ):
-	name = "TestTileSet"
-	a = 1
-	def __init__( self ):
-		self.tiles = TileGroup.createFromSheet( self, loadImageNoAlpha( "testTileMap.png", 2 ), size=( 32, 16 ), kickUpBreak=1, solidList = [] )
+    name = "TestTileSet"
+    a = 1
+    def __init__( self ):
+        self.tiles = TileGroup.createFromSheet( self, loadImageNoAlpha( "testTileMap.png", 2 ), size=( 32, 16 ), kickUpBreak=1, solidList = [] )
 
 #MasterTileSet.tileSetClasses.append( TestTileSet )
 #MasterTileSet.tileSetsToLoad.append( TestTileSet )

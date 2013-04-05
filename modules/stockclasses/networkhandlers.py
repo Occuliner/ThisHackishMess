@@ -21,131 +21,131 @@ from idsource import IdSource
 from picklestuff import loadPlayState
 
 class ClientHandler(pygnetic.Handler):
-	def __init__( self, client ):
-		#The tick that the handler is on, from its own perspective.
-		#Set to none by default, and then set it when you recieve your first update from the serv.
-		self.networkTick = None
+    def __init__( self, client ):
+        #The tick that the handler is on, from its own perspective.
+        #Set to none by default, and then set it when you recieve your first update from the serv.
+        self.networkTick = None
 
-		#A ref to the client itself.
-		self.client = weakref.ref( client )
+        #A ref to the client itself.
+        self.client = weakref.ref( client )
 
-	def net_requestInfo( self, message, **kwargs ):
-		playState = self.client().playStateRef()
-		if not (message.levelName is "Untitled"):
-			#So, if there is a level name, load that level if found.
-			newState = loadPlayState( message.levelName, playState.floor.tileSet, self.client().networkEntsClassDefs.values(), networkClient=self.client() )
-			if newState is None:
-				print "Host was on a level you don't have."
-			else:
-				playState.swap( newState )
-		
-		playState.soundManager.idGen = IdSource()
-		if message.soundMgrCurPlayId != 0:
-			for each in xrange( message.soundMgrCurPlayId+1 ):
-				playState.soundManager.idGen.getId()
-		playState.soundManager.curPlayId = message.soundMgrCurPlayId
+    def net_requestInfo( self, message, **kwargs ):
+        playState = self.client().playStateRef()
+        if not (message.levelName is "Untitled"):
+            #So, if there is a level name, load that level if found.
+            newState = loadPlayState( message.levelName, playState.floor.tileSet, self.client().networkEntsClassDefs.values(), networkClient=self.client() )
+            if newState is None:
+                print "Host was on a level you don't have."
+            else:
+                playState.swap( newState )
+        
+        playState.soundManager.idGen = IdSource()
+        if message.soundMgrCurPlayId != 0:
+            for each in xrange( message.soundMgrCurPlayId+1 ):
+                playState.soundManager.idGen.getId()
+        playState.soundManager.curPlayId = message.soundMgrCurPlayId
 
-		self.connection.net_hereIsMyInfo( self.client().timer, self.client().name )
+        self.connection.net_hereIsMyInfo( self.client().timer, self.client().name )
 
-		self.connection.net_joinGame( self.client().name )
+        self.connection.net_joinGame( self.client().name )
 
-	def net_acceptPlayer( self, message, **kwargs ):
-		pass
-	def net_kickPlayer( self, message, **kwargs ):
-		pass
-	def net_chatToClient( self, message, **kwargs ):
-		pass
-	def net_updateEvent( self, message, **kwargs ):
-		client = self.client()
+    def net_acceptPlayer( self, message, **kwargs ):
+        pass
+    def net_kickPlayer( self, message, **kwargs ):
+        pass
+    def net_chatToClient( self, message, **kwargs ):
+        pass
+    def net_updateEvent( self, message, **kwargs ):
+        client = self.client()
 
-		client.createEntities( message.createEnts )
-		client.removeEntities( message.removeEnts )
-		client.updatePositions( message.updatePositions, message.clientTime )
-		client.startSounds( message.startSounds )
-		client.stopSounds( message.stopSounds )
-		client.swapAnims( message.swapAnims )
-		client.changeAnims( message.changeAnims )
+        client.createEntities( message.createEnts )
+        client.removeEntities( message.removeEnts )
+        client.updatePositions( message.updatePositions, message.clientTime )
+        client.startSounds( message.startSounds )
+        client.stopSounds( message.stopSounds )
+        client.swapAnims( message.swapAnims )
+        client.changeAnims( message.changeAnims )
 
-		client.networkTick = message.tickNum
+        client.networkTick = message.tickNum
 
-	def net_forceEntFrame( self, message, **kwargs ):
-		client = self.client()
+    def net_forceEntFrame( self, message, **kwargs ):
+        client = self.client()
 
-		client.forceAnims( message.entIdFrameTuples )
+        client.forceAnims( message.entIdFrameTuples )
 
-	def net_hostRequestPing( self, message, **kwargs ):
-		self.connection.net_hostRequestPing( message.timeStamp )
+    def net_hostRequestPing( self, message, **kwargs ):
+        self.connection.net_hostRequestPing( message.timeStamp )
 
-	def net_clientRequestPing( self, message, **kwargs ):
-		#Here is the ping calc:
-		#self.client().timer - message.timeStamp	
-		#Find something to do with it.
-		pass
+    def net_clientRequestPing( self, message, **kwargs ):
+        #Here is the ping calc:
+        #self.client().timer - message.timeStamp    
+        #Find something to do with it.
+        pass
 
-	def net_forcePlayingSound( self, message, **kwargs ):
-		self.client().forcePlayingSounds( message.soundTuples )
+    def net_forcePlayingSound( self, message, **kwargs ):
+        self.client().forcePlayingSounds( message.soundTuples )
 
-	def net_forceVelocities( self, message, **kwargs ):
-		self.client().forceVelocities( message.entIdVelocityTuples, message.clientTime )
+    def net_forceVelocities( self, message, **kwargs ):
+        self.client().forceVelocities( message.entIdVelocityTuples, message.clientTime )
 
-	def on_disconnect( self ):
-		pass
-	
-	def on_recive( self, message, **kwargs ):
-		print "Unrecognized message: ", message
+    def on_disconnect( self ):
+        pass
+    
+    def on_recive( self, message, **kwargs ):
+        print "Unrecognized message: ", message
 
 class ServerHandler(pygnetic.Handler):
-	def on_connect( self ):
-		#Check this address isn't in the banlist.
-		for eachSet in self.server.networkServerRef().ipBanList:
-			if eachSet[0] == self.connection.address:
-				self.connection.kick_player( eachSet[1], eachSet[2] )
-				self.connection.disconnect()
-				return None
-		playState = self.server.networkServerRef().playStateRef()
-		self.connection.net_requestInfo( playState.soundManager.curPlayId, self.server.networkServerRef().timer, playState.fileName )
-		pygnetic.Handler.on_connect( self )
+    def on_connect( self ):
+        #Check this address isn't in the banlist.
+        for eachSet in self.server.networkServerRef().ipBanList:
+            if eachSet[0] == self.connection.address:
+                self.connection.kick_player( eachSet[1], eachSet[2] )
+                self.connection.disconnect()
+                return None
+        playState = self.server.networkServerRef().playStateRef()
+        self.connection.net_requestInfo( playState.soundManager.curPlayId, self.server.networkServerRef().timer, playState.fileName )
+        pygnetic.Handler.on_connect( self )
 
-	def net_hereIsMyInfo( self, message, **kwargs ):
-		networkServer = self.server.networkServerRef()
-		networkServer.addClient( message, self.connection )
+    def net_hereIsMyInfo( self, message, **kwargs ):
+        networkServer = self.server.networkServerRef()
+        networkServer.addClient( message, self.connection )
 
-		#Send all the existing state info.
-		client = networkServer.getClientByConnection( self.connection )
-		networkServer.sendAlreadyExistingState( client )
+        #Send all the existing state info.
+        client = networkServer.getClientByConnection( self.connection )
+        networkServer.sendAlreadyExistingState( client )
 
-	def net_joinGame( self, message, **kwargs ):
-		client = self.server.networkServerRef().getClientByConnection( self.connection )
-		self.connection.net_acceptPlayer( client.name )
-		self.server.networkServerRef().addPlayer( client )
+    def net_joinGame( self, message, **kwargs ):
+        client = self.server.networkServerRef().getClientByConnection( self.connection )
+        self.connection.net_acceptPlayer( client.name )
+        self.server.networkServerRef().addPlayer( client )
 
-	def net_chatToHost( self, message, **kwargs ):
-		pass
+    def net_chatToHost( self, message, **kwargs ):
+        pass
 
-	def net_inputEvent( self, message, **kwargs ):
-		networkServer = self.server.networkServerRef()
-		client = networkServer.getClientByConnection( self.connection )
-		if client is None:
-			return None
-		client.time = message.time
-		playerKey = networkServer.getPlayerKey( client )
-		playerEntList = networkServer.players.get( playerKey, [] )
+    def net_inputEvent( self, message, **kwargs ):
+        networkServer = self.server.networkServerRef()
+        client = networkServer.getClientByConnection( self.connection )
+        if client is None:
+            return None
+        client.time = message.time
+        playerKey = networkServer.getPlayerKey( client )
+        playerEntList = networkServer.players.get( playerKey, [] )
 
-		for each in playerEntList:
-			each.sendInput( message.inputDict )
+        for each in playerEntList:
+            each.sendInput( message.inputDict )
 
-	def net_clientRequestPing( self, message, **kwargs ):
-		self.connection.net_clientRequestPing( message.timeStamp )
+    def net_clientRequestPing( self, message, **kwargs ):
+        self.connection.net_clientRequestPing( message.timeStamp )
 
-	def net_hostRequestPing( self, message, **kwargs ):
-		#Here is the ping calc:
-		#self.server.networkServerRef().timer - message.timeStamp	
-		#Find something to do with it.
-		pass
+    def net_hostRequestPing( self, message, **kwargs ):
+        #Here is the ping calc:
+        #self.server.networkServerRef().timer - message.timeStamp    
+        #Find something to do with it.
+        pass
 
-	def on_disconnect( self ):
-		self.server.networkServerRef().removeClientByConnection( self.connection )
+    def on_disconnect( self ):
+        self.server.networkServerRef().removeClientByConnection( self.connection )
 
-	def on_recive( self, message, **kwargs ):
-		print "Unrecognized message: ", message
+    def on_recive( self, message, **kwargs ):
+        print "Unrecognized message: ", message
 

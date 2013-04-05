@@ -16,32 +16,32 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 class MasterEntitySet:
-	entsToLoad = []
+    entsToLoad = []
 
-	def __init__( self ):
-		self.individualSets = {}
+    def __init__( self ):
+        self.individualSets = {}
 
-		self.updateEnts()
-	
-	def addEnt( self, ent ):
-		
-		if ent.setName in self.individualSets:
-			listOfNames = [ each.__name__ for each in self.individualSets[ent.setName] ]
-			if ent.__name__ in listOfNames:
-				self.individualSets[ent.setName][ listOfNames.index( ent.__name__ ) ] = ent
-			else:
-				self.individualSets[ent.setName].append( ent )
-		else:
-			self.individualSets[ent.setName] = [ent]
-		
-	def getEnts( self ):
-		returnList = []
-		for eachKey, eachVal in self.individualSets.items():
-			returnList.extend( eachVal )
-		return returnList
-		
-	def updateEnts( self ):
-		for eachClass in self.entsToLoad:
-			self.addEnt( eachClass )
-			self.entsToLoad.remove( eachClass )
+        self.updateEnts()
+    
+    def addEnt( self, ent ):
+        
+        if ent.setName in self.individualSets:
+            listOfNames = [ each.__name__ for each in self.individualSets[ent.setName] ]
+            if ent.__name__ in listOfNames:
+                self.individualSets[ent.setName][ listOfNames.index( ent.__name__ ) ] = ent
+            else:
+                self.individualSets[ent.setName].append( ent )
+        else:
+            self.individualSets[ent.setName] = [ent]
+        
+    def getEnts( self ):
+        returnList = []
+        for eachKey, eachVal in self.individualSets.items():
+            returnList.extend( eachVal )
+        return returnList
+        
+    def updateEnts( self ):
+        for eachClass in self.entsToLoad:
+            self.addEnt( eachClass )
+            self.entsToLoad.remove( eachClass )
 

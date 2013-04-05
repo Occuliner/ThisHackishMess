@@ -19,8 +19,8 @@ import pygame
 from pygame.locals import *
 
 def tint( surface, colour, original=None ):
-	tintSurf = pygame.Surface( surface.get_size() ).convert_alpha()
-	tintSurf.fill( colour )
-	if original != None:
-		surface.blit( original, (0,0) )
-	surface.blit( tintSurf, (0,0), special_flags=BLEND_RGB_MULT )
+    tintSurf = pygame.Surface( surface.get_size() ).convert_alpha()
+    tintSurf.fill( colour )
+    if original != None:
+        surface.blit( original, (0,0) )
+    surface.blit( tintSurf, (0,0), special_flags=BLEND_RGB_MULT )

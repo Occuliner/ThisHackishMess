@@ -24,31 +24,31 @@ from pygame.locals import *
 import math
 
 class GenericBlockNetwork( NetworkEntity ):
-	scale = 2
-	width = 32
-	height = 32
-	bWidth = width
-	bHeight = height
-	bdx = 0
-	bdy = 0
-	wbWidth = 32
-	wbHeight = 16
-	wbdx = 0
-	wbdy = 16
+    scale = 2
+    width = 32
+    height = 32
+    bWidth = width
+    bHeight = height
+    bdx = 0
+    bdy = 0
+    wbWidth = 32
+    wbHeight = 16
+    wbdx = 0
+    wbdy = 16
 
-	playStateGroup = "genericStuffGroup"
-	setName = "genericstuff"
+    playStateGroup = "genericStuffGroup"
+    setName = "genericstuff"
 
-	sheetFileName = "block.png"
-	sheet = loadImage( sheetFileName, scale )
+    sheetFileName = "block.png"
+    sheet = loadImage( sheetFileName, scale )
 
-	solid = True
-	mass = 20
-	
-	def __init__( self, pos = [0,0], vel = [0,0], group=None, **kwargs ):
-		NetworkEntity.__init__( self, pos, [0,0], None, group, pygame.Rect( 0, 0, self.width, self.height ), animated=False, **kwargs )
-		
-	def update( self, dt ):
-		NetworkEntity.update( self, dt )
+    solid = True
+    mass = 20
+    
+    def __init__( self, pos = [0,0], vel = [0,0], group=None, **kwargs ):
+        NetworkEntity.__init__( self, pos, [0,0], None, group, pygame.Rect( 0, 0, self.width, self.height ), animated=False, **kwargs )
+        
+    def update( self, dt ):
+        NetworkEntity.update( self, dt )
 
 MindlessEntHolder.dictOfEnts["GenericBlockNetwork"] = GenericBlockNetwork

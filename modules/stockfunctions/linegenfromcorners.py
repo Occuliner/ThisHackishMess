@@ -16,8 +16,8 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 def generateListOfLines( corner1, corner2 ):
-	line1 = [corner1, (corner1[0], corner2[1])]
-	line2 = [(corner2[0],corner1[1]), corner2]
-	line3 = [corner1, (corner2[0], corner1[1])]
-	line4 = [(corner1[0],corner2[1]), corner2]
-	return [ line1, line2, line3, line4 ]
+    line1 = [corner1, (corner1[0], corner2[1])]
+    line2 = [(corner2[0],corner1[1]), corner2]
+    line3 = [corner1, (corner2[0], corner1[1])]
+    line4 = [(corner1[0],corner2[1]), corner2]
+    return [ line1, line2, line3, line4 ]

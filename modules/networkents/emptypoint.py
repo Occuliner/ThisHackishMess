@@ -21,21 +21,21 @@ from mindlessentholder import *
 import pygame
 
 class EmptyPointNetwork( NetworkEntity ):
-	width = 32
-	height = 32
-	setName = "points"
-	playStateGroup = "genericStuffGroup"
-	solid = False
-	mass = 20
-	pureSensor = True
-	sheet = pygame.Surface( ( width, height ) ).convert_alpha()
-	sheet.fill( pygame.Color( 0, 0, 0, 0 ) )
-	sheetFileName = None
-	pygame.draw.rect( sheet, pygame.Color( 255, 0, 0, 255 ), pygame.Rect( 0, 0, width, height ), 2 )
+    width = 32
+    height = 32
+    setName = "points"
+    playStateGroup = "genericStuffGroup"
+    solid = False
+    mass = 20
+    pureSensor = True
+    sheet = pygame.Surface( ( width, height ) ).convert_alpha()
+    sheet.fill( pygame.Color( 0, 0, 0, 0 ) )
+    sheetFileName = None
+    pygame.draw.rect( sheet, pygame.Color( 255, 0, 0, 255 ), pygame.Rect( 0, 0, width, height ), 2 )
 
-	instanceSpecificVars = None
-	def __init__( self, pos=[0,0], vel=[0,0], group=None, **kwargs ):
-		NetworkEntity.__init__( self, pos, [0,0], None, group, pygame.Rect( 0, 0, self.width, self.height ), animated=False, **kwargs )
-		self.visible = 0
-		
+    instanceSpecificVars = None
+    def __init__( self, pos=[0,0], vel=[0,0], group=None, **kwargs ):
+        NetworkEntity.__init__( self, pos, [0,0], None, group, pygame.Rect( 0, 0, self.width, self.height ), animated=False, **kwargs )
+        self.visible = 0
+        
 MindlessEntHolder.dictOfEnts["EmptyPointNetwork"] = EmptyPointNetwork

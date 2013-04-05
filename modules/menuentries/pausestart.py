@@ -22,20 +22,20 @@ from button import Button
 import pygame
 
 class PauseStartButton( Button ):
-	image = loadImage("pausestart.png",2)
-	def __init__( self, menu=None ):
-		Button.__init__( self, None, None, menu )
-		self.rect = self.image.get_rect()
-		self.rect.topleft = ( 60, 370 )
-		self.on = False
-	def push( self, clickKey, click ):
-		if "up" in clickKey:
-			if not self.on:
-				self.on = True
-			elif self.on:
-				self.on = False
-			self.parentState.menu.playState.paused = self.on
-			if self.on:
-				pygame.mixer.pause()
-			else:
-				pygame.mixer.unpause()
+    image = loadImage("pausestart.png",2)
+    def __init__( self, menu=None ):
+        Button.__init__( self, None, None, menu )
+        self.rect = self.image.get_rect()
+        self.rect.topleft = ( 60, 370 )
+        self.on = False
+    def push( self, clickKey, click ):
+        if "up" in clickKey:
+            if not self.on:
+                self.on = True
+            elif self.on:
+                self.on = False
+            self.parentState.menu.playState.paused = self.on
+            if self.on:
+                pygame.mixer.pause()
+            else:
+                pygame.mixer.unpause()

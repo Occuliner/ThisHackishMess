@@ -20,13 +20,13 @@ import pygame
 #from pygame.locals import *
 
 class Tile( pygame.sprite.Sprite ):
-	"""The Tile class. For use in the Floor class and editing the Floor class.\n""" \
-	"""Merely contains an image, size, whether the tile is solid, and if it supports kickUp."""
-	def __init__( self, image, solid=False, kickUp=False ):
-		pygame.sprite.Sprite.__init__( self )
-		self.image = image
-		self.rect = image.get_rect()
-		self.rect.topleft = 0,0
-		self.solid = solid
-		self.kickUp = kickUp
+    """The Tile class. For use in the Floor class and editing the Floor class.\n""" \
+    """Merely contains an image, size, whether the tile is solid, and if it supports kickUp."""
+    def __init__( self, image, solid=False, kickUp=False ):
+        pygame.sprite.Sprite.__init__( self )
+        self.image = image
+        self.rect = image.get_rect()
+        self.rect.topleft = 0,0
+        self.solid = solid
+        self.kickUp = kickUp
 

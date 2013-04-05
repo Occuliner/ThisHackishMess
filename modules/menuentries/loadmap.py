@@ -25,47 +25,47 @@ import pygame
 import os
 
 class FileLoadButton( Button ):
-	FileLoadButtonText = pygame.font.Font( os.path.join( "data", "fonts", "PD-tarzeau_-_Atari_Small.ttf" ), 24 )
-	def __init__( self, parentState=None, text="", pos=(0,0) ):
-		Button.__init__( self, None, None, parentState )
-		self.text = text
-		self.image = self.FileLoadButtonText.render( text, False, pygame.Color( 0, 0, 0 ) )
-		self.rect = self.image.get_rect()
-		self.rect.topleft = pos
-	def push( self, clickKey, click ):
-		if "up" in clickKey:
-			self.parentState.menu.playState.swap( loadPlayState( os.path.join( "data", "maps", self.text ), self.parentState.menu.playState.floor.tileSet, self.parentState.menu.masterEntSet.getEnts() ) )
-			self.parentState.menu.rerenderEverythingIn = 1
-			self.parentState.menu.backToDefault()
-		
+    FileLoadButtonText = pygame.font.Font( os.path.join( "data", "fonts", "PD-tarzeau_-_Atari_Small.ttf" ), 24 )
+    def __init__( self, parentState=None, text="", pos=(0,0) ):
+        Button.__init__( self, None, None, parentState )
+        self.text = text
+        self.image = self.FileLoadButtonText.render( text, False, pygame.Color( 0, 0, 0 ) )
+        self.rect = self.image.get_rect()
+        self.rect.topleft = pos
+    def push( self, clickKey, click ):
+        if "up" in clickKey:
+            self.parentState.menu.playState.swap( loadPlayState( os.path.join( "data", "maps", self.text ), self.parentState.menu.playState.floor.tileSet, self.parentState.menu.masterEntSet.getEnts() ) )
+            self.parentState.menu.rerenderEverythingIn = 1
+            self.parentState.menu.backToDefault()
+        
 
 class LoadMapButton( Button ):
-	"""Load the current playState with cPickle."""
-	image = loadImage( "loadmapbutton.png", 2 )
-	rect = image.get_rect()
-	rect.topleft = ( 24, 84 )
-	def __init__( self, parentState=None ):
-		Button.__init__( self,  None, None, parentState )
+    """Load the current playState with cPickle."""
+    image = loadImage( "loadmapbutton.png", 2 )
+    rect = image.get_rect()
+    rect.topleft = ( 24, 84 )
+    def __init__( self, parentState=None ):
+        Button.__init__( self,  None, None, parentState )
 
-	def push( self, clickKey, click ):
-		"""Pull the state from a file"""
-		#SWITCH TO FLOOREDIT MENU STATE
-		if "up" in clickKey:
-			aLoadMapState = LoadMapState( self.parentState.menu )
-			self.parentState.menu.loadMenuState( aLoadMapState )
+    def push( self, clickKey, click ):
+        """Pull the state from a file"""
+        #SWITCH TO FLOOREDIT MENU STATE
+        if "up" in clickKey:
+            aLoadMapState = LoadMapState( self.parentState.menu )
+            self.parentState.menu.loadMenuState( aLoadMapState )
 
 class LoadMapState( FileDialogState ):
-	"""The file browser for Loading."""
-	def __init__( self, menu, sprites=[] ):
-		sprites = []
-		buttons = []
-		FileDialogState.__init__( self, menu, FileLoadButton, sprites )
-			
-	def update( self, dt, click, clickKey, curMousePos=None ):
-		oldString = self.currentString
-		FileDialogState.update( self, dt, click, clickKey, curMousePos )
-		if oldString != self.currentString:
-			curText = self.userFont.render( self.currentString, False, pygame.Color( 0, 0, 0 ) )
-			self.addSprite( StaticImage( curText, ( 40, 30 ) ) )
-			self.menu.loadMenuState( self )
-		
+    """The file browser for Loading."""
+    def __init__( self, menu, sprites=[] ):
+        sprites = []
+        buttons = []
+        FileDialogState.__init__( self, menu, FileLoadButton, sprites )
+            
+    def update( self, dt, click, clickKey, curMousePos=None ):
+        oldString = self.currentString
+        FileDialogState.update( self, dt, click, clickKey, curMousePos )
+        if oldString != self.currentString:
+            curText = self.userFont.render( self.currentString, False, pygame.Color( 0, 0, 0 ) )
+            self.addSprite( StaticImage( curText, ( 40, 30 ) ) )
+            self.menu.loadMenuState( self )
+        

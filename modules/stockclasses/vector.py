@@ -18,70 +18,70 @@
 import math
 
 class Vector:
-	def __init__( self, x = None, y = None ):
-		self.x = x
-		self.y = y
+    def __init__( self, x = None, y = None ):
+        self.x = x
+        self.y = y
 
-	def getSize( self ):
-		return math.hypot( self.x, self.y )
+    def getSize( self ):
+        return math.hypot( self.x, self.y )
 
-	def __getitem__( self, key ):
-		if key == 0:
-			return self.x
-		elif key == 1:
-			return self.y
-		else:
-			return None
-			print "Invalid key for vector"
-	
-	def __setitem__( self, key, value ):
-		if key == 0:
-			self.x = value
-		elif key == 1:
-			self.y = value
-		else:
-			return None
-			print "Invalid key for vector"
+    def __getitem__( self, key ):
+        if key == 0:
+            return self.x
+        elif key == 1:
+            return self.y
+        else:
+            return None
+            print "Invalid key for vector"
+    
+    def __setitem__( self, key, value ):
+        if key == 0:
+            self.x = value
+        elif key == 1:
+            self.y = value
+        else:
+            return None
+            print "Invalid key for vector"
 
-	def __add__( self, other ):
-		classType = other.__class__
-		if classType == Vector:
-			return Vector( self.x + other.x, self.y + other.y )
-		else:
-			return None
-			print "Invalid Type for Vector.__add__"
+    def __add__( self, other ):
+        classType = other.__class__
+        if classType == Vector:
+            return Vector( self.x + other.x, self.y + other.y )
+        else:
+            return None
+            print "Invalid Type for Vector.__add__"
 
-	def __sub__( self, other ):
-		classType = other.__class__
-		if classType == Vector:
-			return Vector( self.x - other.x, self.y - other.y )
-		else:
-			return None
-			print "Invalid Type for Vector.__sub__"
+    def __sub__( self, other ):
+        classType = other.__class__
+        if classType == Vector:
+            return Vector( self.x - other.x, self.y - other.y )
+        else:
+            return None
+            print "Invalid Type for Vector.__sub__"
 
-	def __mul__( self, other ):
-		classType = other.__class__
-		if classType in (int, float):
-			return Vector( self.x*other, self.y*other )
-		else:
-			return None
-			print "Invalid Type for Vector.__mul__"
-	
-	def __div__( self, other ):
-		classType = other.__class__
-		if classType in (int, float):
-			return Vector( float(self.x)/other, float(self.y)/other )
-		else:
-			return None
-			print "Invalid Type for Vector.__mul__"
+    def __mul__( self, other ):
+        classType = other.__class__
+        if classType in (int, float):
+            return Vector( self.x*other, self.y*other )
+        else:
+            return None
+            print "Invalid Type for Vector.__mul__"
+    
+    def __div__( self, other ):
+        classType = other.__class__
+        if classType in (int, float):
+            return Vector( float(self.x)/other, float(self.y)/other )
+        else:
+            return None
+            print "Invalid Type for Vector.__mul__"
 
-	def setAngle( self, angle ):
-		radianVal = math.radians( angle )
-		curSize = self.getSize()
-		return Vector( math.sin(radianVal)*curSize, math.cos(radianVal)*curSize )
-			
-	def getAngle( self ):
-		radians = math.atan2( self.x, self.y )
-		if radians < 0:
-			radians += 2*math.pi
-		return math.degrees( radians )
+    def setAngle( self, angle ):
+        radianVal = math.radians( angle )
+        curSize = self.getSize()
+        return Vector( math.sin(radianVal)*curSize, math.cos(radianVal)*curSize )
+            
+    def getAngle( self ):
+        radians = math.atan2( self.x, self.y )
+        if radians < 0:
+            radians += 2*math.pi
+        return math.degrees( radians )

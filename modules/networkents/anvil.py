@@ -24,25 +24,25 @@ from mindlessentholder import *
 import math
 
 class AnvilNetwork( NetworkEntity ):
-	width = 32
-	height = 22
+    width = 32
+    height = 22
 
-	playStateGroup = "genericStuffGroup"
-	setName = "genericstuff"
+    playStateGroup = "genericStuffGroup"
+    setName = "genericstuff"
 
-	sheetFileName = "anvil.png"
-	sheet = loadImage( sheetFileName, 2 )
+    sheetFileName = "anvil.png"
+    sheet = loadImage( sheetFileName, 2 )
 
 
-	solid = True
-	mass = 2000000000
-	scale = 2
-	
-	def __init__( self, pos = [0,0], vel = [0,0], group=None, **kwargs ):
-		NetworkEntity.__init__( self, pos, [0,0], None, group, pygame.Rect( 0, 0, self.width, self.height ), animated=False, **kwargs )
-	
-	def update( self, dt ):
-		NetworkEntity.update( self, dt )
-		
+    solid = True
+    mass = 2000000000
+    scale = 2
+    
+    def __init__( self, pos = [0,0], vel = [0,0], group=None, **kwargs ):
+        NetworkEntity.__init__( self, pos, [0,0], None, group, pygame.Rect( 0, 0, self.width, self.height ), animated=False, **kwargs )
+    
+    def update( self, dt ):
+        NetworkEntity.update( self, dt )
+        
 
 MindlessEntHolder.dictOfEnts["AnvilNetwork"] = AnvilNetwork

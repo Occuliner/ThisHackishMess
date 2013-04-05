@@ -21,37 +21,37 @@ from tile import *
 #parameters, which is instead a list of index values of which tiles support kickUp or are solid.
 
 def getSection( x, y, size, image ):
-	theRect = pygame.Rect( ( x, y ), size )
-	return image.subsurface( theRect )
+    theRect = pygame.Rect( ( x, y ), size )
+    return image.subsurface( theRect )
 
 class TileGroup:
-	def createFromSheet( self, tileSheet, size, solidBreak = None, kickUpBreak = None, solidList = None, kickUpList = None ):
-		tileList = []
-		for y in xrange( 0, tileSheet.get_height(), size[1] ):
-			for x in xrange( 0, tileSheet.get_width(), size[0] ):
-				tileList.append( Tile( getSection( x, y, size, tileSheet ) ) )
+    def createFromSheet( self, tileSheet, size, solidBreak = None, kickUpBreak = None, solidList = None, kickUpList = None ):
+        tileList = []
+        for y in xrange( 0, tileSheet.get_height(), size[1] ):
+            for x in xrange( 0, tileSheet.get_width(), size[0] ):
+                tileList.append( Tile( getSection( x, y, size, tileSheet ) ) )
 
-		if solidBreak != None:
-			for eachTileIndex in xrange( solidBreak, len( tileList ) ):
-				tileList[eachTileIndex].solid = True
+        if solidBreak != None:
+            for eachTileIndex in xrange( solidBreak, len( tileList ) ):
+                tileList[eachTileIndex].solid = True
 
-		elif solidList != None:
-			for eachTileIndex in solidList:
-				tileList[eachTileIndex].solid = True
+        elif solidList != None:
+            for eachTileIndex in solidList:
+                tileList[eachTileIndex].solid = True
 
-		else:
-			raise Exception("splitToTiles() was called without a solidBreak or solidList parameter.")
-	
-		if kickUpBreak != None:
-			for eachTileIndex in xrange( kickUpBreak, len( tileList ) ):
-				tileList[eachTileIndex].kickUp = True
-	
-		elif kickUpList != None:
-			for eachTileIndex in kickUpList:
-				tileList[eachTileIndex].kickUp = True
-	
-		else:
-			raise Exception("splitToTiles() was called without a solidBreak or solidLis parameter.")
-	
-		return tileList
+        else:
+            raise Exception("splitToTiles() was called without a solidBreak or solidList parameter.")
+    
+        if kickUpBreak != None:
+            for eachTileIndex in xrange( kickUpBreak, len( tileList ) ):
+                tileList[eachTileIndex].kickUp = True
+    
+        elif kickUpList != None:
+            for eachTileIndex in kickUpList:
+                tileList[eachTileIndex].kickUp = True
+    
+        else:
+            raise Exception("splitToTiles() was called without a solidBreak or solidLis parameter.")
+    
+        return tileList
 

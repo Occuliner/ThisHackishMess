@@ -25,24 +25,24 @@ from picklestuff import *
 
 class LevelWarpNetwork( NetworkEntity ):
 
-	scale = 2 
-	
-	width = 16
-	height = 16
+    scale = 2 
+    
+    width = 16
+    height = 16
 
-	playStateGroup = "levelWarpGroup"
-	setName = "levelwarp"
+    playStateGroup = "levelWarpGroup"
+    setName = "levelwarp"
 
-	sheetFileName = "block.png"
-	sheet = loadImage( sheetFileName, scale )
+    sheetFileName = "block.png"
+    sheet = loadImage( sheetFileName, scale )
 
-	solid = False
-	mass = 20
-	
-	def __init__( self, pos = [0,0], vel = [0,0], group=None, **kwargs ):
-		NetworkEntity.__init__( self, pos, [0,0], None, group, pygame.Rect( 0, 0, self.width, self.height ), animated=False, **kwargs )
+    solid = False
+    mass = 20
+    
+    def __init__( self, pos = [0,0], vel = [0,0], group=None, **kwargs ):
+        NetworkEntity.__init__( self, pos, [0,0], None, group, pygame.Rect( 0, 0, self.width, self.height ), animated=False, **kwargs )
 
-	def update( self, dt ):
-		NetworkEntity.update( self, dt )
-		
+    def update( self, dt ):
+        NetworkEntity.update( self, dt )
+        
 MindlessEntHolder.dictOfEnts["LevelWarpNetwork"] = LevelWarpNetwork

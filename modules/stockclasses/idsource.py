@@ -18,22 +18,22 @@
 """This is an IdSource, all it does is hand out integers, starting at zero, it never resets in it's life. The reason this isn't just a variable that's incremented is to forget accidentally not incrementing and avoiding outside tampering."""
 
 class IdSource( object ):
-	def __init__( self ):
-		self.__dict__["_currentNumber"] = 0
+    def __init__( self ):
+        self.__dict__["_currentNumber"] = 0
 
-	def __setattr__( self, name, value ):
-		if name == "_currentNumber":
-			raise Exception( "NO. NO. You are NOT supposed to reference IdSources _currentNumber. Just no." )
-		else:
-			self.__dict__[name] = value
+    def __setattr__( self, name, value ):
+        if name == "_currentNumber":
+            raise Exception( "NO. NO. You are NOT supposed to reference IdSources _currentNumber. Just no." )
+        else:
+            self.__dict__[name] = value
 
-	def __getattribute__( self, name ):
-		if name == "_currentNumber":
-			raise Exception( "NO. NO. You are NOT supposed to reference IdSources _currentNumber. Just no." )
-		else:
-			return object.__getattribute__( self, name )
+    def __getattribute__( self, name ):
+        if name == "_currentNumber":
+            raise Exception( "NO. NO. You are NOT supposed to reference IdSources _currentNumber. Just no." )
+        else:
+            return object.__getattribute__( self, name )
 
-	def getId( self ):
-		self.__dict__["_currentNumber"] += 1
-		return self.__dict__["_currentNumber"] - 1
+    def getId( self ):
+        self.__dict__["_currentNumber"] += 1
+        return self.__dict__["_currentNumber"] - 1
 
