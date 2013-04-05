@@ -221,6 +221,15 @@ class PlayState:
     def checkForFocus( self ):
         self.paused = ( (not pygame.mouse.get_focused()) and self.checkFocus ) or self.paused
 
+    def pause( self ):
+        self.paused = True
+
+    def unpause( self ):
+        self.paused = False
+
+    def togglePaused( self ):
+        self.paused = not self.paused
+
     def update( self, dt ):
         """A generic update function.
         Sends input dictionaries to playerGroups.

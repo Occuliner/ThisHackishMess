@@ -195,6 +195,8 @@ while not done:
                 panR = False
             elif event.key == K_s:
                 panD = False
+            elif event.key == K_ESCAPE:
+                currentState.togglePaused()
             
         elif event.type == MOUSEBUTTONDOWN:
             curMousePos = event.pos[0] + currentState.panX, event.pos[1] + currentState.panY
