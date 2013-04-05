@@ -110,6 +110,7 @@ class PlayState:
 		self.devMenuRef = None
 
 		self.paused = False
+		self.checkFocus = True
 
 		#So this is quite an important boolean.
 		#If this is true everything in the PlayState will be drawn in order of the bottom of it's bounding rect, which I will refer
@@ -217,6 +218,9 @@ class PlayState:
 			self.namedGroups[name] = group
 			setattr( self, name, group )
 
+	def checkForFocus( self ):
+		self.paused = (not pygame.mouse.get_focused()) and self.checkFocus
+
 	def update( self, dt ):
 		"""A generic update function.
 		Sends input dictionaries to playerGroups.
@@ -224,6 +228,7 @@ class PlayState:
 		
 		self.floor.update( self.panX, self.panY )
 		
+		self.checkForFocus()
 		if self.paused:
 			return None
 
