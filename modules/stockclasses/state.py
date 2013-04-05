@@ -219,7 +219,7 @@ class PlayState:
 			setattr( self, name, group )
 
 	def checkForFocus( self ):
-		self.paused = (not pygame.mouse.get_focused()) and self.checkFocus
+		self.paused = ( (not pygame.mouse.get_focused()) and self.checkFocus ) or self.paused
 
 	def update( self, dt ):
 		"""A generic update function.
