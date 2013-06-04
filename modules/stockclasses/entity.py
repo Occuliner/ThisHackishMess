@@ -298,7 +298,8 @@ class Entity( pygame.sprite.DirtySprite ):
         #if self.animated:
         if self.frameRects is None:
             tmpRect = self.rect.copy()
-            tmpRect.topleft = ( 0, 0 )               self.frames.append( tmpSurface )
+            tmpRect.topleft = ( 0, 0 )               
+            self.frames.append( tmpSurface )
             self.frames = sliceImage( self.sheet, tmpRect, colourKey=self.colourKey )
             if len( self.frames ) is 0:
                 self.frames = [self.sheet]
