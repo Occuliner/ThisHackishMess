@@ -315,7 +315,8 @@ class Entity( pygame.sprite.DirtySprite ):
         #NOTE, angle here is in radians, this needs to be converted for rotozoom which is in degrees.
         deg = math.degrees( angle )
         self.frames = [ pygame.transform.rotozoom( eachFrame.copy(), deg, 1.0 ) for eachFrame in self.originalFrames ]
-        self.image = self.frames[self.frame]
+	[ each.set_colorkey( self.colourKey ) for each in self.frames ]        
+	self.image = self.frames[self.frame]
         if self.collidable:
             self.body.angle = angle
         self.angle = angle
