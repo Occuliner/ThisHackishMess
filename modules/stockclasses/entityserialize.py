@@ -62,6 +62,9 @@ class EntityGhost:
         else:
             self.loc = theEntity.rect.topleft
 
+        #Get the Entity rotation.
+        self.angle = theEntity.angle
+
 
         ## PHYSICS STUFF
 
@@ -189,6 +192,9 @@ class EntityGhost:
 
         #Pans
         theInst.oldPan = self.oldPan
+
+        #Rotate
+        theInst.rotate( self.angle )
 
 
         #Set the animation

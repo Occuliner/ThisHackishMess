@@ -15,7 +15,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import pygame, extern_modules.pymunk as pymunk, weakref
+import pygame, extern_modules.pymunk as pymunk, weakref, math
 
 #sys.path.append( "../../" )
 
@@ -30,15 +30,7 @@ class EntityGroup( pygame.sprite.LayeredDirty ):
         self.playState = None
     def add( self, *sprites, **kwargs ):
         for sprite in sprites:
-            #if hasattr( sprite, "shape" ):
             if sprite.collidable:
-                #if hasattr( sprite, "sensorBox" ):
-                #    if sprite.sensorBox not in self.playState.space.shapes:
-                #        self.playState.space.add( sprite.sensorBox )
-                #if sprite.shape not in self.playState.space.shapes:
-                #    self.playState.space.add( sprite.shape )
-                #if sprite.body not in self.playState.space.bodies:
-                #    self.playState.space.add( sprite.body )
                 self.playState.space.add( sprite.physicsObjects )
             sprite.id = self.playState.idSource.getId()
             
@@ -264,6 +256,8 @@ class Entity( pygame.sprite.DirtySprite ):
 
         self.oldPan = group.playState.panX, group.playState.panY
 
+        self.angle = 0.0
+
         if self.collidable:
             framePosition = self.framePositions.get( self.curAnimation['frames'][self.frame], (0,0) )
             self.rect.topleft = self.body.position.x+framePosition[0], self.body.position.y+framePosition[1]
@@ -279,13 +273,6 @@ class Entity( pygame.sprite.DirtySprite ):
             for group in groups:
                 group.playState.space.add( self.physicsObjects )
                 self.playStateRef = weakref.ref( group.playState )
-                #if hasattr( self, "sensorBox" ):
-                #    if self.sensorBox not in group.playState.space.shapes:
-                #        group.playState.space.add( self.sensorBox )
-                #if self.body not in group.playState.space.bodies:
-                #    group.playState.space.add( self.body )
-                #if self.shape not in group.playState.space.shapes:
-                #    group.playState.space.add( self.shape )
         pygame.sprite.DirtySprite.add( self, groups )
 
     def removeFromGroup( self, *groups ):
@@ -293,13 +280,6 @@ class Entity( pygame.sprite.DirtySprite ):
         if self.collidable:
             for group in groups:
                 group.playState.space.remove( self.physicsObjects )
-                #if hasattr( self, "sensorBox" ):
-                #    if self.sensorBox in group.playState.space.shapes:
-                #        group.playState.space.remove( self.sensorBox )
-                #if self.body in group.playState.space.bodies:
-                #    group.playState.space.remove( self.body )
-                #if self.shape in group.playState.space.shapes:
-                #    group.playState.space.remove( self.shape )
         pygame.sprite.DirtySprite.remove( self, groups )
 
     def getPosition( self ):
@@ -318,15 +298,7 @@ class Entity( pygame.sprite.DirtySprite ):
         #if self.animated:
         if self.frameRects is None:
             tmpRect = self.rect.copy()
-            tmpRect.topleft = ( 0, 0 )
-            #for y in xrange( 0, self.sheet.get_height(), self.rect.h ):
-            #    if y + self.height <= self.sheet.get_height():
-            #        for x in xrange( 0, self.sheet.get_width(), self.rect.w ):
-            #            if x + self.width <= self.sheet.get_width():
-            #                tmpRect.topleft = (x, y)
-            #                tmpSurface = self.sheet.subsurface( tmpRect )
-            #                tmpSurface.set_colorkey( self.colourKey )
-            #                self.frames.append( tmpSurface )
+            tmpRect.topleft = ( 0, 0 )               self.frames.append( tmpSurface )
             self.frames = sliceImage( self.sheet, tmpRect, colourKey=self.colourKey )
             if len( self.frames ) is 0:
                 self.frames = [self.sheet]
@@ -335,6 +307,15 @@ class Entity( pygame.sprite.DirtySprite ):
                 img = self.sheet.subsurface( eachFrame )
                 img.set_colorkey( self.colourKey )
                 self.frames.append( img )
+
+    def rotate( self, angle ):
+        #NOTE, angle here is in radians, this needs to be converted for rotozoom which is in degrees.
+        deg = math.degrees( angle )
+        self.frames = [ pygame.transform.rotozoom( eachFrame, deg, 1.0 ) for eachFrame in self.frames ]
+        self.image = self.frames[self.frame]
+        if self.collidable:
+            self.body.angle = angle
+        self.angle = angle
         
 
     def setVisible( self, theBool ):
