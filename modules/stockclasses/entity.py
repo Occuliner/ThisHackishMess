@@ -187,8 +187,11 @@ class Entity( pygame.sprite.DirtySprite ):
             self.physicsObjects = [self.body]
 
 
+            offset = (-float(width)/2, -float(height)/2)
+
             if self.bHeight is not None and self.bWidth is not None:
-                self.sensorBox = pymunk.Poly( self.body, map( pymunk.vec2d.Vec2d, [ (self.bWidth+self.bdx, 0+self.bdy), (self.bWidth+self.bdx, self.bHeight+self.bdy), (0+self.bdx, self.bHeight+self.bdy), (0+self.bdx, 0+self.bdy) ] ) )
+                #offset = (-float(self.bWidth)/2, -float(self.bHeight)/2)
+                self.sensorBox = pymunk.Poly( self.body, map( pymunk.vec2d.Vec2d, [ (self.bWidth+self.bdx, 0+self.bdy), (self.bWidth+self.bdx, self.bHeight+self.bdy), (0+self.bdx, self.bHeight+self.bdy), (0+self.bdx, 0+self.bdy) ] ), offset )
                 self.sensorBox.sensor = True
                 self.sensorBox.collision_type = 2
                 self.sensorBox.entity = self
@@ -197,11 +200,14 @@ class Entity( pygame.sprite.DirtySprite ):
 
             if not self.circular:
                 if self.wbHeight is not None and self.wbWidth is not None:
-                    self.shape = pymunk.Poly( self.body, map( pymunk.vec2d.Vec2d, [ (self.wbWidth+self.wbdx, 0+self.wbdy), (self.wbWidth+self.wbdx, self.wbHeight+self.wbdy), (0+self.wbdx, self.wbHeight+self.wbdy), (0+self.wbdx, 0+self.wbdy) ] ) )
+                    #offset = (-float(self.wbWidth)/2, -float(self.wbHeight)/2)
+                    self.shape = pymunk.Poly( self.body, map( pymunk.vec2d.Vec2d, [ (self.wbWidth+self.wbdx, 0+self.wbdy), (self.wbWidth+self.wbdx, self.wbHeight+self.wbdy), (0+self.wbdx, self.wbHeight+self.wbdy), (0+self.wbdx, 0+self.wbdy) ] ), offset )
                 elif height is not None and width is not None:
-                    self.shape = pymunk.Poly( self.body, map( pymunk.vec2d.Vec2d, [ (width, 0), (width, height), (0, height), (0, 0) ] ) )
+                    #offset = (-float(width)/2, -float(height)/2)
+                    self.shape = pymunk.Poly( self.body, map( pymunk.vec2d.Vec2d, [ (width, 0), (width, height), (0, height), (0, 0) ] ), offset )
                 else:
-                    self.shape = pymunk.Poly( self.body, map( pymunk.vec2d.Vec2d, [ (self.rect.w, 0), (self.rect.w, self.rect.h), (0, self.rect.h), (0, 0) ] ) )
+                    #offset = (-float(self.rect.w)/2, -float(self.rect.h)/2)
+                    self.shape = pymunk.Poly( self.body, map( pymunk.vec2d.Vec2d, [ (self.rect.w, 0), (self.rect.w, self.rect.h), (0, self.rect.h), (0, 0) ] ), offset )
     
             else:
                 self.shape = pymunk.Circle( self.body, self.radius )
@@ -264,9 +270,8 @@ class Entity( pygame.sprite.DirtySprite ):
             framePosition = self.framePositions.get( self.curAnimation['frames'][self.frame], (0,0) )
             self.rect.topleft = self.body.position.x+framePosition[0], self.body.position.y+framePosition[1]
             #Behold, a cheap hack to fix circular objects physics and visuals not lining up.
-            if self.circular:
-                self.rect.y -= self.height/2
-                self.rect.x -= self.width/2
+            self.rect.y -= self.height/2
+            self.rect.x -= self.width/2
 
     def addToGroup( self, *groups ):
         self.id = groups[0].playState.idSource.getId()
@@ -314,7 +319,7 @@ class Entity( pygame.sprite.DirtySprite ):
     def setRotation( self, angle ):
         #NOTE, angle here is in radians, this needs to be converted for rotozoom which is in degrees.
         deg = math.degrees( angle )
-        self.frames = [ pygame.transform.rotozoom( eachFrame.copy(), deg, 1.0 ) for eachFrame in self.originalFrames ]
+        self.frames = [ pygame.transform.rotozoom( eachFrame.copy(), -deg, 1.0 ) for eachFrame in self.originalFrames ]
 	[ each.set_colorkey( self.colourKey ) for each in self.frames ]        
 	self.image = self.frames[self.frame]
         if self.collidable:
@@ -404,9 +409,11 @@ class Entity( pygame.sprite.DirtySprite ):
             framePosition = self.framePositions.get( self.curAnimation['frames'][self.frame], (0,0) )
             self.rect.topleft = self.body.position.x+framePosition[0], self.body.position.y+framePosition[1]
             #Behold, a cheap hack to fix circular objects physics and visuals not lining up.
-            if self.circular:
-                self.rect.y -= self.height/2
-                self.rect.x -= self.width/2
+            #if self.circular:
+            #    self.rect.y -= self.height/2
+            #    self.rect.x -= self.width/2
+            self.rect.y -= self.height/2
+            self.rect.x -= self.width/2
 
         listOfGroups = self.groups()
         if len( listOfGroups ) > 0:
