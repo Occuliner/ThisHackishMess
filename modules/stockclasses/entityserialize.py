@@ -194,7 +194,7 @@ class EntityGhost:
         theInst.oldPan = self.oldPan
 
         #Rotate
-        theInst.rotate( self.angle )
+        theInst.setRotation( self.angle )
 
 
         #Set the animation

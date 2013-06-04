@@ -311,7 +311,7 @@ class Entity( pygame.sprite.DirtySprite ):
                 self.frames.append( img )
 	self.originalFrames = [ each.copy() for each in self.frames ]
 
-    def rotate( self, angle ):
+    def setRotation( self, angle ):
         #NOTE, angle here is in radians, this needs to be converted for rotozoom which is in degrees.
         deg = math.degrees( angle )
         self.frames = [ pygame.transform.rotozoom( eachFrame.copy(), deg, 1.0 ) for eachFrame in self.originalFrames ]
