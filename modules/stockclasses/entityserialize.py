@@ -82,9 +82,8 @@ class EntityGhost:
 
         ## CHILDREN STUFF
 
-        #Get the childrens' ids.
-        self.childrenIds = [ each.id for each in theEntity.children ]
-
+        #Turn the children into ghosts.
+        self.childrenGhosts = [ EntityGhost( each ) for each in theEntity.children ]
 
         ## INSTANCE SPECIFIC 
 
@@ -154,6 +153,9 @@ class EntityGhost:
         #Now set the correct frameTime.
         theInst.frameTime = self.frameTime
 
+        #Now recreate the children.
+        theInst.children = [ each.resurrect( classDefs, playState ) for each in self.childrenGhosts ]
+
 
         #Now set the instance specific vars.
         for eachKey, eachVal in self.instanceSpecificVars.items():
@@ -205,5 +207,8 @@ class EntityGhost:
         theInst.nextFrame()
         #Now set the correct frameTime.
         theInst.frameTime = self.frameTime
+
+        #Now recreate the children.
+        theInst.children = [ each.resurrectNetworked( classDefs, playState ) for each in self.childrenGhosts ]
 
         return theInst

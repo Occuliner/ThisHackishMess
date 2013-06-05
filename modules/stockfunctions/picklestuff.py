@@ -82,7 +82,8 @@ def dumpPlayState( givenState, fileName, saveHud=False ):
         #Create the StateStoreTuple, this will store all the data, and be serialized.
         stateTuple = StateStoreTuple( [], floorImageBuffers, givenState.soundManager, hudList, bndList )
     
-        for eachSprite in givenState.sprites():
+        #Ignore children, they're handled by their parents.
+        for eachSprite in [ each for each in givenState.sprites() if not each.isChild ]:
             #Create EntityGhost.
             ghost = EntityGhost( eachSprite )
             #Add the the ghost list.

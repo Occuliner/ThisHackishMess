@@ -127,6 +127,9 @@ class Entity( pygame.sprite.DirtySprite ):
     #Frame Positions are the x-position and y-position of the each frame relative to the physics body, (0,0) is the center is positioned on body location, this is the default and typical state.
     framePositions = {}
 
+    #If this flag is set to true, then this entity in ghost form is stored by its parent, not by the usual methods.
+    isChild = False
+
     circular = False
     radius = 1
     def __init__( self, pos, vel, image=None, group=None, rect=None, animated=None, collidable=None, collideId=None, collideWith=None, mass=None, specialCollision=None, solid=None, pureSensor=None, circular=None, radius=None ):
