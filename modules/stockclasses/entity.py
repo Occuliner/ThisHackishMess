@@ -124,7 +124,7 @@ class Entity( pygame.sprite.DirtySprite ):
     #FrameRects are all the rect areas to cut for frames, in index order, if left as none, it auto-slices.
     frameRects = None
 
-    #Frame Positions are the x-position and y-position of the each frame relative to the physics body, (0,0) is the uppleft corner is positioned on body location, this is the default and typical state.
+    #Frame Positions are the x-position and y-position of the each frame relative to the physics body, (0,0) is the center is positioned on body location, this is the default and typical state.
     framePositions = {}
 
     circular = False
@@ -325,7 +325,6 @@ class Entity( pygame.sprite.DirtySprite ):
         if self.collidable:
             self.body.angle = angle
         self.angle = angle
-        
 
     def setVisible( self, theBool ):
         if theBool:
@@ -400,7 +399,6 @@ class Entity( pygame.sprite.DirtySprite ):
             self.frameTime -= dt
             if self.frameTime <= 0:
                 self.nextFrame()
-                #self.frameTime = self.maxFrameTime
         
         self.rect.x -= self.oldPan[0]
         self.rect.y -= self.oldPan[1]
@@ -412,8 +410,8 @@ class Entity( pygame.sprite.DirtySprite ):
             #if self.circular:
             #    self.rect.y -= self.height/2
             #    self.rect.x -= self.width/2
-            self.rect.y -= self.height/2
-            self.rect.x -= self.width/2
+            self.rect.y -= self.image.get_height()/2
+            self.rect.x -= self.image.get_width()/2
 
         listOfGroups = self.groups()
         if len( listOfGroups ) > 0:
