@@ -404,7 +404,9 @@ class Entity( pygame.sprite.DirtySprite ):
         self.rect.y -= self.oldPan[1]
 
         if self.collidable:
-            framePosition = self.framePositions.get( self.curAnimation['frames'][self.frame], (0,0) )
+            framePositionVector = pymunk.vec2d.Vec2d(self.framePositions.get( self.curAnimation['frames'][self.frame], (0,0) ))
+            framePositionVector.rotate(self.angle)
+            framePosition = framePositionVector.int_tuple
             self.rect.topleft = self.body.position.x+framePosition[0], self.body.position.y+framePosition[1]
             #Behold, a cheap hack to fix circular objects physics and visuals not lining up.
             #if self.circular:
