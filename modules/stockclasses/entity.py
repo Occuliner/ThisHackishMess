@@ -321,7 +321,7 @@ class Entity( pygame.sprite.DirtySprite ):
         deg = math.degrees( angle )
         self.frames = [ pygame.transform.rotozoom( eachFrame.copy(), -deg, 1.0 ) for eachFrame in self.originalFrames ]
 	[ each.set_colorkey( self.colourKey ) for each in self.frames ]        
-	self.image = self.frames[self.frame]
+	self.image = self.frames[ self.curAnimation['frames'][self.frame] ]
         if self.collidable:
             self.body.angle = angle
         self.angle = angle
