@@ -16,10 +16,11 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import extern_modules.pygnetic as pygnetic, networkhandlers, weakref, extern_modules.pymunk as pymunk
-from genericpolyfuncs import getExtremesAlongAxis
+from genericpolyfuncs import getExtremesAlongAxis, getMidOfPoints
+from dictfuncs import getClosestInBounds, filterDict, getClosestKey, getInterpolatedPairValue, getSurroundingValues, getSurroundingKeys
 
 class NetworkClient:
-    def __init__( self, playState=None, networkEntsClassDefs=None, conn_limit=1, networkingMode=0, clientSidePrediction=True, resimulationMethod=1, *args, **kwargs ):
+    def __init__( self, playState=None, networkEntsClassDefs=None, conn_limit=1, networkingMode=0, clientSidePrediction=False, clientSideAuthority=True, resimulationMethod=0, *args, **kwargs ):
         self._client = pygnetic.Client( conn_limit, *args, **kwargs )
         
         self.playStateRef = weakref.ref( playState )
@@ -36,6 +37,10 @@ class NetworkClient:
 
         self.timer = 0.0
 
+        self.serverTime = 0.0
+
+        self.inputTimeLog = [0.0]
+
         #Networking mode is whether the client will merely recreate the state as sent from the host, and send input, or use interpolation and/or extrapolation.
         #0=No interoplation/extrapoltion, 1=Extrapolation, 2=Interpolation.
         self.interpolationOn, self.extrapolationOn = False, False
@@ -45,6 +50,7 @@ class NetworkClient:
             self.interpolationOn = True
 
         self.clientSidePrediction = clientSidePrediction
+        self.clientSideAuthority = clientSideAuthority
 
         #This is how the client corrects itself when a prediction is wrong.
         #0 is simply teleport to the new location, this causes clipping into objects.
@@ -53,14 +59,34 @@ class NetworkClient:
         #2 is to resimulate the series of events, using some approximations (attempts to ignore objects that shouldn't have changed.)
         self.resimulationMethod = resimulationMethod
 
+        #self.givenFirstState = False
+
+        self.needToFullyResimulate = False
+
+        self.messageLog = {}
+
+        self.latencySamples = []
+        self.latencySampleSize = 5
+
+        self.clientPlayerIds = []
+
     def connect( self, address, port, message_factory=pygnetic.message.message_factory, **kwargs ):
         self.connection = self._client.connect( address, port, message_factory, **kwargs )
         self.handler = networkhandlers.ClientHandler( self )
         self.connection.add_handler( self.handler )
 
+    def getLatency( self ):
+        return float( sum( self.latencySamples ) )/len( self.latencySamples )
+
+    def addLatencySample( self, time ):
+        self.latencySamples.append( time )
+        if ( len( self.latencySamples ) > self.latencySampleSize ):
+            self.latencySamples.pop(0)
+
     def sendInput( self, inputDict ):
         if self.connection.connected:
             self.connection.net_inputEvent( self.networkTick, self.timer, inputDict )
+        self.inputTimeLog.append( self.timer )
 
     def createEntities( self, createTuples ):
         for eachTuple in createTuples:
@@ -75,238 +101,173 @@ class NetworkClient:
             eachEnt = self.findEntById( self, eachId )
             if eachEnt is not None:
                 eachEnt.removeFromGroup( *eachEnt.groups() )
-
-    def resimulationUsingSweeps( self, eachEnt, deltaPos ):
-        #Segment query sweep.
-        #This will use four segments, two at the outermost points of the objects (with respect to the direction of travel)
-        #And the others goe from the start of one segment to the end of the other, to help avoid clipping through smaller objects.
-        #But no promises.
-
-        #Get the starts, I probably need to convert these starts to space co-ords. As the poly one gets the points with respecct to the body location
-        if type( eachEnt.shape ) == pymunk.Poly:
-            polyPoints = eachEnt.shape.get_points()
-            axis = eachEnt.body.velocity.perpendicular()
-            start1, start2 = getExtremesAlongAxis( polyPoints, axis, eachEnt.getPosition() )
-        elif type( eachEnt.Shape ) == pymunk.Circle:
-            start1 = eachEnt.body.velocity.perpendicular()*(float(eachEnt.shape.radius)/eachEnt.body.velocity.get_length())
-            start2 = eachEnt.body.velocity.perpendicular()*-(float(eachEnt.shape.radius)/eachEnt.body.velocity.get_length())
-        else:
-            print "Client resimulation doesn't support type: " + eachShape.__class__.__name__
-
-        #So now that I have the starts, make the ends.
-        end1 = start1[0] + deltaPos[0], start1[1] + deltaPos[1]
-        end2 = start2[0] + deltaPos[0], start2[1] + deltaPos[1]
-
-        #Now create those two diagonal segment sweeps.
-        start3, end3 = start1, end2
-        start4, end4 = start2, end2
-
-        #SWEEEEEP
-        space = self.playStateRef().space
-
-        results = space.segment_query( start1, end1 )
-        results.extend( space.segment_query( start2, end2 ) )
-        results.extend( space.segment_query( start3, end3 ) )
-        results.extend( space.segment_query( start4, end4 ) )
-
-        closestDistance = 10000000
-        closestQuery = None
-        entPos = eachEnt.getPosition()
-        for eachResult in results:
-            if eachResult.shape not in eachEnt.physicsObjects and not eachResult.shape.sensor:
-                point = eachResult.get_hit_point()
-                distance = ( (point[0]-entPos[0])**2 + (point[1]-entPos[1])**2 )**0.5
-                if distance < closestDistance:
-                    closestDistance = distance
-                    closestQuery = eachResult
-
-        if closestQuery is None:
-            #In this scenario, nothing was hit at all, return the original deltaPos
-            return deltaPos
-        else:
-            point = closestQuery.get_hit_point()
-            #Now I need to figure out what side hits this point.
-
-            cRight, cLeft, cBottom, cTop = False, False, False, False
-            if type( eachEnt.shape ) == pymunk.Poly or eachEnt.circular:
-                if not eachEnt.circular:
-                    top, bottom, left, right = entPos[1]+eachEnt.wbdy, entPos[1]+eachEnt.wbdy+eachEnt.wbHeight, entPos[0]+eachEnt.wbdx, entPos[0]+eachEnt.wbdx+eachEnt.wbWidth
-                else:
-                    top, bottom, left, right = entPos[1]-eachEnt.radius, entPos[1]+eachENt.radius, entPos[0]-eachEnt.radius, entPos[0]+eachEnt.radius
-                if deltaPos[0] == 0:
-                    if point[1] > top:
-                        #Clamp the bottom
-                        cBottom = True
-                    else:
-                        #Clamp the top
-                        cTop = True
-                elif deltaPos[1] == 0:
-                    if point[0] > left:
-                        #Clamp the right
-                        cRight = True
-                    else:
-                        #Clamp the left
-                        cLeft = True
-                else:
-                    pTop, pBottom, pRight, pLeft = False, False, False, False
-                    if point[1] > top:
-                        #Potentially bottom
-                        pBottom = True
-                        if point[0] > left:
-                            #Potentially right
-                            pRight = True
-                            corner = ( right, bottom )
-                        else:
-                            #Potentially left
-                            pLeft = True
-                            corner = ( left, bottom )
-                    else:
-                        #Potentially top
-                        pTop = True
-                        if point[0] > left:
-                            #Potentially right
-                            pRight = True
-                            corner = ( right, top )
-                        else:
-                            #Potentially left
-                            pLeft = True
-                            corner = ( left, top )
-                    #This messy equation figures out the y of the line extending out from the corner by deltaPos at point x, where x is point[0]
-                    lineY = (float(deltaPos[1])/deltaPos[0])*(point[0]-corner[0])+corner[1]
-    
-                    if lineY > point[1]:
-                        #Below the line
-                        if pBottom:
-                            #Clamp to bottom
-                            cBottom = True
-                        else:
-                            if pRight:
-                                #Clamp to right
-                                cRight = True
-                            else:
-                                #Clamp to left
-                                cLeft = True
-                    else:
-                        #Above the line
-                        if pTop:
-                            #Clamp to top
-                            cTop = True
-                        else:
-                            if pRight:
-                                #Clamp to right
-                                cRight = True
-                            else:
-                                #Clamp to left
-                                cLeft = True
-                
-                #Now that we know what side to clamp to. FUCKING DO IT ALREADY
-
-                if deltaPos[1] == 0:
-                    if cLeft:
-                        newDelta = ( point[0]-(left), 0 )
-                    else:
-                        newDelta = ( point[0]-(right), 0 )
-                elif deltaPos[0] == 0:
-                    if cTop:
-                        newDelta = ( 0, point[1]-(top) )
-                    else:
-                        newDelta = ( 0, point[1]-(bottom) )
-                else:
-                    if cTop:
-                        dy = point[1]-top
-                        dx = (float(deltaPos[0])/deltaPos[1])*dy
-                    elif cBottom:
-                        dy = point[1]-bottom
-                        dx = (float(deltaPos[0])/deltaPos[1])*dy
-                    elif cLeft:
-                        dx = point[0]-left
-                        dy = (float(deltaPos[1])/deltaPos[1])*dx
-                    elif cRight:
-                        dx = point[0]-right
-                        dy = (float(deltaPos[1])/deltaPos[1])*dx
-                    newDelta = int(dx), int(dy)
-
-        return newDelta
-
-    def resimulationUsingPymunk( self, time ):
-        #So, part of this approximation is that it won't bother remaking everything that was removed from the scene in the mean time, this shouldn't be an issue often however.
-
-        #First, set everything to how it was.
-        playState = self.playStateRef()
-        for eachSprite in playState.sprites():
-            eachSprite.setPosition( eachSprite.logOfPositions[time] )
-            eachSprite.velocity.x, eachSprite.velocity.y = eachSprite.logOfVelocities[time]
-            eachSprite.force.x, eachSprite.force.y = eachSprite.logOfForces[time]
-
-        #Now, going to resimulate the update steps, 
         
+    def resimulationUsingPymunk( self, startTime, lastAckTime, duration, inputCount, positionTuples, velocityTuples ):
+        #So, part of this approximation is that it won't bother remaking everything that was removed from the scene in the mean time, this shouldn't be an issue often however.
+        #Work on finding every ent in the ids.
+        #print startTime
+
+        playState = self.playStateRef()
+        positionDict = dict( positionTuples )
+        velocityDict = dict( velocityTuples )
+
+        timeKeys = sorted( playState.stateLog.keys() )
+        #If the sent inputCount doesn't match our local one, at that time, then ignore the update.
+        #Naaah
+
+
+        # TODO: This whole thing is toooo daaaamn slow.
+        # I need to add indexing to PlayState so this isn't done over and over.
+        entDict = {}
+        for eachTuple in velocityTuples:
+            eachId = eachTuple[0]
+            eachEnt = self.findEntById( eachId )
+            if eachEnt is None:
+                velocityTuples.remove(eachTuple)
+            else:
+                entDict[eachId] = eachEnt
+        #for eachTuple in [ each for each in positionTuples if entDict.get(each[0]) is None ]:
+        for eachTuple in [ each for each in positionTuples if each[0] not in entDict.keys() ]:
+            eachId = eachTuple[0]
+            eachEnt = self.findEntById( eachId )
+            if eachEnt is None:
+                positionTuples.remove(eachTuple)
+            else:
+                entDict[eachId] = eachEnt
+        #Now, go through every entity, check if the logs are correct, if they're not, flick a boolean and escape the loop.
+        resim = False
+
+        #print 'Vel '.join([ str((velocityTuples[each][1], getClosestInBounds(entDict[each].logOfVelocities, startTime))) for each in entDict.keys() ])
+        #print 'Pos '.join([ str((positionTuples[each][1], getClosestInBounds(entDict[each].logOfVelocities, startTime))) for each in entDict.keys() ])
+        
+        for eachTuple in positionTuples:
+            eachEnt = entDict[eachTuple[0]]
+            #print "Position",
+            posAtTime = getClosestInBounds(eachEnt.logOfPositions, startTime)
+            #posAtTime = getInterpolatedPairValue(eachEnt.logOfPositions, startTime)
+            if posAtTime is None:
+                #print sorted( eachEnt.logOfPositions.keys() ), startTime
+                continue
+            if posAtTime is not None:
+                #print "Position"
+                #print eachTuple[1]
+                deltaPos = eachTuple[1][0]-posAtTime[0], eachTuple[1][1]-posAtTime[1]
+                #print deltaPos
+                if abs( deltaPos[0] ) > 1 or abs( deltaPos[1] ) > 1:
+                    print "Position"
+                    timeOfGottenPos = [ each for each in eachEnt.logOfPositions.keys() if eachEnt.logOfPositions[each] == posAtTime ]
+                    #surroundingTimes = getSurroundingKeys( eachEnt.logOfPositions, startTime )
+                    print posAtTime, eachTuple[1], startTime, timeOfGottenPos, [ ( eachKey, eachEnt.logOfPositions[eachKey] ) for eachKey in sorted( eachEnt.logOfPositions.keys() ) ]#]eachEnt.logOfPositions
+                    #for eachKey, eachVal in eachEnt.logOfPositions.items():
+                    #    if eachVal == eachTuple[1]:
+                    #        print 'trueTime', eachKey, startTime-eachKey#timeOfGottenPos[0]-eachKey
+                    #print eachEnt.logOfPositions[timeKeys.index(posAtTime)-1], eachEnt.logOfPositions[timeKeys.index(posAtTime)+1]
+                    resim = True
+                    break
+        if resim == False:
+            for eachTuple in velocityTuples:
+                eachEnt = entDict[eachTuple[0]]
+                #print "Velocity",
+                velAtTime = getClosestInBounds(eachEnt.logOfVelocities, startTime)
+                #velAtTime = getInterpolatedPairValue(eachEnt.logOfVelocities, startTime)
+                if velAtTime is None:
+                    continue
+                #print "Velocity"
+                #print eachTuple[1]
+                deltaVel = eachTuple[1][0]-velAtTime[0], eachTuple[1][1]-velAtTime[1]
+                deltaPos = deltaVel[0]*(self.timer-startTime), deltaVel[1]*(self.timer-startTime)
+                if abs( deltaPos[0] ) > 1 or abs( deltaPos[1] ) > 1:
+                    print "Velocity"
+                    resim = True
+                    #timeOfGottenPos = [ each for each in eachEnt.logOfVelocities.keys() if eachEnt.logOfVelocities[each] == velAtTime ]
+                    #print velAtTime, eachTuple[1], startTime, timeOfGottenPos, eachEnt.logOfVelocities    
+                    #for eachKey, eachVal in eachEnt.logOfVelocities.items():
+                    #    if eachVal == eachTuple[1]:
+                    #        print 'trueTime', eachKey, timeOfGottenPos[0]-eachKey
+                    #print eachEnt.logOfPositions[timeKeys.index(velAtTime)-1], eachEnt.logOfPositions[timeKeys.index(velAtTime)+1]
+                    break
+        
+        for eachKey in playState.clientSideCorrectionInputBuffer.keys():
+            if eachKey < (startTime):
+                del playState.clientSideCorrectionInputBuffer[eachKey]
+        for eachEnt in entDict.values():
+            #eachEnt.logOfPositions = dict( [ (eachTime, eachEnt.logOfPositions
+            eachEnt.logOfPositions = filterDict( eachEnt.logOfPositions, lambda x: x >= startTime )
+            if eachEnt.collidable:
+                eachEnt.logOfVelocities = filterDict( eachEnt.logOfVelocities, lambda x: x >= startTime )
+
+        if resim:
+            print "Resimulating, startTime:", startTime, "duration:", duration, "self.timer", self.timer
+            #Set everything how it was. By purging everything!
+
+            for eachGroup in playState.groups:
+                eachGroup.remove( *eachGroup.sprites() )
+
+
+            #timeKeys = sorted( playState.stateLog.keys() )
+            
+            #startIndex = timeKeys.index( startTime ) + 1
+            #startIndex = timeKeys.index( getClosestKey( playState.stateLog, startTime ) )
+            #if timeKeys[startIndex] < startTime:
+            #    startIndex += 1
+            #timeKeys = timeKeys[startIndex:]
+            #timeKeys.insert(0, startTime)
+            timeKeys = [ each for each in timeKeys if each > startTime ]
+            timeKeys.insert(0, startTime)
+            startIndex = 1
+            
+            classDefs = playState.devMenuRef().masterEntSet.getEnts()
+            classDefsDict = dict( [ ( eachClass.__name__, eachClass ) for eachClass in classDefs ] )
+            classDefsDict.update( self.networkEntsClassDefs )
+            #for eachGhost in playState.stateLog[startTime]:
+            #for eachGhost in getClosestInBounds( playState.stateLog, startTime ):
+            for eachGhost in getSurroundingValues( playState.stateLog, startTime )[0]:
+                if eachGhost.collidable:
+                    eachGhost.bodyGhost.position = positionDict[eachGhost.id][0], positionDict[eachGhost.id][1]
+                    eachGhost.loc = eachGhost.bodyGhost.position
+                    eachGhost.bodyGhost.velocity = velocityDict[eachGhost.id]
+                else:
+                    eachGhost.loc = positionDict[eachGhost.id][0], positionDict[eachGhost.id][1]
+                eachGhost.resurrectNetworked( classDefsDict, playState )
+
+            self.timer = timeKeys[startIndex]
+            tmpInputBuffer = dict( playState.clientSideCorrectionInputBuffer )
+            playState.stateLog = dict()
+            #Now, LOG PURGE
+            #for eachKey in playState.clientSideCorrectionInputBuffer.keys():
+            #    if eachKey < (startTime):
+            #        del playState.clientSideCorrectionInputBuffer[eachKey]
+
+            for eachIndex in range( startIndex, len( timeKeys ) ):
+                eachTime = timeKeys[eachIndex]
+                dt = eachTime-timeKeys[eachIndex-1]
+                inputDicts = tmpInputBuffer.get( eachTime )
+                
+                if inputDicts is None:
+                    inputDicts = []
+                playState.resimulationUpdate( dt, eachTime, inputDicts )
+        else:
+            #playState.stateLog = dict( [ (eachKey, playState.stateLog[eachKey]) for eachKey in playState.stateLog.keys() if eachKey >= startTime ] )
+            print "Everything's fine."
+            playState.stateLog = filterDict( playState.stateLog, lambda x: x >= startTime )
+        #self.needToFullyResimulate = False
 
     def findEntById( self, theId ):
         for eachEnt in self.playStateRef().sprites():
             if eachEnt.id == theId:
                 return eachEnt
-        print "WAT. RECEIVED UPDATE REFERRING TO NON-EXISTANT ENTITY."
+        print "WAT. RECEIVED UPDATE REFERRING TO NON-EXISTANT ENTITY.", 'Cur ents', self.playStateRef().sprites()
 
     def updatePositions( self, positionTuples, updateTime ):
         playState = self.playStateRef()
-        if not self.clientSidePrediction or updateTime is None:
-            for eachTuple in positionTuples:
-                eachId = eachTuple[0]
-                eachEnt = self.findEntById( eachId )
-                if eachEnt is None:
-                    return None
-                if eachEnt.collidable:
-                    eachEnt.body.activate()
-                eachEnt.setPosition( eachTuple[1] )
-        else:
-            for eachTuple in positionTuples:
-                eachId = eachTuple[0]
-                eachEnt = self.findEntById( eachId )
-                if eachEnt is None:
-                    return None
-                if eachEnt.collidable:
-                    eachEnt.body.activate()
-                if eachEnt.logOfPositions.get(updateTime) is not None:
-                    posAtTime = eachEnt.logOfPositions[updateTime]
-                    deltaPos = eachTuple[1][0]-posAtTime[0], eachTuple[1][1]-posAtTime[1]
-                    #if ( int( posAtTime[0] ), int( posAtTime[1] ) ) != eachTuple[1]:
-                    if deltaPos[0] > 1 or deltaPos[1] > 1:
-                        curPos = eachEnt.getPosition()
-                        newPos = curPos[0]+deltaPos[0], curPos[1]+deltaPos[1]
-                        #Here I'm going to do the resimulation.
-                        if self.resimulationMethod is 1 and eachEnt.collidable and newPos!=curPos:
-                            newDelta = self.resimulationUsingSweeps( eachEnt, deltaPos )
-                            #print "Yay", deltaPos, newDelta
-                            newPos = curPos[0]+newDelta[0], curPos[1]+newDelta[1]
-                            if eachEnt.collidable:
-                                eachEnt.body.activate()
-                            eachEnt.setPosition( list(newPos) )
-
-                            for eachKey, eachVal in eachEnt.logOfPositions.items():
-                                if eachKey < updateTime:
-                                    del eachEnt.logOfPositions[eachKey]
-                                else:
-                                    eachEnt.logOfPositions[eachKey] = eachVal[0]+newDelta[0], eachVal[1]+newDelta[1]
-
-                        if self.resimulationMethod is 2 and eachEnt.collidable and newPos!=curPos:
-                            #In the scenario of resimulation method 2 and something had the wrong location,
-                            resim2Bool = True
-
-                        else:
-                            if eachEnt.collidable:
-                                eachEnt.body.activate()
-                            eachEnt.setPosition( list(newPos) )
-                            for eachKey, eachVal in eachEnt.logOfPositions.items():
-                                if eachKey < updateTime:
-                                    del eachEnt.logOfPositions[eachKey]
-                                else:
-                                    eachEnt.logOfPositions[eachKey] = eachVal[0]+deltaPos[0], eachVal[1]+deltaPos[1]
-                            
-                    else:
-                        for eachKey, eachVal in eachEnt.logOfPositions.items():
-                            if eachKey < updateTime:
-                                del eachEnt.logOfPositions[eachKey]
-                
+        for eachTuple in positionTuples:
+            eachId = eachTuple[0]
+            eachEnt = self.findEntById( eachId )
+            if eachEnt is None or ( eachId in self.clientPlayerIds and self.clientSideAuthority ):
+                continue
+            if eachEnt.collidable:
+                eachEnt.body.activate()
+            eachEnt.setPosition( eachTuple[1] )
 
     def startSounds( self, soundTuples ):
         sndMgr = self.playStateRef().soundManager
@@ -323,7 +284,7 @@ class NetworkClient:
         for eachTuple in swapTuples:
             eachId = eachTuple[0]
             eachEnt = self.findEntById( eachId )
-            if eachEnt is not None:
+            if eachEnt is not None and not (eachId in self.clientPlayerIds):
                 eachEnt.swapAnimation( eachTuple[1] )
 
     def changeAnims( self, changeTuples ):
@@ -331,7 +292,7 @@ class NetworkClient:
         for eachTuple in changeTuples:
             eachId = eachTuple[0]
             eachEnt = self.findEntById( eachId )
-            if eachEnt is not None:
+            if eachEnt is not None and not (eachId in self.clientPlayerIds):
                 eachEnt.changeAnimation( eachTuple[1] )
 
     def forceAnims( self, entIdFrameTuples ):
@@ -339,7 +300,7 @@ class NetworkClient:
         for eachTuple in entIdFrameTuples:
             eachId = eachTuple[0]
             eachEnt = self.findEntById( eachId )
-            if eachEnt is None:
+            if eachEnt is None or (eachId in self.clientPlayerIds):
                 return None
             eachEnt.frame = eachTuple[1] - 1
             eachEnt.nextFrame()
@@ -355,65 +316,47 @@ class NetworkClient:
 
     def forceVelocities( self, entIdVelocityTuples, updateTime ):
         playState = self.playStateRef()
-        if not self.clientSidePrediction or updateTime is None:
-            for eachTuple in entIdVelocityTuples:
-                eachId = eachTuple[0]
-                eachEnt = self.findEntById( eachId )
-                if eachEnt is None:
-                    return None
-                eachEnt.body.velocity.x = eachTuple[1][0]
-                eachEnt.body.velocity.y = eachTuple[1][1]
-        else:
-            for eachTuple in entIdVelocityTuples:
-                eachId = eachTuple[0]
-                eachEnt = self.findEntById( eachId )
-                velAtTime = eachEnt.logOfVelocities.get(updateTime)
-                curPos = eachEnt.getPosition()
-                if velAtTime is None:
-                    #print "No vel..."
-                    continue
-                deltaVel = eachTuple[1][0]-velAtTime[0], eachTuple[1][1]-velAtTime[1]
-                eachEnt.body.velocity.x = eachEnt.body.velocity.x + deltaVel[0]
-                eachEnt.body.velocity.y = eachEnt.body.velocity.y + deltaVel[1]
-                deltaPos = deltaVel[0]*(self.timer-updateTime), deltaVel[1]*(self.timer-updateTime)
-                #print "Yay!"
-                if deltaPos[0] > 1 or deltaPos[1] > 1:
-                    if self.resimulationMethod is 1 and eachEnt.collidable:
-                        if eachEnt.collidable:
-                            eachEnt.body.activate()
-                        newDelta = self.resimulationUsingSweeps( eachEnt, deltaPos )
-                        #print "Nay", deltaPos, newDelta
-                        eachEnt.setPosition( ( curPos[0]+newDelta[0], curPos[1]+newDelta[1] ) )
-                        for eachKey, eachVal in eachEnt.logOfPositions.items():
-                            if eachKey > updateTime:
-                                ratio = float(eachKey-updateTime)/(self.timer-updateTime)
-                                eachEnt.logOfPositions[eachKey] = eachVal[0]+newDelta[0]*ratio, eachVal[1]+newDelta[1]*ratio
-                        for eachKey, eachVal in eachEnt.logOfVelocities.items():
-                            if eachKey < updateTime:
-                                del eachEnt.logOfVelocities[eachKey]
-                            else:
-                                eachEnt.logOfVelocities[eachKey] = eachVal[0]+deltaVel[0], eachVal[1]+deltaVel[1]
-                    else:
-                        if eachEnt.collidable:
-                            eachEnt.body.activate()
-                        eachEnt.setPosition( ( curPos[0]+deltaPos[0], curPos[1]+deltaPos[1] ) )
-                        for eachKey, eachVal in eachEnt.logOfPositions.items():
-                            if eachKey > updateTime:
-                                eachEnt.logOfPositions[eachKey] = eachVal[0]+deltaVel[0]*(eachKey-updateTime), eachVal[1]+deltaVel[1]*(eachKey-updateTime)
-                        for eachKey, eachVal in eachEnt.logOfVelocities.items():
-                            if eachKey < updateTime:
-                                del eachEnt.logOfVelocities[eachKey]
-                            else:
-                                eachEnt.logOfVelocities[eachKey] = eachVal[0]+deltaVel[0], eachVal[1]+deltaVel[1]
-                else:
-                    for eachKey, eachVal in eachEnt.logOfVelocities.items():
-                        if eachKey < updateTime:
-                            del eachEnt.logOfVelocities[eachKey]
+        for eachTuple in entIdVelocityTuples:
+            eachId = eachTuple[0]
+            eachEnt = self.findEntById( eachId )
+            if eachEnt is None or ( eachId in self.clientPlayerIds and self.clientSideAuthority ):
+                continue
+            eachEnt.body.velocity.x = eachTuple[1][0]
+            eachEnt.body.velocity.y = eachTuple[1][1]
     
     def disconnectAll( self ):
         if self.connection.connected:
             self.connection.disconnect()
 
+    def addToMessageLog( self, message ):
+        if self.messageLog.get( self.timer ) == None:
+            self.messageLog[self.timer] = []
+        self.messageLog[self.timer].append( message )
+
+    def sendPlayerState( self ):
+        players = []
+        players.extend( self.playStateRef().playersGroup.sprites() )
+        for each in self.playStateRef().networkPlayers:
+            if each.id in self.clientPlayerIds:
+                players.append(each)
+        for eachPlayer in players:
+            self.connection.net_playerUpdate( self.networkTick, self.serverTime, eachPlayer.id, eachPlayer.getPosition(), eachPlayer.body.velocity.int_tuple )
+
     def update( self, dt, timeout=0 ):
         self._client.update( timeout )
+        #self.timer += dt
+        if self.clientSideAuthority:
+            self.sendPlayerState()
+
+    def updateTime( self, dt ):
         self.timer += dt
+        self.serverTime += dt
+
+    def resimulationUpdate( self, dt, curTime, timeout=0 ):
+        messages = getClosestInBounds( self.messageLog, curTime )
+        if messages is not None:
+            for eachMessage in messages:
+                getattr( self.handler, "net_" + type( eachMessage ).__name__ )( eachMessage, resimulation=True )
+        self.timer += dt
+        
+        

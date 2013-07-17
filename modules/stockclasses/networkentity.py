@@ -20,21 +20,6 @@ import pygame, extern_modules.pymunk as pymunk, weakref
 from imageload import loadImage, loadImageNoAlpha
 from imageslice import sliceImage
 
-def idleCentricVelocityUpdateNoGrav( body, gravity, damping, dt ):
-    """
-    Same as above, but without gravity.
-    """
-    if body.force.x == 0 and body.force.y == 0:
-        pymunk.Body.update_velocity( body, 0.0, damping, dt )
-    else:
-        pymunk.Body.update_velocity( body, 0.0, 1.0, dt )
-    dx = abs(body.velocity.x)-body.xLimit
-    dy = abs(body.velocity.y)-body.yLimit
-    if dx > 0:
-        body.velocity.x -= dx
-    if dy > 0:
-        body.velocity.y -= dy
-
 def noGravVelocityUpdate( body, gravity, damping, dt ):
     """Standard Vel update, but without gravity."""
     pymunk.Body.update_velocity( body, [0.0, 0.0], damping, dt )
@@ -52,6 +37,28 @@ def idleCentricVelocityUpdate( body, gravity, damping, dt ):
         pymunk.Body.update_velocity( body, gravity, damping, dt )
     else:
         pymunk.Body.update_velocity( body, gravity, 1.0, dt )
+    dx = abs(body.velocity.x)-body.xLimit
+    dy = abs(body.velocity.y)-body.yLimit
+    if dx > 0:
+        body.velocity.x -= dx
+    if dy > 0:
+        body.velocity.y -= dy
+
+def idleCentricVelocityUpdateNoGrav( body, gravity, damping, dt ):
+    """
+    Same as above, but without gravity.
+    """
+    if body.force.x == 0 and body.force.y == 0:
+        pymunk.Body.update_velocity( body, 0.0, damping, dt )
+    else:
+        pymunk.Body.update_velocity( body, 0.0, 1.0, dt )
+    dx = abs(body.velocity.x)-body.xLimit
+    dy = abs(body.velocity.y)-body.yLimit
+    if dx > 0:
+        body.velocity.x -= dx
+    if dy > 0:
+        body.velocity.y -= dy
+
 
 
 class NetworkEntity( pygame.sprite.DirtySprite ):
@@ -93,7 +100,7 @@ class NetworkEntity( pygame.sprite.DirtySprite ):
 
     circular = False
     radius = 1
-    def __init__( self, pos, vel, image=None, group=None, rect=None, animated=None, solid=None, collidable=None ):
+    def __init__( self, pos, vel, image=None, group=None, rect=None, animated=None, solid=None, collidable=None, forceId=None ):
         pygame.sprite.DirtySprite.__init__( self )
         
         #All of these are purely so that instances CAN have their own unique one of each of these variables, but if one isn't specified, it'll use its Class's one.
@@ -166,6 +173,9 @@ class NetworkEntity( pygame.sprite.DirtySprite ):
         
         self.createFrames()
 
+        self.tags = {}
+        self.children = []
+
         self.frame = 0
         self.image = self.frames[0]
         self.maxFrameTime = 1.000/self.curAnimation['fps']
@@ -175,8 +185,11 @@ class NetworkEntity( pygame.sprite.DirtySprite ):
         self.dirty = 2
         
         if group != None:
-            self.id = len( group )
             self.addToGroup( group )
+        elif forceId != None:
+            self.id = forceId
+            self.playStateRef = weakref.ref( group.playState )
+            group.add( self, noIds=True )
         else:
             self.id = None
             self.playStateRef = None
@@ -188,8 +201,12 @@ class NetworkEntity( pygame.sprite.DirtySprite ):
         #This is a log of positions for retroactive location correction for networking.
         self.logOfPositions = {}
         self.logOfVelocities = {}
+        #self.logOfForces = {}
 
     def addToGroup( self, *groups ):
+        
+        self.id = groups[0].playState.idSource.getId()
+        self.playStateRef = weakref.ref( groups[0].playState )
         if self.collidable:
             for group in groups:
                 group.playState.space.add( self.physicsObjects )
@@ -316,7 +333,6 @@ class NetworkEntity( pygame.sprite.DirtySprite ):
 
         self.oldPan = npx, npy
 
-
         #Check if class has been updated.
         if self.classUpdated:
             self.frames = []
@@ -333,6 +349,7 @@ class NetworkEntity( pygame.sprite.DirtySprite ):
             self.logOfPositions[networkNode.timer] = self.getPosition()
             if self.collidable:
                 self.logOfVelocities[networkNode.timer] = self.body.velocity.x, self.body.velocity.y
+                #self.logOfForces[networkNode.timer] = self.body.force.x, self.body.force.y
 
         if len( self.groups() ) > 1:
             raise Exception( "An instance of Entity is in more than one group, that should probably not be happening." )

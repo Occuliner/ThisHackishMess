@@ -21,11 +21,15 @@ from networkupdateclasses import *
 
 #ClientTuple = namedtuple( 'ClientTuple', ['name', 'connection', 'isPlayer', 'time'] )
 class ClientInfo:
-    def __init__( self, name, connection, isPlayer, time ):
+    def __init__( self, idNum, name, connection, isPlayer, time, lastAckClientTime, lastAckServerTime ):
         self.name = name
         self.connection = connection
         self.isPlayer = isPlayer
         self.time = time
+        self.lastAckClientTime = lastAckClientTime
+        self.lastAckServerTime = lastAckServerTime
+        self.inputCount = 0
+        self.idNum = idNum
 
 class NetworkServer:
     def __init__( self, playState=None, host="", port=1337, con_limit=4, networkingMode=0 ):
@@ -96,7 +100,7 @@ class NetworkServer:
         if not ( connection.address in [each.address for each in self._server.connections()] ):
             return None
 
-        self.clients.append( ClientInfo( info.name, connection, False, info.time ) )
+        self.clients.append( ClientInfo( len(self.clients), info.name, connection, False, info.time, info.time, self.timer ) )
 
     def sendAlreadyExistingState( self, client ):
         playState = self.playStateRef()
@@ -110,6 +114,9 @@ class NetworkServer:
 
         #Make a create list
         createEntList = [ self.addCreateEnt( each, forceReturn=True ) for each in listOfEntsToSend ]
+
+        #Make the position tuples
+        positionTuples = [ UpdatePosition( each.id, each.getPosition() ) for each in playState.sprites() ]
         
         #Make a list of the animations to change them each to, and the forceAnim list.
         changeAnimList = []
@@ -127,13 +134,11 @@ class NetworkServer:
         if self.extrapolationOn:
             #Get velocities.
             velocityTuples = [ (each.id, (each.body.velocity.x, each.body.velocity.y)) for each in self.playStateRef().sprites() if each.collidable ]
+        else:
+            velocityTuples = None
 
         #Send the update
-        client.connection.net_updateEvent( self.networkTick, self.timer, None, createEntList, [], [], [], [], changeAnimList, [] )
-
-        if self.extrapolationOn:
-            #Now force velocities.
-            client.connection.net_forceVelocities( self.networkTick, self.timer, client.time, velocityTuples )
+        client.connection.net_createEvent( self.networkTick, self.timer, None, None, 0, createEntList, [], positionTuples, velocityTuples, [], [], changeAnimList, [] )
 
         #Now send the forceAnims.
         client.connection.net_forceEntFrame( self.networkTick, forceAnimList )
@@ -154,9 +159,7 @@ class NetworkServer:
                 self.removePlayer( client )
 
     def getPlayerKey( self, client ):
-        """Return the adler32 digest of the client name"""
-        if client is not None:
-            return zlib.adler32( client.name )
+        return client.idNum
 
     def addPlayer( self, client ):
         #This can vary HUGELY.
@@ -165,13 +168,14 @@ class NetworkServer:
         
         if not client.isPlayer:
             for each in self.playStateRef().devMenuRef().masterEntSet.individualSets["players"]:
-                if each.__name__ == "YasbClass":
+                if each.__name__ == "NewPlayer":
                     classDef = each
                     break
             destGroup = getattr( self.playStateRef(), "networkPlayers" )
             playerEntity = classDef( pos=[0,0], vel=[0,0], group=destGroup )
             self.players[self.getPlayerKey( client )] = [ playerEntity ]
             client.isPlayer = True
+            client.connection.net_setPlayerEnt( self.networkTick, playerEntity.id )
 
     def removePlayer( self, client ):
         #Again, this can vary a lot.
@@ -186,17 +190,24 @@ class NetworkServer:
     def disconnectAll( self ):
         [ each.disconnect() for each in self._server.connections() if each.connected ]
 
+    def updateTime( self, dt ):
+        self.timer += dt
+        for eachClient in self.clients:
+            eachClient.time += dt
+        
     def update( self, dt, timeout=0 ):
         self._server.update( timeout )
         
         #Create the network update.
-        updatedPositions = [ UpdatePosition( each.id, each.rect.topleft ) for each in self.playStateRef().sprites() ]
+        updatedPositions = [ UpdatePosition( each.id, each.getPosition() ) for each in self.playStateRef().sprites() ]
         createEntUpdates = list( self.createdEnts )
         removeEntUpdates = list( self.removedEnts )
         swapAnimUpdates = list( self.swapAnims )
         changeAnimUpdates = list( self.changeAnims )
         startSoundUpdates = list( self.startSounds )
         stopSoundUpdates = list( self.stopSounds )
+
+        #print self.timer
 
         if self.extrapolationOn:
             #Create the velocity tuple list.
@@ -207,8 +218,11 @@ class NetworkServer:
             for eachClient in self.clients[:]:
                 #Check if the connection is still valid:
                 if eachClient.connection.connected:
+                    #Time since this client last sent anything:
+                    clientDt = self.timer-eachClient.lastAckServerTime
                     #Send each a network update.
-                    eachClient.connection.net_updateEvent( self.networkTick, self.timer, eachClient.time, createEntUpdates, removeEntUpdates, updatedPositions, startSoundUpdates, stopSoundUpdates, changeAnimUpdates, swapAnimUpdates )
+                    eachClient.connection.net_updateEvent( self.networkTick, self.timer, eachClient.time+clientDt, eachClient.time, eachClient.inputCount, createEntUpdates, removeEntUpdates, updatedPositions, None, startSoundUpdates, stopSoundUpdates, changeAnimUpdates, swapAnimUpdates )
+                    #eachClient.time += dt
                 else:
                     #Remove associated players and the client tuple.
                     self.removePlayer( eachClient )
@@ -218,10 +232,15 @@ class NetworkServer:
             for eachClient in self.clients[:]:
                 #Check if the connection is still valid:
                 if eachClient.connection.connected:
+                    #print eachClient.time, self.timer
+                    #Time since this client last sent anything:
+                    clientDt = self.timer-eachClient.lastAckServerTime
                     #Send each a network update.
-                    eachClient.connection.net_updateEvent( self.networkTick, self.timer, eachClient.time, createEntUpdates, removeEntUpdates, updatedPositions, startSoundUpdates, stopSoundUpdates, changeAnimUpdates, swapAnimUpdates )
+                    #print eachClient.time, clientDt
+                    eachClient.connection.net_updateEvent( self.networkTick, self.timer, eachClient.time+clientDt, eachClient.time, eachClient.inputCount, createEntUpdates, removeEntUpdates, updatedPositions, velocityTuples, startSoundUpdates, stopSoundUpdates, changeAnimUpdates, swapAnimUpdates )
                     #Always force the velocity AFTER an updateEvent
-                    eachClient.connection.net_forceVelocities( self.networkTick, self.timer, eachClient.time, velocityTuples )
+                    #eachClient.connection.net_forceVelocities( self.networkTick, self.timer, eachClient.time, velocityTuples )
+                    #eachClient.time += dt
                 else:
                     #Remove associated players and the client tuple.
                     self.removePlayer( eachClient )
@@ -236,4 +255,4 @@ class NetworkServer:
         self.stopSounds = []
 
         self.networkTick += 1
-        self.timer += dt
+        #self.timer += dt

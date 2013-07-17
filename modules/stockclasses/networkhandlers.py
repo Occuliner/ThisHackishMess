@@ -47,7 +47,8 @@ class ClientHandler(pygnetic.Handler):
 
         self.connection.net_hereIsMyInfo( self.client().timer, self.client().name )
 
-        self.connection.net_joinGame( self.client().name )
+        #self.connection.net_joinGame( self.client().name )
+        playState.addJoinGameNotice()
 
     def net_acceptPlayer( self, message, **kwargs ):
         pass
@@ -58,15 +59,44 @@ class ClientHandler(pygnetic.Handler):
     def net_updateEvent( self, message, **kwargs ):
         client = self.client()
 
+        client.serverTime = message.time
+
+        if "resimulation" in kwargs.keys():
+            client.createEntities( message.createEnts )
+            client.removeEntities( message.removeEnts )
+            return None
+
+        latency = client.timer-message.clientTime
+
+        if client.resimulationMethod == 2:
+            if message.clientTime is not None:
+                client.resimulationUsingPymunk( message.clientTime, message.clientLastAckTime, latency, message.clientInputCount, message.updatePositions, message.vels )
+        else:
+            client.updatePositions( message.updatePositions, message.clientTime )
+            client.forceVelocities( message.vels, message.clientTime )
+
         client.createEntities( message.createEnts )
         client.removeEntities( message.removeEnts )
-        client.updatePositions( message.updatePositions, message.clientTime )
         client.startSounds( message.startSounds )
         client.stopSounds( message.stopSounds )
         client.swapAnims( message.swapAnims )
         client.changeAnims( message.changeAnims )
 
         client.networkTick = message.tickNum
+        
+        client.addToMessageLog( message )
+        client.addLatencySample( latency )
+
+    def net_createEvent( self, message, **kwargs ):
+        client = self.client()
+        client.createEntities( message.createEnts )
+        client.removeEntities( message.removeEnts )
+        client.startSounds( message.startSounds )
+        client.stopSounds( message.stopSounds )
+        client.swapAnims( message.swapAnims )
+        client.changeAnims( message.changeAnims )
+        client.updatePositions( message.updatePositions, message.clientTime )
+        client.forceVelocities( message.vels, message.clientTime )
 
     def net_forceEntFrame( self, message, **kwargs ):
         client = self.client()
@@ -81,12 +111,25 @@ class ClientHandler(pygnetic.Handler):
         #self.client().timer - message.timeStamp    
         #Find something to do with it.
         pass
+        #client = self.client()
+
+        #client.latencySamples.append( message.timeStamp )
+        #if ( len( client.latencySamples ) > client.latencySampleSize ):
+        #    client.latencySamples.pop(0)
 
     def net_forcePlayingSound( self, message, **kwargs ):
         self.client().forcePlayingSounds( message.soundTuples )
 
     def net_forceVelocities( self, message, **kwargs ):
-        self.client().forceVelocities( message.entIdVelocityTuples, message.clientTime )
+        #client = self.client()
+        #
+        #if client.needToFullyResimulate:
+        #    client.resimulationUsingPymunk( message.clientTime, (client.timer-message.clientTime) )
+        print "Don't use this method anymore!"
+
+    def net_setPlayerEnt( self, message, **kwargs ):
+        playState = self.client().playStateRef()
+        self.client().clientPlayerIds.append( message.id )
 
     def on_disconnect( self ):
         pass
@@ -99,7 +142,7 @@ class ServerHandler(pygnetic.Handler):
         #Check this address isn't in the banlist.
         for eachSet in self.server.networkServerRef().ipBanList:
             if eachSet[0] == self.connection.address:
-                self.connection.kick_player( eachSet[1], eachSet[2] )
+                self.connection.net_kickPlayer( eachSet[1], eachSet[2] )
                 self.connection.disconnect()
                 return None
         playState = self.server.networkServerRef().playStateRef()
@@ -127,7 +170,11 @@ class ServerHandler(pygnetic.Handler):
         client = networkServer.getClientByConnection( self.connection )
         if client is None:
             return None
+        client.lastAckClientTime = message.time
         client.time = message.time
+        #client.time = max( message.time, client.time )
+        client.lastAckServerTime = networkServer.timer
+        client.inputCount += 1
         playerKey = networkServer.getPlayerKey( client )
         playerEntList = networkServer.players.get( playerKey, [] )
 
@@ -142,6 +189,21 @@ class ServerHandler(pygnetic.Handler):
         #self.server.networkServerRef().timer - message.timeStamp    
         #Find something to do with it.
         pass
+
+    def net_playerUpdate( self, message, **kwargs ):
+        networkServer = self.server.networkServerRef()
+        client = networkServer.getClientByConnection( self.connection )
+        if client is None:
+            return None
+        playerKey = networkServer.getPlayerKey( client )
+        playerEntList = networkServer.players.get( playerKey, [] )
+
+        for eachPlayer in playerEntList:
+            if eachPlayer.id == message.id:
+                eachPlayer.setPosition( message.loc )
+                if eachPlayer.collidable:
+                    eachPlayer.body.velocity.x = message.vel[0]
+                    eachPlayer.body.velocity.y = message.vel[1]
 
     def on_disconnect( self ):
         self.server.networkServerRef().removeClientByConnection( self.connection )

@@ -44,7 +44,10 @@ def registerMessages():
     pygnetic.register( 'chatToHost', ( 'message', 'groupId' ) )
 
     #This message is sent from the host to the player every tick. Each parameter is a list of objects that describe some event that happened this tick.
-    pygnetic.register( 'updateEvent', ('tickNum', 'time', 'clientTime', 'createEnts', 'removeEnts', 'updatePositions', 'startSounds', 'stopSounds', 'changeAnims', 'swapAnims') )
+    pygnetic.register( 'updateEvent', ('tickNum', 'time', 'clientTime', 'clientLastAckTime', 'clientInputCount', 'createEnts', 'removeEnts', 'updatePositions', 'vels', 'startSounds', 'stopSounds', 'changeAnims', 'swapAnims') )
+
+    #This message is sent from the host to the player every tick. Each parameter is a list of objects that describe some event that happened this tick.
+    pygnetic.register( 'createEvent', ('tickNum', 'time', 'clientTime', 'clientLastAckTime', 'clientInputCount', 'createEnts', 'removeEnts', 'updatePositions', 'vels', 'startSounds', 'stopSounds','changeAnims', 'swapAnims') )
 
     #This message is sent from the player to the host containing the players input dicts.
     pygnetic.register( 'inputEvent', ('tickNum', 'time', 'inputDict') )
@@ -63,6 +66,13 @@ def registerMessages():
 
     #This message is sent from the host to client to force a set of velocities. This could be put into the updateEvent tuple, but I don't want to need it to be modified between making a game use extrapolation or interpolation.
     pygnetic.register( 'forceVelocities', ('tickNum', 'time', 'clientTime', 'entIdVelocityTuples') )
+
+    #This message is sent from the client to the host to enforce player data.
+    pygnetic.register( 'playerUpdate', ('tickNum', 'serverTime', 'id', 'loc', 'vel') )
+
+    #This message is sent from the host to the client to tell the client that a given ent should be added to it's local players group.
+    pygnetic.register( 'setPlayerEnt', ('tickNum', 'id') )
+
 
 ###Merge these all into a single event, each being a sub-event. This is to make sure you receive whole updates. There is no interest in partial updates.
 ##This message is to create a network ent on the client side.
