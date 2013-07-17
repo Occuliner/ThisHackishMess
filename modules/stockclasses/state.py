@@ -237,8 +237,7 @@ class PlayState:
             if self.networkTicker >= int(60.0/self.networkRate):
                 self.networkNode.update( dt )
                 self.networkTicker = -1
-            else:
-                self.networkNode.timer += dt
+            self.networkNode.updateTime( dt )
             self.networkTicker += 1
 
     def update( self, dt ):
