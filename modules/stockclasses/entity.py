@@ -239,8 +239,8 @@ class Entity( pygame.sprite.DirtySprite ):
         self.animated = animated
         self.animations = {'idle':{ 'fps':8, 'frames':[0] }}
         self.frames = []
-	#Copies of all the frames from init time. For stuff like rotatation.
-	self.originalFrames = []
+        #Copies of all the frames from init time. For stuff like rotatation.
+        self.originalFrames = []
         self.curAnimation = self.animations['idle']
         
         self.createFrames()
@@ -317,14 +317,14 @@ class Entity( pygame.sprite.DirtySprite ):
                 img = self.sheet.subsurface( eachFrame )
                 img.set_colorkey( self.colourKey )
                 self.frames.append( img )
-	self.originalFrames = [ each.copy() for each in self.frames ]
+                self.originalFrames = [ each.copy() for each in self.frames ]
 
     def setRotation( self, angle ):
         #NOTE, angle here is in radians, this needs to be converted for rotozoom which is in degrees.
         deg = math.degrees( angle )
         self.frames = [ pygame.transform.rotozoom( eachFrame.copy(), -deg, 1.0 ) for eachFrame in self.originalFrames ]
-	[ each.set_colorkey( self.colourKey ) for each in self.frames ]        
-	self.image = self.frames[ self.curAnimation['frames'][self.frame] ]
+        [ each.set_colorkey( self.colourKey ) for each in self.frames ]        
+        self.image = self.frames[ self.curAnimation['frames'][self.frame] ]
         if self.collidable:
             self.body.angle = angle
         self.angle = angle

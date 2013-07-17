@@ -39,11 +39,17 @@ from devtools import DevMenu
 
 from state import PlayState
 
+from confighandler import ConfigHandler
+
+cfg = ConfigHandler( 'thm.cfg' )
+cfg.readConfig()
+
 #from modules import *
 
 timer = pygame.time.Clock()
 
-screen = pygame.display.set_mode( (800, 600) )
+#screen = pygame.display.set_mode( (800, 600) )
+screen = pygame.display.set_mode( (cfg.getWidth(), cfg.getHeight()))
 
 #pygame.event.set_allowed([QUIT, KEYDOWN, KEYUP])
 
@@ -102,7 +108,7 @@ shiftHeld = False
 
 timeTillFpsPrint = 2.0
 
-updatedArea = [ pygame.Rect( 0, 0, 800, 600 ) ]
+updatedArea = [ pygame.Rect( 0, 0, cfg.getWidth(), cfg.getHeight() ) ]
 
 panU, panD, panL, panR = False, False, False, False
 
