@@ -249,7 +249,7 @@ class PlayState:
         
         self.checkForFocus()
         if self.paused or self.pausedByFocus:
-            self.processNetworkEvents()
+            self.processNetworkEvents( dt )
             return None
 
         if not self.hardBlockInput:
