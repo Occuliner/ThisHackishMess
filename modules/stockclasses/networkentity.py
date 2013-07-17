@@ -119,7 +119,7 @@ class NetworkEntity( pygame.sprite.DirtySprite ):
         if collidable is not None:
             self.collidable = collidable
 
-        if self.collidable and self.solid and group.playState.networkNode.extrapolationOn:
+        if self.collidable:
             if not self.circular:
                 self.body = pymunk.Body( self.mass, 1e100 )
             else:
@@ -137,6 +137,8 @@ class NetworkEntity( pygame.sprite.DirtySprite ):
 
             width, height = self.rect.width, self.rect.height
             self.physicsObjects = [self.body]
+
+            offset = (-float(width)/2, -float(height)/2)
 
             if not self.circular:
                 if self.wbHeight is not None and self.wbWidth is not None:
@@ -197,6 +199,15 @@ class NetworkEntity( pygame.sprite.DirtySprite ):
         self.classUpdated = False
 
         self.oldPan = group.playState.panX, group.playState.panY
+
+        self.angle = 0.0
+
+        if self.collidable:
+            framePosition = self.framePositions.get( self.curAnimation['frames'][self.frame], (0,0) )
+            self.rect.topleft = self.body.position.x+framePosition[0], self.body.position.y+framePosition[1]
+            #Behold, a cheap hack to fix circular objects physics and visuals not lining up.
+            self.rect.y -= self.height/2
+            self.rect.x -= self.width/2
 
         #This is a log of positions for retroactive location correction for networking.
         self.logOfPositions = {}
@@ -315,12 +326,12 @@ class NetworkEntity( pygame.sprite.DirtySprite ):
         self.rect.y -= self.oldPan[1]
 
         if self.collidable:
-            framePosition = self.framePositions.get( self.curAnimation['frames'][self.frame], (0,0) )
+            framePositionVector = pymunk.vec2d.Vec2d(self.framePositions.get( self.curAnimation['frames'][self.frame], (0,0) ))
+            framePositionVector.rotate(self.angle)
+            framePosition = framePositionVector.int_tuple
             self.rect.topleft = self.body.position.x+framePosition[0], self.body.position.y+framePosition[1]
-            #Behold, a cheap hack to fix circular objects physics and visuals not lining up.
-            if self.circular:
-                self.rect.y -= self.height/2
-                self.rect.x -= self.width/2
+            self.rect.y -= self.image.get_height()/2
+            self.rect.x -= self.image.get_width()/2
 
         listOfGroups = self.groups()
         if len( listOfGroups ) > 0:

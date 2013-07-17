@@ -183,17 +183,12 @@ class Entity( pygame.sprite.DirtySprite ):
                 self.body.velocity_func = noGravVelocityUpdate
                 self.velocity_func = noGravVelocityUpdate
             
-
-            #self.shape = pymunk.Poly( self.body, [ self.rect.bottomright, self.rect.topright, self.rect.topleft, self.rect.bottomleft ] )
-            #self.shape = pymunk.Circle( self.body, 5 )
             width, height = self.rect.width, self.rect.height
             self.physicsObjects = [self.body]
-
 
             offset = (-float(width)/2, -float(height)/2)
 
             if self.bHeight is not None and self.bWidth is not None:
-                #offset = (-float(self.bWidth)/2, -float(self.bHeight)/2)
                 self.sensorBox = pymunk.Poly( self.body, map( pymunk.vec2d.Vec2d, [ (self.bWidth+self.bdx, 0+self.bdy), (self.bWidth+self.bdx, self.bHeight+self.bdy), (0+self.bdx, self.bHeight+self.bdy), (0+self.bdx, 0+self.bdy) ] ), offset )
                 self.sensorBox.sensor = True
                 self.sensorBox.collision_type = 2
@@ -203,13 +198,10 @@ class Entity( pygame.sprite.DirtySprite ):
 
             if not self.circular:
                 if self.wbHeight is not None and self.wbWidth is not None:
-                    #offset = (-float(self.wbWidth)/2, -float(self.wbHeight)/2)
                     self.shape = pymunk.Poly( self.body, map( pymunk.vec2d.Vec2d, [ (self.wbWidth+self.wbdx, 0+self.wbdy), (self.wbWidth+self.wbdx, self.wbHeight+self.wbdy), (0+self.wbdx, self.wbHeight+self.wbdy), (0+self.wbdx, 0+self.wbdy) ] ), offset )
                 elif height is not None and width is not None:
-                    #offset = (-float(width)/2, -float(height)/2)
                     self.shape = pymunk.Poly( self.body, map( pymunk.vec2d.Vec2d, [ (width, 0), (width, height), (0, height), (0, 0) ] ), offset )
                 else:
-                    #offset = (-float(self.rect.w)/2, -float(self.rect.h)/2)
                     self.shape = pymunk.Poly( self.body, map( pymunk.vec2d.Vec2d, [ (self.rect.w, 0), (self.rect.w, self.rect.h), (0, self.rect.h), (0, 0) ] ), offset )
     
             else:
@@ -411,10 +403,6 @@ class Entity( pygame.sprite.DirtySprite ):
             framePositionVector.rotate(self.angle)
             framePosition = framePositionVector.int_tuple
             self.rect.topleft = self.body.position.x+framePosition[0], self.body.position.y+framePosition[1]
-            #Behold, a cheap hack to fix circular objects physics and visuals not lining up.
-            #if self.circular:
-            #    self.rect.y -= self.height/2
-            #    self.rect.x -= self.width/2
             self.rect.y -= self.image.get_height()/2
             self.rect.x -= self.image.get_width()/2
 
