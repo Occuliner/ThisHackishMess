@@ -232,6 +232,15 @@ class PlayState:
     def togglePaused( self ):
         self.paused = not self.paused
 
+    def processNetworkEvents( self, dt ):
+        if self.isHost or self.isClient:
+            if self.networkTicker >= int(60.0/self.networkRate):
+                self.networkNode.update( dt )
+                self.networkTicker = -1
+            else:
+                self.networkNode.timer += dt
+            self.networkTicker += 1
+
     def update( self, dt ):
         """A generic update function.
         Sends input dictionaries to playerGroups.
@@ -241,6 +250,7 @@ class PlayState:
         
         self.checkForFocus()
         if self.paused or self.pausedByFocus:
+            self.processNetworkEvents()
             return None
 
         if not self.hardBlockInput:
@@ -281,14 +291,7 @@ class PlayState:
             eachElement.update( dt )
 
         self.soundManager.update( dt )
-
-        if self.isHost or self.isClient:
-            if self.networkTicker >= int(60.0/self.networkRate):
-                self.networkNode.update( dt )
-                self.networkTicker = -1
-            else:
-                self.networkNode.timer += dt
-            self.networkTicker += 1
+	self.processNetworkEvents( dt )
 
     def sendInput( self, inputDict ):
         """Simply sets PlayState.curInputDict to a given input dictionary, 
