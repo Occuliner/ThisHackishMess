@@ -72,13 +72,17 @@ class ModuleLoader:
             #execfile( eachFile, globals() )
             moduleName = self.pathToModuleName( eachFile )
             __import__( moduleName )
+           
             self.globals.update( sys.modules[moduleName].__dict__ )
         
         for eachFile in self.changedFiles:
             print eachFile
             moduleName = self.pathToModuleName( eachFile )
-            reload( sys.modules[moduleName] )
-            self.globals.update( sys.modules[moduleName].__dict__ )
+            try:
+                reload( sys.modules[moduleName] )
+                self.globals.update( sys.modules[moduleName].__dict__ )
+            except:
+                print "Error importing file:", eachFile, sys.exc_info()
             
         self.changedFiles = []
         self.newFiles = []
