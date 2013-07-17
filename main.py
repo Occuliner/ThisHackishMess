@@ -49,11 +49,14 @@ cfg.readConfig()
 timer = pygame.time.Clock()
 
 #screen = pygame.display.set_mode( (800, 600) )
-screen = pygame.display.set_mode( (cfg.getWidth(), cfg.getHeight()))
+if int(cfg.getVal('fullscreen')) == 1:
+    screen = pygame.display.set_mode( (cfg.getWidth(), cfg.getHeight()), pygame.FULLSCREEN )
+else:
+    screen = pygame.display.set_mode( (cfg.getWidth(), cfg.getHeight()) )
 
 #pygame.event.set_allowed([QUIT, KEYDOWN, KEYUP])
 
-pygame.display.set_caption( 'ThisHackishMess' )
+pygame.display.set_caption( cfg.getVal('caption') )#'ThisHackishMess' )
 
 done = False
 
