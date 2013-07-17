@@ -111,6 +111,7 @@ class PlayState:
 
         self.paused = False
         self.checkFocus = True
+	self.pausedByFocus = False
 
         #So this is quite an important boolean.
         #If this is true everything in the PlayState will be drawn in order of the bottom of it's bounding rect, which I will refer
@@ -219,7 +220,8 @@ class PlayState:
             setattr( self, name, group )
 
     def checkForFocus( self ):
-        self.paused = ( (not pygame.mouse.get_focused()) and self.checkFocus ) or self.paused
+        lostFocus = ( not pygame.mouse.get_focused() ) and self.checkFocus
+        self.pausedByFocus = lostFocus
 
     def pause( self ):
         self.paused = True
@@ -238,7 +240,7 @@ class PlayState:
         self.floor.update( self.panX, self.panY )
         
         self.checkForFocus()
-        if self.paused:
+        if self.paused or self.pausedByFocus:
             return None
 
         if not self.hardBlockInput:
