@@ -29,7 +29,7 @@ class ConfigHandler:
                 if self.debug:
                     print "Config syntax error on line:", eachLine
             else:
-                self.configVals[vals[0] = vals[1]
+                self.configVals[vals[0]] = vals[1]
         return result
 
     def setVal( self, key, val ):
