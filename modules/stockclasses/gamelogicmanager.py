@@ -34,26 +34,24 @@ class GameLogicManager:
         for eachCall in callList:
             callMethod( eachCall )
 
+    def performTempEvents( self, string ):
+        callEvents( self.temporaryEvents[string] )
+        self.temporaryEvents[string] = []
+
     def preTick( self ):
-        callEvents( self.temporaryEvents['preTick'] )
-        self.temporaryEvents['preTick'] = []
+        performTempEvents( 'preTick' )
 
     def postTick( self ):
-        callEvents( self.temporaryEvents['postTick'] )
-        self.temporaryEvents['postTick'] = []
+        performTempEvents( 'postTick' )
 
     def preNetworkEvent( self ):
-        callEvents( self.temporaryEvents['preNetworkTick'] )
-        self.temporaryEvents['preNetworkTick'] = []
+        performTempEvents( 'preNetworkTick' )
 
     def postNetworkEvent( self ):
-        callEvents( self.temporaryEvents['postNetworkTick'] )
-        self.temporaryEvents['postNetworkTick'] = []
+        performTempEvents( 'postNetworkTick' )
 
     def onLoad( self ):
-        callEvents( self.temporaryEvents['onLoad'] )
-        self.temporaryEvents['onLoad'] = []
+        performTempEvents( 'onLoad' )
 
     def onLaunch( self ):
-        callEvents( self.temporaryEvents['onLaunch'] )
-        self.temporaryEvents['onLaunch'] = []
+        performTempEvents( 'onLaunch' )
