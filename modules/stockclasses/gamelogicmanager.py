@@ -20,10 +20,10 @@ import weakref
 class GameLogicManager:
     """The GameLogicManager is a class to handle game-specific events within the main loop,
     on network events, etc."""
+    self.temporaryEvents = {'preTick':[], 'postTick':[], 'preNetworkEvent':[], 
+                            'postNetworkEvent':[], 'onLoad':[], 'onLaunch':[]}
     def __init__( self, playState ):
         self.playStateRef = weakref.ref( playState )
-        self.temporaryEvents = {'preTick':[], 'postTick':[], 'preNetworkEvent':[], 
-                                'postNetworkEvent':[], 'onLoad':[], 'onLaunch':[]}
 
     def callMethod( self, strTuple ):
         if not hasattr( strTuple[0] ):
@@ -38,10 +38,10 @@ class GameLogicManager:
         callEvents( self.temporaryEvents[string] )
         self.temporaryEvents[string] = []
 
-    def preTick( self ):
+    def preTick( self, dt ):
         performTempEvents( 'preTick' )
 
-    def postTick( self ):
+    def postTick( self, dt ):
         performTempEvents( 'postTick' )
 
     def preNetworkEvent( self ):

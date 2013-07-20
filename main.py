@@ -115,6 +115,8 @@ updatedArea = [ pygame.Rect( 0, 0, cfg.getWidth(), cfg.getHeight() ) ]
 
 panU, panD, panL, panR = False, False, False, False
 
+#Game logic.
+currentState.gameLogicManager.onLaunch()
 
 #
 #

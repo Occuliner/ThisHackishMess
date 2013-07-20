@@ -26,6 +26,7 @@ from networkclient import NetworkClient
 from networkmessages import registerMessages
 from modules.networkents.mindlessentholder import *
 from entity import EntityGroup
+from modules.gamelogic.manager import ActualManager
 
 """This module defines the PlayState class."""
 
@@ -55,6 +56,7 @@ class PlayState:
         self.speshulCaller = callSpeshulEffect
         self.postStepQueue = []
 
+        self.gameLogicManager = ActualManager( self )
 
         self.spaceGhost = None
         
@@ -177,6 +179,9 @@ class PlayState:
         del gc.garbage[:]
         self.devMenuRef = tmpRef
 
+        #Call game logic events.
+        self.gameLogicManager.onLoad()
+
     def addInterweaveGroup( self, group, index ):
         if self.interweaveOrder.get( index, None ) is None:
             self.interweaveOrder[index] = [group]
@@ -252,6 +257,9 @@ class PlayState:
             self.processNetworkEvents( dt )
             return None
 
+        #Game logic
+        self.gameLogicManager.preTick( dt )
+
         if not self.hardBlockInput:
             #I'm doing the same thing even if the host or client is the same, to force identical player behaviour for either.
             if self.isClient or self.isHost:
@@ -288,6 +296,8 @@ class PlayState:
 
         for eachElement in self.hudList:
             eachElement.update( dt )
+
+        self.gameLogicManager.postTick( dt )
 
         self.soundManager.update( dt )
 	self.processNetworkEvents( dt )
