@@ -31,6 +31,9 @@ class ClientHandler(pygnetic.Handler):
 
     def net_requestInfo( self, message, **kwargs ):
         playState = self.client().playStateRef()
+
+        playState.gameLogicManager.preNetworkEvent()
+
         if not (message.levelName is "Untitled"):
             #So, if there is a level name, load that level if found.
             newState = loadPlayState( message.levelName, playState.floor.tileSet, self.client().networkEntsClassDefs.values(), networkClient=self.client() )
@@ -50,14 +53,31 @@ class ClientHandler(pygnetic.Handler):
         #self.connection.net_joinGame( self.client().name )
         playState.addJoinGameNotice()
 
+        playState.gameLogicManager.postNetworkEvent()
+
     def net_acceptPlayer( self, message, **kwargs ):
-        pass
+        playState = self.client().playStateRef()
+        playState.gameLogicManager.preNetworkEvent()
+
+        playState.gameLogicManager.postNetworkEvent()
+
     def net_kickPlayer( self, message, **kwargs ):
-        pass
+        playState = self.client().playStateRef()
+        playState.gameLogicManager.preNetworkEvent()
+
+        playState.gameLogicManager.postNetworkEvent()
+
     def net_chatToClient( self, message, **kwargs ):
-        pass
+        playState = self.client().playStateRef()
+        playState.gameLogicManager.preNetworkEvent()
+
+        playState.gameLogicManager.postNetworkEvent()
+
     def net_updateEvent( self, message, **kwargs ):
         client = self.client()
+
+        playState = client.playStateRef()
+        playState.gameLogicManager.preNetworkEvent()
 
         client.serverTime = message.time
 
@@ -87,8 +107,12 @@ class ClientHandler(pygnetic.Handler):
         client.addToMessageLog( message )
         client.addLatencySample( latency )
 
+        playState.gameLogicManager.postNetworkEvent()
+
     def net_createEvent( self, message, **kwargs ):
         client = self.client()
+        playState = client.playStateRef()
+        playState.gameLogicManager.preNetworkEvent()
         client.createEntities( message.createEnts )
         client.removeEntities( message.removeEnts )
         client.startSounds( message.startSounds )
@@ -98,15 +122,24 @@ class ClientHandler(pygnetic.Handler):
         client.updatePositions( message.updatePositions, message.clientTime )
         client.forceVelocities( message.vels, message.clientTime )
 
+        playState.gameLogicManager.postNetworkEvent()
+
     def net_forceEntFrame( self, message, **kwargs ):
         client = self.client()
-
+        playState = client.playStateRef()
+        playState.gameLogicManager.preNetworkEvent()
         client.forceAnims( message.entIdFrameTuples )
+        playState.gameLogicManager.postNetworkEvent()
 
     def net_hostRequestPing( self, message, **kwargs ):
+        playState = self.client().playStateRef()
+        playState.gameLogicManager.preNetworkEvent()
         self.connection.net_hostRequestPing( message.timeStamp )
+        playState.gameLogicManager.postNetworkEvent()
 
     def net_clientRequestPing( self, message, **kwargs ):
+        playState = self.client().playStateRef()
+        playState.gameLogicManager.preNetworkEvent()
         #Here is the ping calc:
         #self.client().timer - message.timeStamp    
         #Find something to do with it.
@@ -116,20 +149,24 @@ class ClientHandler(pygnetic.Handler):
         #client.latencySamples.append( message.timeStamp )
         #if ( len( client.latencySamples ) > client.latencySampleSize ):
         #    client.latencySamples.pop(0)
+        playState.gameLogicManager.postNetworkEvent()
 
     def net_forcePlayingSound( self, message, **kwargs ):
+        playState = self.client().playStateRef()
+        playState.gameLogicManager.preNetworkEvent()
         self.client().forcePlayingSounds( message.soundTuples )
-
-    def net_forceVelocities( self, message, **kwargs ):
-        #client = self.client()
-        #
-        #if client.needToFullyResimulate:
-        #    client.resimulationUsingPymunk( message.clientTime, (client.timer-message.clientTime) )
-        print "Don't use this method anymore!"
+        playState.gameLogicManager.postNetworkEvent()
 
     def net_setPlayerEnt( self, message, **kwargs ):
         playState = self.client().playStateRef()
+        playState.gameLogicManager.preNetworkEvent()
+        playState = self.client().playStateRef()
         self.client().clientPlayerIds.append( message.id )
+        playState.gameLogicManager.postNetworkEvent()
+
+    def net_gameLogicCall( self, message, **kwargs ):
+        playState = self.client().playStateRef()
+        playState.gameLogicManager.callMethod( ( message.methodName, message.callArgs, message.callKwargs ) )
 
     def on_disconnect( self ):
         pass
@@ -139,6 +176,7 @@ class ClientHandler(pygnetic.Handler):
 
 class ServerHandler(pygnetic.Handler):
     def on_connect( self ):
+        playState.gameLogicManager.preNetworkEvent()
         #Check this address isn't in the banlist.
         for eachSet in self.server.networkServerRef().ipBanList:
             if eachSet[0] == self.connection.address:
@@ -148,25 +186,38 @@ class ServerHandler(pygnetic.Handler):
         playState = self.server.networkServerRef().playStateRef()
         self.connection.net_requestInfo( playState.soundManager.curPlayId, self.server.networkServerRef().timer, playState.fileName )
         pygnetic.Handler.on_connect( self )
+        playState.gameLogicManager.postNetworkEvent()
 
     def net_hereIsMyInfo( self, message, **kwargs ):
+        playState = self.server.networkServerRef().playStateRef()
+        playState.gameLogicManager.preNetworkEvent()
         networkServer = self.server.networkServerRef()
         networkServer.addClient( message, self.connection )
 
         #Send all the existing state info.
         client = networkServer.getClientByConnection( self.connection )
         networkServer.sendAlreadyExistingState( client )
+        playState.gameLogicManager.postNetworkEvent()
 
     def net_joinGame( self, message, **kwargs ):
+        playState = self.server.networkServerRef().playStateRef()
+        playState.gameLogicManager.preNetworkEvent()
         client = self.server.networkServerRef().getClientByConnection( self.connection )
         self.connection.net_acceptPlayer( client.name )
         self.server.networkServerRef().addPlayer( client )
+        playState.gameLogicManager.postNetworkEvent()
 
     def net_chatToHost( self, message, **kwargs ):
-        pass
+        playState = self.server.networkServerRef().playStateRef()
+        playState.gameLogicManager.preNetworkEvent()
+        playState.gameLogicManager.postNetworkEvent()
 
     def net_inputEvent( self, message, **kwargs ):
+        playState = self.server.networkServerRef().playStateRef()
         networkServer = self.server.networkServerRef()
+
+        playState.gameLogicManager.preNetworkEvent()
+
         client = networkServer.getClientByConnection( self.connection )
         if client is None:
             return None
@@ -181,18 +232,27 @@ class ServerHandler(pygnetic.Handler):
         for each in playerEntList:
             each.sendInput( message.inputDict )
 
+        playState.gameLogicManager.postNetworkEvent()
+
     def net_clientRequestPing( self, message, **kwargs ):
+        playState = self.server.networkServerRef().playStateRef()
+        playState.gameLogicManager.preNetworkEvent()
         self.connection.net_clientRequestPing( message.timeStamp )
+        playState.gameLogicManager.postNetworkEvent()
 
     def net_hostRequestPing( self, message, **kwargs ):
+        playState = self.server.networkServerRef().playStateRef()
+        playState.gameLogicManager.preNetworkEvent()
         #Here is the ping calc:
         #self.server.networkServerRef().timer - message.timeStamp    
         #Find something to do with it.
-        pass
+        playState.gameLogicManager.postNetworkEvent()
 
     def net_playerUpdate( self, message, **kwargs ):
+        playState = self.server.networkServerRef().playStateRef()
         networkServer = self.server.networkServerRef()
         client = networkServer.getClientByConnection( self.connection )
+        playState.gameLogicManager.preNetworkEvent()
         if client is None:
             return None
         playerKey = networkServer.getPlayerKey( client )
@@ -204,6 +264,7 @@ class ServerHandler(pygnetic.Handler):
                 if eachPlayer.collidable:
                     eachPlayer.body.velocity.x = message.vel[0]
                     eachPlayer.body.velocity.y = message.vel[1]
+        playState.gameLogicManager.postNetworkEvent()
 
     def on_disconnect( self ):
         self.server.networkServerRef().removeClientByConnection( self.connection )

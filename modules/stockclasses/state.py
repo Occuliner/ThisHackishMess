@@ -238,12 +238,14 @@ class PlayState:
         self.paused = not self.paused
 
     def processNetworkEvents( self, dt ):
+        self.gameLogicManager.preNetworkTick( dt )
         if self.isHost or self.isClient:
             if self.networkTicker >= int(60.0/self.networkRate):
                 self.networkNode.update( dt )
                 self.networkTicker = -1
             self.networkNode.updateTime( dt )
             self.networkTicker += 1
+       self.gameLogicManager.postNetworkTick( dt )
 
     def update( self, dt ):
         """A generic update function.

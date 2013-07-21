@@ -20,15 +20,15 @@ import weakref
 class GameLogicManager:
     """The GameLogicManager is a class to handle game-specific events within the main loop,
     on network events, etc."""
-    self.temporaryEvents = {'preTick':[], 'postTick':[], 'preNetworkEvent':[], 
-                            'postNetworkEvent':[], 'onLoad':[], 'onLaunch':[]}
+    self.temporaryEvents = {'preTick':[], 'postTick':[], 'preNetworkTick':[], 
+                            'postNetworkTick':[], 'onLoad':[], 'onLaunch':[]}
     def __init__( self, playState ):
         self.playStateRef = weakref.ref( playState )
 
-    def callMethod( self, strTuple ):
-        if not hasattr( strTuple[0] ):
-            print "GameLogicManager has been told to call a method that doesn't exist:", strTuple[0]
-        getattr( self, strTuple[0] )( *strTuple[1], **strTuple[2] )
+    def callMethod( self, callTuple ):
+        if not hasattr( callTuple[0] ):
+            print "GameLogicManager has been told to call a method that doesn't exist:", callTuple[0]
+        getattr( self, callTuple[0] )( *callTuple[1], **callTuple[2] )
 
     def callEvents( self, callList ):
         for eachCall in callList:
@@ -44,11 +44,17 @@ class GameLogicManager:
     def postTick( self, dt ):
         performTempEvents( 'postTick' )
 
-    def preNetworkEvent( self ):
+    def preNetworkTick( self, dt ):
         performTempEvents( 'preNetworkTick' )
 
-    def postNetworkEvent( self ):
+    def postNetworkTick( self, dt ):
         performTempEvents( 'postNetworkTick' )
+
+    def preNetworkEvent( self, message ):
+        pass
+
+    def postNetworkEvent( self, message ):
+        pass
 
     def onLoad( self ):
         performTempEvents( 'onLoad' )
