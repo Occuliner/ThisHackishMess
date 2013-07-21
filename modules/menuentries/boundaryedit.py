@@ -103,8 +103,8 @@ class BoundaryEditState( MenuState ):
         self.removingMode = False
 
         self.curStart = None
-        self.gridX = 20
-        self.gridY = 20
+        tmpGrdRect = self.menu.playState.floor.tileSet.getTiles()[0].image.get_rect()
+        self.gridX, self.gridY = tmpGrdRect.w, tmpGrdRect.h
         self.snapToGrid = False
 
     def toggleSnapToGrid( self ):
