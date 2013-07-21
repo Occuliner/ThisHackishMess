@@ -50,9 +50,6 @@ class ClientHandler(pygnetic.Handler):
 
         self.connection.net_hereIsMyInfo( self.client().timer, self.client().name )
 
-        #self.connection.net_joinGame( self.client().name )
-        playState.addJoinGameNotice()
-
         playState.gameLogicManager.postNetworkEvent()
 
     def net_acceptPlayer( self, message, **kwargs ):
