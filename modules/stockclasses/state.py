@@ -245,7 +245,7 @@ class PlayState:
                 self.networkTicker = -1
             self.networkNode.updateTime( dt )
             self.networkTicker += 1
-       self.gameLogicManager.postNetworkTick( dt )
+        self.gameLogicManager.postNetworkTick( dt )
 
     def update( self, dt ):
         """A generic update function.

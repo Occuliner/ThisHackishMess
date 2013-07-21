@@ -20,7 +20,7 @@ import weakref
 class GameLogicManager:
     """The GameLogicManager is a class to handle game-specific events within the main loop,
     on network events, etc."""
-    self.temporaryEvents = {'preTick':[], 'postTick':[], 'preNetworkTick':[], 
+    temporaryEvents = {'preTick':[], 'postTick':[], 'preNetworkTick':[], 
                             'postNetworkTick':[], 'onLoad':[], 'onLaunch':[]}
     def __init__( self, playState ):
         self.playStateRef = weakref.ref( playState )
@@ -32,23 +32,23 @@ class GameLogicManager:
 
     def callEvents( self, callList ):
         for eachCall in callList:
-            callMethod( eachCall )
+            self.callMethod( eachCall )
 
     def performTempEvents( self, string ):
-        callEvents( self.temporaryEvents[string] )
+        self.callEvents( self.temporaryEvents[string] )
         self.temporaryEvents[string] = []
 
     def preTick( self, dt ):
-        performTempEvents( 'preTick' )
+        self.performTempEvents( 'preTick' )
 
     def postTick( self, dt ):
-        performTempEvents( 'postTick' )
+        self.performTempEvents( 'postTick' )
 
     def preNetworkTick( self, dt ):
-        performTempEvents( 'preNetworkTick' )
+        self.performTempEvents( 'preNetworkTick' )
 
     def postNetworkTick( self, dt ):
-        performTempEvents( 'postNetworkTick' )
+        self.performTempEvents( 'postNetworkTick' )
 
     def preNetworkEvent( self, message ):
         pass
@@ -57,7 +57,7 @@ class GameLogicManager:
         pass
 
     def onLoad( self ):
-        performTempEvents( 'onLoad' )
+        self.performTempEvents( 'onLoad' )
 
     def onLaunch( self ):
-        performTempEvents( 'onLaunch' )
+        self.performTempEvents( 'onLaunch' )
