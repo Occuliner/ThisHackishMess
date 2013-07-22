@@ -42,7 +42,7 @@ class MasterEntitySet:
 
     def getEntDict( self ):
         returnDict = {}
-        for eachKey, eachVal in self.individualSets.item():
+        for eachKey, eachVal in self.individualSets.items():
             for eachEnt in eachVal:
                 returnDict[eachEnt.__name__] = eachEnt
         return returnDict
