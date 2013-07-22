@@ -302,12 +302,6 @@ class NetworkEntity( pygame.sprite.DirtySprite ):
         signX = cmp( self.acceleration[0], 0 )
         signY = cmp( self.acceleration[1], 0 )
         return ( self.acceleration[0] - signX*self.idleDeceleration, self.acceleration[1] - signY*self.idleDeceleration )
-    
-    def readyAccel( self, dt ):
-        """
-        This method is a dummy method to be replaced by child classes.
-        Basically you call this for things that ONLY effect acceleration, before everything else in the frame starts."""
-        pass
 
     def kill( self ):
         if self.collidable:
@@ -354,13 +348,6 @@ class NetworkEntity( pygame.sprite.DirtySprite ):
 
             self.createFrames()
             self.classUpdated = False
-
-        networkNode = self.playStateRef().networkNode
-        if networkNode.clientSidePrediction:
-            self.logOfPositions[networkNode.timer] = self.getPosition()
-            if self.collidable:
-                self.logOfVelocities[networkNode.timer] = self.body.velocity.x, self.body.velocity.y
-                #self.logOfForces[networkNode.timer] = self.body.force.x, self.body.force.y
 
         if len( self.groups() ) > 1:
             raise Exception( "An instance of Entity is in more than one group, that should probably not be happening." )

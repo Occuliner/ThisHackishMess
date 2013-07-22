@@ -39,7 +39,14 @@ class MasterEntitySet:
         for eachKey, eachVal in self.individualSets.items():
             returnList.extend( eachVal )
         return returnList
-        
+
+    def getEntDict( self );
+        returnDict = {}
+        for eachKey, eachVal in self.individualSets.item():
+            for eachEnt in eachVal:
+                returnDict[eachEnt.__name__] = eachEnt
+        return returnDict
+
     def updateEnts( self ):
         for eachClass in self.entsToLoad:
             self.addEnt( eachClass )

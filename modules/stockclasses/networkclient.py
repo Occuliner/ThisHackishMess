@@ -90,7 +90,8 @@ class NetworkClient:
 
     def createEntities( self, createTuples ):
         for eachTuple in createTuples:
-            classDef = self.networkEntsClassDefs[eachTuple[1]+"Network"]
+            #Needs to swap from NetworkEntities to normal entities.
+            classDef = self.networkEntsClassDefs[eachTuple[1]]
             destGroup = getattr( self.playStateRef(), classDef.playStateGroup )
             inst = classDef( pos=eachTuple[2], vel=eachTuple[3], group=destGroup )
             inst.id = eachTuple[0]

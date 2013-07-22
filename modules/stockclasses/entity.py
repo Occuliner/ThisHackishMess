@@ -17,9 +17,6 @@
 
 import pygame, extern_modules.pymunk as pymunk, weakref, math
 
-#sys.path.append( "../../" )
-
-#from maskcompare import *
 from imageload import loadImage, loadImageNoAlpha
 from imageslice import sliceImage
 
@@ -49,10 +46,6 @@ class EntityGroup( pygame.sprite.LayeredDirty ):
         for each in iter( self ):
             each.update( dt )
             
-    def readyAccel( self, dt ):
-        for each in iter( self ):
-            each.readyAccel( dt )
-
 def idleCentricVelocityUpdateNoGrav( body, gravity, damping, dt ):
     """
     Same as above, but without gravity.

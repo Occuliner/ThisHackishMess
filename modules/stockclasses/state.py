@@ -24,7 +24,7 @@ from idsource import IdSource
 from networkserver import NetworkServer
 from networkclient import NetworkClient
 from networkmessages import registerMessages
-from modules.networkents.mindlessentholder import *
+#from modules.networkents.mindlessentholder import *
 from entity import EntityGroup
 from modules.gamelogic.manager import ActualManager
 
@@ -105,7 +105,6 @@ class PlayState:
         self.networkRate = 20.0
         self.networkTicker = 0
         self.networkNode = None
-        self.networkEntHolder = None
         self.networkingStarted = False
 
         #This is set by the DevMenu init
@@ -150,8 +149,7 @@ class PlayState:
         else:
             self.isClient = True
             self.initNetworking()
-        self.networkEntHolder = MindlessEntHolder()
-        self.networkNode = NetworkClient( self, self.networkEntHolder.dictOfEnts, networkingMode=1 )
+        self.networkNode = NetworkClient( self, self.devMenuRef().masterEntSet.getEntDict(), networkingMode=1 )
         self.networkNode.connect( "localhost", 1337 )
         print "Connecting..."
 
