@@ -74,7 +74,7 @@ def registerMessages():
     pygnetic.register( 'setPlayerEnt', ('tickNum', 'id') )
 
     #This message is sent from the host to the client to tell the client to perform GameLogicManager call.
-    pyngetic.register( 'gameLogicCall', ('tickNum', 'methodName', 'callArgs', 'callKwargs') )
+    pygnetic.register( 'gameLogicCall', ('tickNum', 'methodName', 'callArgs', 'callKwargs') )
 
 ###Merge these all into a single event, each being a sub-event. This is to make sure you receive whole updates. There is no interest in partial updates.
 ##This message is to create a network ent on the client side.
