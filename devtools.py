@@ -14,7 +14,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """The devtools file defines the DevMenu class."""
-import pygame, weakref
+import pygame, weakref, os
 
 from imageload import loadImage
 
@@ -66,10 +66,18 @@ class DevMenu( pygame.sprite.OrderedUpdates ):
 
         self.loadMenuState( self.defaultMenuState )
 
+        #FUCKING HORRIBLE HIDEOUS HACK OH GOD WHY.
+        #Foricbly reload everything in EntitySets so that they're actually added 
+        #to the MasterEntSet, I should really find someway of doing this right
+        #the first time.
+	self.theModuleLoader.loadModules( os.path.join( "modules", "entitysets" ) )
+        self.masterEntSet.updateEnts()
+
         self.draggingMenu = False
         self.draggedSpot = [0,0]
 
         self.playState.devMenuRef = weakref.ref( self )
+
         
     def toggle( self ):
         """Flips the DevMenu.open boolean, and wasOpen boolean.
