@@ -40,7 +40,7 @@ class MasterEntitySet:
             returnList.extend( eachVal )
         return returnList
 
-    def getEntDict( self );
+    def getEntDict( self ):
         returnDict = {}
         for eachKey, eachVal in self.individualSets.item():
             for eachEnt in eachVal:
