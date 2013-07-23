@@ -39,8 +39,9 @@ class MenuState:
         self.x, self.y = 0, 0
         self.fileNameLabel = Label( self, menu.playState.fileName, (0,570) )
         self.addSprite( self.fileNameLabel )
-        self.miniMap = MiniMap( self, ( 800-160, 600-120 ), 160, 120 )
-        self.addSprite( self.miniMap )
+        if miniMap:
+            self.miniMap = MiniMap( self, ( 800-160, 600-120 ), 160, 120 )
+            self.addSprite( self.miniMap )
 
     def moveTo( self, x, y ):
         if x-self.x+self.panel.rect.left < 0:
