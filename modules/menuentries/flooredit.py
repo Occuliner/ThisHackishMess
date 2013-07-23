@@ -182,7 +182,7 @@ class FloorEditState( MenuState ):
         MenuState.__init__( self, menu, sprites )
 
         self.buttons = []
-        self.sprites = [self.fileNameLabel]
+        self.sprites = [self.fileNameLabel, self.miniMap]
 
         self.panel = StaticImage( loadImage( "devmenu.png", 2 ), ( 10, 10 ) )
         self.addSprite( self.panel )
@@ -256,6 +256,7 @@ class FloorEditState( MenuState ):
 
         self.gridX, self.gridY = self.curSelectedButton.rect.w, self.curSelectedButton.rect.h
         self.setClamps()
+        self.miniMapFlip = False
 
     def applySelectionBox( self, button ):
         if self.tileSelectionBox in self.sprites:
@@ -467,6 +468,9 @@ class FloorEditState( MenuState ):
                 ny = curPoint[1]-self.grabPoint[1]
                 self.floor.layers[self.currentFloorLayer].resize( 0, nx-self.bottomRightLayerClamp.rect.left, 0, ny-self.bottomRightLayerClamp.rect.top )
                 self.setClamps()
+        self.miniMapFlip = not self.miniMapFlip
+        if self.miniMapFlip:
+            self.miniMap.regenerateImage()
 
 class FloorEditButton( Button ):
     """The FloorEditButton class, just creates a Button that invokes FloorEditState on the DevMenu."""

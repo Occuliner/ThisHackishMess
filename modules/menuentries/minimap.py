@@ -47,7 +47,13 @@ class MiniMap( Button ):
         else:
             scale = float(self.height)/worldHeight
         img = pygame.transform.rotozoom(img, 0.0, scale ).convert()
-        pos = -playState.panX, -playState.panY
+        pos = playState.panX*scale, playState.panY*scale
         finalImage = pygame.Surface( (self.width, self.height) ).convert()
         finalImage.blit( img, pos )
         return finalImage
+
+    def regenerateImage( self ):
+        tmpLoc = self.rect.topleft
+        self.image = self.generateImage()
+        self.rect = self.image.get_rect()
+        self.rect.topleft = tmpLoc

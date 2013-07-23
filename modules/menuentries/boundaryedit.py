@@ -79,7 +79,7 @@ def distance( point1, point2 ):
 class BoundaryEditState( MenuState ):
     def __init__( self, menu, sprites=[] ):
         MenuState.__init__( self, menu, sprites )
-        self.sprites = [self.fileNameLabel]
+        self.sprites = [self.fileNameLabel, self.miniMap]
         self.buttons = []
 
         self.panel = StaticImage(loadImage("devmenu.png", 2 ), (10, 10))
