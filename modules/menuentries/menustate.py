@@ -98,11 +98,16 @@ class MenuState:
             if self.miniMapFlip:
                 self.miniMap.regenerateImage()
             if self.miniMap.held:
-                self.miniMap.rect.topleft = curMousePos[0]-self.miniMap.heldPos[0], curMousePos[1]-self.miniMap.heldPos[1]
-                MiniMap.pos = self.miniMap.rect.topleft
+                if self.miniMap.dragging:
+                    self.miniMap.rect.topleft = curMousePos[0]-self.miniMap.heldPos[0], curMousePos[1]-self.miniMap.heldPos[1]
+                    MiniMap.pos = self.miniMap.rect.topleft
+                if self.miniMap.panning:
+                    self.miniMap.pan( curMousePos )
                 if not self.miniMap.rect.collidepoint( curMousePos ):
                     self.miniMap.held = False
                     self.miniMap.heldPos = None
+                    self.miniMap.dragging = False
+                    self.miniMap.panning = False
 
     def keyboardInput( self, keyEvent ):
         self.keyInput += keyEvent

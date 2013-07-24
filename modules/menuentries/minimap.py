@@ -31,6 +31,8 @@ class MiniMap( Button ):
         self.rect.topleft = self.pos
         self.held = False
         self.heldPos = None
+        self.dragging = False
+        self.panning = False
 
     def generateImage( self ):
         rightMostPoint = max( [ each.rect.right for each in self.floor.layers ] )
@@ -67,17 +69,23 @@ class MiniMap( Button ):
         self.rect = self.image.get_rect()
         self.rect.topleft = tmpLoc
 
+    def pan( self, point ):
+        dx = float(point[0]-self.rect.left)
+        dy = float(point[1]-self.rect.top)
+        playState = self.parentState.menu.playState
+        playState.panX = int(dx/self.scale)
+        playState.panY = int(dy/self.scale)
+
     def push( self, clickKey, click ):
+        self.held = True
+        self.heldPos = click[0]-self.rect.left, click[1]-self.rect.top
         if "down" in clickKey:
             if "mouse1" in clickKey:
-                dx = float(click[0]-self.rect.left)
-                dy = float(click[1]-self.rect.top)
-                playState = self.parentState.menu.playState
-                playState.panX = int(dx/self.scale)
-                playState.panY = int(dy/self.scale)
+                self.panning = True
             if "mouse3" in clickKey:
-                self.held = True
-                self.heldPos = click[0]-self.rect.left, click[1]-self.rect.top
+                self.dragging = True
         if "up" in clickKey:
             self.held = False
             self.heldPos = None
+            self.dragging = False
+            self.panning = False
