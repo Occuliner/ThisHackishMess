@@ -19,7 +19,8 @@ import pygame, os
 from button import Button
 
 class MiniMap( Button ):
-    def __init__( self, parentState, pos, width, height ):
+    pos = ( 800-160, 600-120 )
+    def __init__( self, parentState, width, height ):
         Button.__init__( self, None, None, parentState, True )
         self.width = width
         self.height = height
@@ -27,7 +28,7 @@ class MiniMap( Button ):
         self.floor = parentState.menu.playState.floor
         self.image = self.generateImage()
         self.rect = self.image.get_rect()
-        self.rect.topleft = pos
+        self.rect.topleft = self.pos
         self.held = False
         self.heldPos = None
 

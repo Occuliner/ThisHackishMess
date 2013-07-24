@@ -45,7 +45,7 @@ class MenuState:
         self.miniMapFlip = False
 
     def addMiniMap( self ):
-        self.miniMap = MiniMap( self, ( 800-160, 600-120 ), 160, 120 )
+        self.miniMap = MiniMap( self, 160, 120 )
         self.addSprite( self.miniMap )
 
     def moveTo( self, x, y ):
@@ -99,6 +99,7 @@ class MenuState:
                 self.miniMap.regenerateImage()
             if self.miniMap.held:
                 self.miniMap.rect.topleft = curMousePos[0]-self.miniMap.heldPos[0], curMousePos[1]-self.miniMap.heldPos[1]
+                MiniMap.pos = self.miniMap.rect.topleft
                 if not self.miniMap.rect.collidepoint( curMousePos ):
                     self.miniMap.held = False
                     self.miniMap.heldPos = None
