@@ -60,7 +60,7 @@ pygame.display.set_caption( cfg.getVal('caption') )#'ThisHackishMess' )
 
 done = False
 
-white = pygame.Color( 255, 255, 255 )
+black = pygame.Color( 0, 0, 0 )
 
 #
 #    Set Up the PlayState!
@@ -127,7 +127,7 @@ currentState.gameLogicManager.onLaunch()
 timer.tick( 60 )
 while not done:
 
-    screen.fill( white )
+    screen.fill( black )
 
     currentState.update( float(timer.get_time())/1000 )
 
@@ -242,8 +242,8 @@ while not done:
     if panL:
         currentState.panX += 2
 
-    pygame.display.update( updatedArea )
-    #pygame.display.update( )
+    #pygame.display.update( updatedArea )
+    pygame.display.update( )
 
     updatedArea = []
 

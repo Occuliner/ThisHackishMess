@@ -55,7 +55,7 @@ class MiniMap( Button ):
         self.scale = scale
         img = pygame.transform.rotozoom(img, 0.0, scale ).convert()
         #pos = playState.panX*scale, playState.panY*scale
-        viewRect = pygame.Rect( playState.panX*scale, playState.panY*scale, 800*scale, 600*scale )
+        viewRect = pygame.Rect( -playState.panX*scale, -playState.panY*scale, 800*scale, 600*scale )
         
         finalImage = pygame.Surface( (self.width, self.height) ).convert()
         finalImage.blit( img, (0, 0) )
@@ -73,8 +73,8 @@ class MiniMap( Button ):
         dx = float(point[0]-self.rect.left)
         dy = float(point[1]-self.rect.top)
         playState = self.parentState.menu.playState
-        playState.panX = int(dx/self.scale)
-        playState.panY = int(dy/self.scale)
+        playState.panX = -int(dx/self.scale)+(800/2)
+        playState.panY = -int(dy/self.scale)+(600/2)
 
     def push( self, clickKey, click ):
         self.held = True
