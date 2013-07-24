@@ -96,6 +96,7 @@ class PlayState:
 
         #These to variables are the displacement from the state's (0,0) and the screen's (0,0), so they can be used for panning.
         self.panX, self.panY = 0, 0
+        self.limitX1, self.limitX2, self.limitY1, self.limitY2 = None, None, None, None
 
         #This is the idSource, I use it for give ids to Entitys.
         self.idSource = IdSource()
@@ -111,6 +112,8 @@ class PlayState:
         self.devMenuRef = None
 
         self.paused = False
+        self.keyboardInputEnabled = False
+        self.deleteLastChar = False
         self.checkFocus = True
 	self.pausedByFocus = False
 
@@ -301,6 +304,17 @@ class PlayState:
 
         self.soundManager.update( dt )
 	self.processNetworkEvents( dt )
+
+    def setPan( self, x, y ):
+        if self.limitX1 is not None:
+            x = max( self.limitX1, x )
+        if self.limitX2 is not None:
+            x = min( self.limitX2, x )
+        if self.limitY1 is not None:
+            y = max( self.limitY1, y )
+        if self.limitY2 is not None:
+            y = min( self.limitY2, y )
+        self.panX, self.panY = x, y
 
     def sendInput( self, inputDict ):
         """Simply sets PlayState.curInputDict to a given input dictionary, 

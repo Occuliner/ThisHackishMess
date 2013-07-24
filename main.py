@@ -143,7 +143,20 @@ while not done:
             pygame.quit()
             sys.exit()
         elif event.type == KEYDOWN:
-            if event.key == K_UP:
+            if theDevMenu.menuState.keyboardEnabled:
+                someChr = event.unicode
+                if chr(8) == someChr:
+                    theDevMenu.menuState.deleteLastChar = True
+                else:
+                    theDevMenu.menuState.keyboardInput( someChr )
+            if currentState.keyboardInputEnabled:
+                someChr = event.unicode
+                if chr(8) == someChr:
+                    currentState.deleteLastChar = True
+                else:
+                    for eachEl in currentState.hudList:
+                        eachEl.keyboardInput( someChr )
+            elif event.key == K_UP:
                 inputDict['K_UP'] = 'down'
             elif event.key == K_LEFT:
                 inputDict['K_LEFT'] = 'down'
@@ -182,21 +195,6 @@ while not done:
                 inputDict['K_DOWN'] = 'up'
             elif event.key in [ K_LSHIFT, K_RSHIFT ]:
                 shiftHeld = False
-            elif event.key == K_BACKSPACE:
-                #objgraph.show_most_common_types(limit=300)
-                #print len( currentState.space.shapes )
-                theDevMenu.menuState.deleteLastChar = True
-            elif theDevMenu.menuState.keyboardEnabled:
-                if 0 <= event.key < 256:
-                    if shiftHeld:
-                        someChr = chr( event.key ).upper()
-                        if someChr == ";":
-                            someChr = ":"
-                    else:
-                        someChr = chr( event.key )
-                    if someChr.isalnum() or someChr == ":":
-                        theDevMenu.menuState.keyboardInput( someChr )
-
             elif event.key == K_w:
                 panU = False
             elif event.key == K_a:
@@ -233,13 +231,13 @@ while not done:
     inputDict = {}
     
     if panU:
-        currentState.panY += 2
+        currentState.setPan( currentState.panX, currentState.panY + 2 )
     if panD:
-        currentState.panY -= 2
+        currentState.setPan( currentState.panX, currentState.panY - 2 )
     if panR:
-        currentState.panX -= 2
+        currentState.setPan( currentState.panX - 2, currentState.panY)
     if panL:
-        currentState.panX += 2
+        currentState.setPan( currentState.panX + 2, currentState.panY )
 
     #pygame.display.update( updatedArea )
     pygame.display.update( )

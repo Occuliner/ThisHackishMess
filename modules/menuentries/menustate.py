@@ -37,6 +37,7 @@ class MenuState:
                 #eachSprite.menu = menu
         self.keyInput = ""
         self.keyboardEnabled = False
+        self.deleteLastChar = False
         self.x, self.y = 0, 0
         self.fileNameLabel = Label( self, menu.playState.fileName, (0,getResolution()[1]-32) )
         self.addSprite( self.fileNameLabel )

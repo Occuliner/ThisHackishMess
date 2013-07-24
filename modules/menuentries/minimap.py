@@ -78,8 +78,7 @@ class MiniMap( Button ):
         dy = float(point[1]-self.rect.top)
         playState = self.parentState.menu.playState
         screenW, screenH = getResolution()
-        playState.panX = -int(dx/self.scale)+(screenW/2)
-        playState.panY = -int(dy/self.scale)+(screenH/2)
+        playState.setPan( -int(dx/self.scale)+(screenW/2), -int(dy/self.scale)+(screenH/2) )
 
     def push( self, clickKey, click ):
         self.held = True
