@@ -17,9 +17,10 @@
 
 import pygame, os
 from button import Button
+from getres import getResolution
 
 class MiniMap( Button ):
-    pos = ( 800-160, 600-120 )
+    pos = None
     def __init__( self, parentState, width, height ):
         Button.__init__( self, None, None, parentState, True )
         self.width = width
@@ -28,6 +29,8 @@ class MiniMap( Button ):
         self.floor = parentState.menu.playState.floor
         self.image = self.generateImage()
         self.rect = self.image.get_rect()
+        if self.pos is None:
+             MiniMap.pos = ( getResolution()[0]-width, getResolution()[1]-height )
         self.rect.topleft = self.pos
         self.held = False
         self.heldPos = None
@@ -55,7 +58,8 @@ class MiniMap( Button ):
         self.scale = scale
         img = pygame.transform.rotozoom(img, 0.0, scale ).convert()
         #pos = playState.panX*scale, playState.panY*scale
-        viewRect = pygame.Rect( -playState.panX*scale, -playState.panY*scale, 800*scale, 600*scale )
+        screenW, screenH = getResolution()
+        viewRect = pygame.Rect( -playState.panX*scale, -playState.panY*scale, screenW*scale, screenH*scale )
         
         finalImage = pygame.Surface( (self.width, self.height) ).convert()
         finalImage.blit( img, (0, 0) )
@@ -73,8 +77,9 @@ class MiniMap( Button ):
         dx = float(point[0]-self.rect.left)
         dy = float(point[1]-self.rect.top)
         playState = self.parentState.menu.playState
-        playState.panX = -int(dx/self.scale)+(800/2)
-        playState.panY = -int(dy/self.scale)+(600/2)
+        screenW, screenH = getResolution()
+        playState.panX = -int(dx/self.scale)+(screenW/2)
+        playState.panY = -int(dy/self.scale)+(screenH/2)
 
     def push( self, clickKey, click ):
         self.held = True

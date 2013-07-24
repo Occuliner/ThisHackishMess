@@ -178,12 +178,11 @@ class DevMenu( pygame.sprite.OrderedUpdates ):
                 self.rerenderEverythingIn -= 1
             elif self.rerenderEverythingIn == 0:
                 self.rerenderEverythingIn -= 1
-                changedAreas.append( pygame.Rect( 0 , 0, 800, 600 ) )
+                changedAreas.append( pygame.Rect( 0 , 0, surface.get_width(), surface.get_height() ) )
             return changedAreas
         elif self.wasOpen:
             self.wasOpen = False
-            #return [ self.devPanel.rect ]
-            return [ pygame.Rect( 0, 0, 800, 600 ) ]    
+            return [ pygame.Rect( 0, 0, surface.get_width(), surface.get_height() ) ]    
         else:
             return []
     

@@ -19,6 +19,7 @@
 
 from label import Label
 from minimap import MiniMap
+from getres import getResolution
 
 class MenuState:
     """The MenuState class. Generally serves two purposes:\n""" \
@@ -37,7 +38,7 @@ class MenuState:
         self.keyInput = ""
         self.keyboardEnabled = False
         self.x, self.y = 0, 0
-        self.fileNameLabel = Label( self, menu.playState.fileName, (0,570) )
+        self.fileNameLabel = Label( self, menu.playState.fileName, (0,getResolution()[1]-32) )
         self.addSprite( self.fileNameLabel )
         self.usingMiniMap = miniMap
         if miniMap:
@@ -49,14 +50,15 @@ class MenuState:
         self.addSprite( self.miniMap )
 
     def moveTo( self, x, y ):
+        w, h = getResolution()
         if x-self.x+self.panel.rect.left < 0:
             x -= x-self.x+self.panel.rect.left
-        elif x-self.x+self.panel.rect.right > 800:
-            x -= x-self.x+self.panel.rect.right-800
+        elif x-self.x+self.panel.rect.right > w:
+            x -= x-self.x+self.panel.rect.right-w
         if y-self.y+self.panel.rect.top < 0:
             y -= y-self.y+self.panel.rect.top
-        elif y-self.y+self.panel.rect.bottom > 600:
-            y -= y-self.y+self.panel.rect.bottom-600
+        elif y-self.y+self.panel.rect.bottom > h:
+            y -= y-self.y+self.panel.rect.bottom-h
         dx, dy = x-self.x,y-self.y
         self.x, self.y = x, y
         for each in [ sprite for sprite in self.sprites if not sprite.fixed ]:

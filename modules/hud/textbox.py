@@ -20,6 +20,7 @@ from pygame.locals import *
 
 from hudelement import HudElement
 from imageload import loadImageNoAlpha
+from getres import getResolution
 
 def splitFrames( image, size ):
     frames = []
@@ -42,7 +43,8 @@ class TextBox( HudElement ):
         sheet = loadImageNoAlpha( self.sheetFileName )
         self.originFrames = splitFrames( sheet, (32, 32) )
         if box is None:
-            box = pygame.Rect( (0, 350), (800, 250 ) )
+            w, h = getResolution()
+            box = pygame.Rect( (0, (7.0/12)*h), (w, (5.0/12)*h ) )
         
         img = pygame.Surface( (box.w, box.h) ).convert()
         #img.fill( pygame.Color( 0, 0, 0, 0 ) )

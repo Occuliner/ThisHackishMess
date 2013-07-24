@@ -137,7 +137,7 @@ def loadPlayState( fileName, curTileSet, classDefs, networkServer=None, networkC
         givenState.networkingStarted = True
         networkSever.playStateRef = weakref.ref( givenState )
 
-    #Create it's floor
+    #Create it's floor, I don't think the res here matters as all layers are replaced later anyway.
     givenState.floor = Floor( curTileSet, ( 800, 608 ) )
 
     #Set the amount of ents this file has.

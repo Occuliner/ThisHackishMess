@@ -351,7 +351,8 @@ class PlayState:
         changeRects.extend( [ each.rect for each in self.hudList ] )
         
         if self.rerenderEverything:
-            changeRects.extend( [ pygame.Rect( 0, 0, 800, 600 ) ] )
+            w, h = surface.get_width(), surface.get_height()
+            changeRects.extend( [ pygame.Rect( 0, 0, w, h ) ] )
             self.rerenderEverything = False
         return changeRects
 

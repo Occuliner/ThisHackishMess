@@ -48,7 +48,6 @@ cfg.readConfig()
 
 timer = pygame.time.Clock()
 
-#screen = pygame.display.set_mode( (800, 600) )
 if int(cfg.getVal('fullscreen')) == 1:
     screen = pygame.display.set_mode( (cfg.getWidth(), cfg.getHeight()), pygame.FULLSCREEN )
 else:
@@ -78,7 +77,7 @@ from modules.tilesets.mastertileset import MasterTileSet
 
 prototypeTileGroup = MasterTileSet()
 
-playArea = Floor( prototypeTileGroup, ( 800, 608 ) )
+playArea = Floor( prototypeTileGroup, (cfg.getWidth(), cfg.getHeight()) )
 
 currentState.floor = playArea
 
