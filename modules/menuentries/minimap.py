@@ -23,10 +23,13 @@ class MiniMap( Button ):
         Button.__init__( self, None, None, parentState, True )
         self.width = width
         self.height = height
+        self.scale = None
         self.floor = parentState.menu.playState.floor
         self.image = self.generateImage()
         self.rect = self.image.get_rect()
         self.rect.topleft = pos
+        self.held = False
+        self.heldPos = None
 
     def generateImage( self ):
         rightMostPoint = max( [ each.rect.right for each in self.floor.layers ] )
@@ -46,10 +49,15 @@ class MiniMap( Button ):
             scale = float(self.width)/worldWidth
         else:
             scale = float(self.height)/worldHeight
+        self.scale = scale
         img = pygame.transform.rotozoom(img, 0.0, scale ).convert()
-        pos = playState.panX*scale, playState.panY*scale
+        #pos = playState.panX*scale, playState.panY*scale
+        viewRect = pygame.Rect( playState.panX*scale, playState.panY*scale, 800*scale, 600*scale )
+        
         finalImage = pygame.Surface( (self.width, self.height) ).convert()
-        finalImage.blit( img, pos )
+        finalImage.blit( img, (0, 0) )
+        pygame.draw.rect( finalImage, pygame.Color( 255, 0, 0 ), viewRect, 1 )
+        pygame.draw.rect( finalImage, pygame.Color( 255, 0, 0 ), pygame.Rect( 0, 0, self.width-1, self.height-1 ), 1 )
         return finalImage
 
     def regenerateImage( self ):
@@ -57,3 +65,18 @@ class MiniMap( Button ):
         self.image = self.generateImage()
         self.rect = self.image.get_rect()
         self.rect.topleft = tmpLoc
+
+    def push( self, clickKey, click ):
+        if "down" in clickKey:
+            if "mouse1" in clickKey:
+                dx = float(click[0]-self.rect.left)
+                dy = float(click[1]-self.rect.top)
+                playState = self.parentState.menu.playState
+                playState.panX = int(dx/self.scale)
+                playState.panY = int(dy/self.scale)
+            if "mouse3" in clickKey:
+                self.held = True
+                self.heldPos = click[0]-self.rect.left, click[1]-self.rect.top
+        if "up" in clickKey:
+            self.held = False
+            self.heldPos = None

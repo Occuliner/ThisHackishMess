@@ -78,8 +78,6 @@ class DevMenu( pygame.sprite.OrderedUpdates ):
 
         self.playState.devMenuRef = weakref.ref( self )
         
-        self.miniMapFlip = False
-        
     def toggle( self ):
         """Flips the DevMenu.open boolean, and wasOpen boolean.
         (Also forces the DevMenu into the defaultMenuState)"""
@@ -108,10 +106,6 @@ class DevMenu( pygame.sprite.OrderedUpdates ):
         curMousePos = pygame.mouse.get_pos()
         
         self.menuState.update( dt, None, None, curMousePos )
-        if hasattr( self.menuState, 'miniMap' ):
-            self.miniMapFlip = not self.miniMapFlip
-            if self.miniMapFlip:
-                self.menuState.miniMap.regenerateImage()
         curButtonArea = self.menuState.panel.rect
         for clickKey, clickList in self.clicks.items():
             for eachClick in clickList:

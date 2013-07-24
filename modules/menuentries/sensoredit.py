@@ -96,6 +96,7 @@ class SensorEditState( MenuState ):
                     return eachSprite
     
     def update( self, dt, click, clickKey, curMousePos=None ):
+        MenuState.update( self, dt, click, clickKey, curMousePos )
         if self.curStart is not None:
             if self.snapToGrid:
                 curPoint = gridRound( curMousePos, self.gridX, self.gridY, trueRounding=True )

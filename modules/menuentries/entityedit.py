@@ -233,6 +233,7 @@ class EntityEditState( MenuState ):
     def update( self, dt, click, clickKey, curMousePos=None ):
         """Generic update method. The actual Entity-placing happens in here."""
         #print len( self.menu.playState.sprites() )
+        MenuState.update( self, dt, click, clickKey, curMousePos )
         self.generateButtons()
         if click is not None:
             if clickKey is 'mouse1down':

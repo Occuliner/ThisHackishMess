@@ -371,6 +371,7 @@ class FloorEditState( MenuState ):
     
     def update( self, dt, click, clickKey, curMousePos=None ):
         """Where the actual Tile placing on the Floor happens."""
+        MenuState.update( self, dt, click, clickKey, curMousePos )
         self.menu.playState.lineVisualiser.devMenuLineGroups = []
         for eachLayer in self.floor.layers:
             self.menu.playState.lineVisualiser.devMenuLineGroups.extend( generateListOfLines( eachLayer.rect.topleft, eachLayer.rect.bottomright  ) )

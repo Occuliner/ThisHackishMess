@@ -190,6 +190,7 @@ class TagEditState( MenuState ):
         
 
     def update( self, dt, click, clickKey, curMousePos=None ):
+        MenuState.update( self, dt, click, clickKey, curMousePos )
         if click is not None:
             if clickKey is 'mouse1down':
                 self.curEnt = self.getPressedEnt( curMousePos )

@@ -170,6 +170,7 @@ class BoundaryEditState( MenuState ):
         return sorted( possib.items(), cmp=lambda x, y: cmp( x[0], y[0] ) )[-1][1]
         
     def update( self, dt, click, clickKey, curMousePos=None ):
+        MenuState.update( self, dt, click, clickKey, curMousePos )
         if self.curStart is not None:
             if self.snapToGrid:
                 curPoint = gridRound( curMousePos, self.gridX, self.gridY, trueRounding=True )

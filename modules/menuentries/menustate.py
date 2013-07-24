@@ -39,8 +39,10 @@ class MenuState:
         self.x, self.y = 0, 0
         self.fileNameLabel = Label( self, menu.playState.fileName, (0,570) )
         self.addSprite( self.fileNameLabel )
+        self.usingMiniMap = miniMap
         if miniMap:
             self.addMiniMap()
+        self.miniMapFlip = False
 
     def addMiniMap( self ):
         self.miniMap = MiniMap( self, ( 800-160, 600-120 ), 160, 120 )
@@ -88,11 +90,18 @@ class MenuState:
         self.removeSprite( button )
         self.buttons.remove( button )
 
-    def emptyMenuUpdate( self, dt, clickPoint, clickKey, curMousePos ):
-        """Does absolutely nothing! This is the default to MenuState.update,\n""" \
-        """the method that runs when the user has clicked somewhere outside of the menu,\n""" \
+    def update( self, dt, clickPoint, clickKey, curMousePos ):
+        """The method that runs when the user has clicked somewhere outside of the menu,\n""" \
         """whilst the menu is still open."""
-        pass
+        if self.usingMiniMap:
+            self.miniMapFlip = not self.miniMapFlip
+            if self.miniMapFlip:
+                self.miniMap.regenerateImage()
+            if self.miniMap.held:
+                self.miniMap.rect.topleft = curMousePos[0]-self.miniMap.heldPos[0], curMousePos[1]-self.miniMap.heldPos[1]
+                if not self.miniMap.rect.collidepoint( curMousePos ):
+                    self.miniMap.held = False
+                    self.miniMap.heldPos = None
 
     def keyboardInput( self, keyEvent ):
         self.keyInput += keyEvent
@@ -101,6 +110,4 @@ class MenuState:
         result = self.keyInput
         self.keyInput = ""
         return result
-
-    update = emptyMenuUpdate
 
