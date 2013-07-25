@@ -1,18 +1,24 @@
-#    Copyright (c) 2012 Connor Sherson
-#    This file is part of ThisHackishMess
+# Copyright (c) 2013 Connor Sherson
 #
-#    ThisHackishMess is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
-#    the Free Software Foundation, either version 3 of the License, or
-#    (at your option) any later version.
+# This software is provided 'as-is', without any express or implied
+# warranty. In no event will the authors be held liable for any damages
+# arising from the use of this software.
 #
-#    This program is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU General Public License for more details.
+# Permission is granted to anyone to use this software for any purpose,
+# including commercial applications, and to alter it and redistribute it
+# freely, subject to the following restrictions:
 #
-#    You should have received a copy of the GNU General Public License
-#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#    1. The origin of this software must not be misrepresented; you must not
+#    claim that you wrote the original software. If you use this software
+#    in a product, an acknowledgment in the product documentation would be
+#    appreciated but is not required.
+#
+#    2. Altered source versions must be plainly marked as such, and must not be
+#    misrepresented as being the original software.
+#
+#    3. This notice may not be removed or altered from any source
+#    distribution.
+
 """The devtools file defines the DevMenu class."""
 import pygame, weakref, os
 
@@ -109,18 +115,6 @@ class DevMenu( pygame.sprite.OrderedUpdates ):
         curButtonArea = self.menuState.panel.rect
         for clickKey, clickList in self.clicks.items():
             for eachClick in clickList:
-                #if curButtonArea.collidepoint( eachClick ):
-                #    someButtonPressed = False
-                #    for eachButton in self.buttons:
-                #        if eachButton.rect.collidepoint( eachClick ):
-                #            eachButton.push( clickKey )
-                #            someButtonPressed = True
-                #            break
-                #    if not someButtonPressed and "down" in clickKey:
-                #        self.draggingMenu = True
-                #        self.draggedSpot = curMousePos[0]-self.menuState.x, curMousePos[1]-self.menuState.y
-                #else:
-                #    self.menuState.update( dt, eachClick, clickKey, curMousePos )
                 someButtonPressed = False
                 for eachButton in self.buttons:
                     if eachButton.rect.collidepoint( eachClick ):
