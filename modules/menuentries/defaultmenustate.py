@@ -86,14 +86,23 @@ class LimitField( Button ):
         self.selected = not self.selected
         self.renderImage()
         if not self.selected:
-            if self.prefix == "Left: " and self.text.isdigit():
-                self.parentState.menu.playState.limitX1 = int( self.text )
-            if self.prefix == "Right: " and self.text.isdigit():
-                self.parentState.menu.playState.limitX2 = int( self.text )
-            if self.prefix == "Top: " and self.text.isdigit():
-                self.parentState.menu.playState.limitY1 = int( self.text )
-            if self.prefix == "Bottom: " and self.text.isdigit():
-                self.parentState.menu.playState.limitY2 = int( self.text )
+            try:
+                val = int( self.text )
+                foundVal = True
+            except:
+                if self.text == "":
+                    val = None
+                    foundVal = True
+                else:
+                    foundVal = False
+            if self.prefix == "Left: " and foundVal:
+                self.parentState.menu.playState.limitX1 = val
+            if self.prefix == "Right: " and foundVal:
+                self.parentState.menu.playState.limitX2 = val
+            if self.prefix == "Top: " and foundVal:
+                self.parentState.menu.playState.limitY1 = val
+            if self.prefix == "Bottom: " and foundVal:
+                self.parentState.menu.playState.limitY2 = val
         if self.parentState.field is not None:
             if self.parentState.field is not self and self.selected:
                 self.parentState.field.toggleSelect()
@@ -139,11 +148,12 @@ class DefaultMenuState( MenuState ):
 
     def __init__( self, menu, sprites=[panel, floorEditButton, entityEditButton, saveMapButton, loadMapButton, tagEditButton, boundEditButton, physicsVisButton, sensorEditButton, connectToButton, hostButton, pauseStartButton] ):
         MenuState.__init__( self, menu, sprites )
-        self.limitLabel = Label( self, "World Limits:", ( 24, 204 ), 16 )
+        self.limitLabel = Label( self, "Pan Limits:", ( 24, 204 ), 16, False )
         self.limitX1 = LimitField( self, prefix = "Left: ", text="", pos=( 24, 224 ) )
         self.limitX2 = LimitField( self, prefix = "Right: ", text="", pos=( 24, 240 ) )
         self.limitY1 = LimitField( self, prefix = "Top: ", text="", pos=( 24, 256 ) )
         self.limitY2 = LimitField( self, prefix = "Bottom: ", text="", pos=( 24, 272 ) )
+        self.keyboardEnabled = True
         self.addSprite( self.limitLabel )
         self.addButton( self.limitX1 )
         self.addButton( self.limitX2 )
@@ -153,13 +163,12 @@ class DefaultMenuState( MenuState ):
 
     def update( self, dt, click, clickKey, curMousePos=None ):
         MenuState.update( self, dt, click, clickKey, curMousePos )
+        inputText = self.getKeyboardInput()
         if self.field is not None:
             oldText = self.field.text
             if self.deleteLastChar:
                 self.field.text =  self.field.text[:-1]
                 self.deleteLastChar = False
-            inputText = self.getKeyboardInput()
-            print inputText
             self.field.text += inputText
             if self.field.text != oldText:
                 self.field.createText()

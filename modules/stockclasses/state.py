@@ -27,6 +27,7 @@ from networkmessages import registerMessages
 #from modules.networkents.mindlessentholder import *
 from entity import EntityGroup
 from modules.gamelogic.manager import ActualManager
+from getres import getResolution
 
 """This module defines the PlayState class."""
 
@@ -306,14 +307,15 @@ class PlayState:
 	self.processNetworkEvents( dt )
 
     def setPan( self, x, y ):
+        screenW, screenH = getResolution()
         if self.limitX1 is not None:
-            x = max( self.limitX1, x )
+            x = min( -self.limitX1, x )
         if self.limitX2 is not None:
-            x = min( self.limitX2, x )
+            x = max( -(self.limitX2-screenW), x )
         if self.limitY1 is not None:
-            y = max( self.limitY1, y )
+            y = min( -(self.limitY1), y )
         if self.limitY2 is not None:
-            y = min( self.limitY2, y )
+            y = max( -(self.limitY2-screenH), y )
         self.panX, self.panY = x, y
 
     def sendInput( self, inputDict ):

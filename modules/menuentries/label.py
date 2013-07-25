@@ -19,8 +19,8 @@ import pygame, os
 from staticimage import StaticImage
 
 class Label( StaticImage ):
-    def __init__( self, parentState, text, pos, size=32):
-        StaticImage.__init__( self, None, None, parentState, True )
+    def __init__( self, parentState, text, pos, size=32, fixed=True ):
+        StaticImage.__init__( self, None, None, parentState, fixed )
         self.labelText = pygame.font.Font( os.path.join( "data", "fonts", "PD-tarzeau_-_Atari_Small.ttf" ), size )
         self.text = text
         self.image = self.labelText.render( text, False, pygame.Color( 0, 0, 0 ) )
