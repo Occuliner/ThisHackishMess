@@ -146,7 +146,7 @@ class PlayState:
         self.addGroup( EntityGroup( 'networkPlayers' ), name='networkPlayers' ) 
         print "Beginning hosting..."
 
-    def connectToGame( self ):
+    def connectToGame( self, addr, port ):
         if self.isClient:
             del self.networkNode._client
             gc.collect()
@@ -154,7 +154,7 @@ class PlayState:
             self.isClient = True
             self.initNetworking()
         self.networkNode = NetworkClient( self, self.devMenuRef().masterEntSet.getEntDict(), networkingMode=1 )
-        self.networkNode.connect( "localhost", 1337 )
+        self.networkNode.connect( addr, port )
         print "Connecting..."
 
     def addBoundary( self, point1, point2 ):

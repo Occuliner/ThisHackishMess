@@ -27,7 +27,8 @@ class ConnectToButton( Button ):
 
     def push( self, clickKey, click ):
         if "up" in clickKey:
-            self.parentState.menu.playState.connectToGame()
+            #self.parentState.menu.playState.connectToGame()
+            print "Button disabled until I can be bothered making a proper connect dialog for it."
             #aBoundEditState = SensorEditState( self.parentState.menu )
             #self.parentState.menu.loadMenuState( aBoundEditState )
 
