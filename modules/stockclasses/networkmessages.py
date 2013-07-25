@@ -76,6 +76,12 @@ def registerMessages():
     #This message is sent from the host to the client to tell the client to perform GameLogicManager call.
     pygnetic.register( 'gameLogicCall', ('tickNum', 'methodName', 'callArgs', 'callKwargs') )
 
+    #This message is sent from the host to the client, its a damn map.
+    pygnetic.register( 'sendMapBuffer', ('tickNum', 'mapName', 'mapBuffer') )
+
+    #This message is sent from the host to the client to request a map download.
+    pygnetic.register( 'requsetMapBuffer', ('tickNum', 'mapName') )
+
 ###Merge these all into a single event, each being a sub-event. This is to make sure you receive whole updates. There is no interest in partial updates.
 ##This message is to create a network ent on the client side.
 #pygnetic.register( 'createEnt', ('className', 'id', 'animation', 'frameNum') )

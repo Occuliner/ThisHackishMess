@@ -15,7 +15,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import extern_modules.pygnetic as pygnetic, weakref
+import extern_modules.pygnetic as pygnetic, weakref, os, gzip
 
 from idsource import IdSource
 from picklestuff import loadPlayState
@@ -38,7 +38,8 @@ class ClientHandler(pygnetic.Handler):
             #So, if there is a level name, load that level if found.
             newState = loadPlayState( message.levelName, playState.floor.tileSet, self.client().networkEntsClassDefs.values(), networkClient=self.client() )
             if newState is None:
-                print "Host was on a level you don't have."
+                print "Host was on a level you don't have. Requesting download"
+                self.connection.net_requestMapBuffer( self.client().networkTick, message.mapName )
             else:
                 playState.swap( newState )
         
@@ -164,6 +165,11 @@ class ClientHandler(pygnetic.Handler):
         playState = self.client().playStateRef()
         playState.gameLogicManager.callMethod( ( message.methodName, message.callArgs, message.callKwargs ) )
 
+    def net_sendMapBuffer( self, message, **kwargs ):
+        destFile = gzip.open( message.mapName, 'wb' )
+        destFile.write( message.mapBuffer )
+        destFile.close()
+
     def on_disconnect( self ):
         pass
     
@@ -261,6 +267,14 @@ class ServerHandler(pygnetic.Handler):
                     eachPlayer.body.velocity.x = message.vel[0]
                     eachPlayer.body.velocity.y = message.vel[1]
         playState.gameLogicManager.postNetworkEvent( message )
+
+    def net_requestMapBuffer( self, message, **kwargs ):
+        if not os.path.isfile( message.mapName ):
+            return None
+        theFile = gzip.open( fileName, 'rb' )
+        loadString = theFile.read()
+        theFile.close()
+        self.connection.net_sendMapBuffer( self.server.networkServerRef().networkTick, message.mapName, loadString )
 
     def on_disconnect( self ):
         self.server.networkServerRef().removeClientByConnection( self.connection )
