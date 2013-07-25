@@ -40,6 +40,7 @@ class ClientHandler(pygnetic.Handler):
             if newState is None:
                 print "Host was on a level you don't have. Requesting download"
                 self.connection.net_requestMapBuffer( self.client().networkTick, message.mapName )
+                return None
             else:
                 playState.swap( newState )
         
@@ -169,6 +170,10 @@ class ClientHandler(pygnetic.Handler):
         destFile = gzip.open( message.mapName, 'wb' )
         destFile.write( message.mapBuffer )
         destFile.close()
+        #Reconnect to load the map this time.
+        addr = self.connection.address
+        self.connection.disconnect()
+        self.client().playStateRef().connectToGame( addr, 1337 ) 
 
     def on_disconnect( self ):
         pass
