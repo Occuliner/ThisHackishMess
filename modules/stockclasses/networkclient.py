@@ -96,7 +96,11 @@ class NetworkClient:
         for eachTuple in createTuples:
             #Needs to swap from NetworkEntities to normal entities.
             classDef = self.networkEntsClassDefs[eachTuple[1]]
-            destGroup = getattr( self.playStateRef(), classDef.playStateGroup )
+            if classDef.playStateGroup == "playersGroup":
+                destGroup = getattr( self.playStateRef(), "networkPlayers" )
+            else:
+                destGroup = getattr( self.playStateRef(), classDef.playStateGroup )
+           
             inst = classDef( pos=eachTuple[2], vel=eachTuple[3], group=destGroup )
             inst.id = eachTuple[0]
 
