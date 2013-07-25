@@ -315,7 +315,6 @@ class FloorEditState( MenuState ):
                 if self.currentFloorLayer != eachNum:
                     self.currentFloorLayer = eachNum
                     break
-        self.setClamps()
 
     def setClamps( self ):
         tlp = self.floor.layers[self.currentFloorLayer].rect.topleft
@@ -449,7 +448,6 @@ class FloorEditState( MenuState ):
                 else:
                     curPoint = (curMousePos[0]-self.grabPoint[0], curMousePos[1]-self.grabPoint[1])
                 self.floor.layers[self.currentFloorLayer].rect.topleft = curPoint
-                self.setClamps()
             elif self.currentlyGrabbedClamp == 1:
                 if self.snapToGrid:
                     curPoint = gridRound( curMousePos, self.gridX, self.gridY, trueRounding=True )
@@ -458,7 +456,6 @@ class FloorEditState( MenuState ):
                 nx = curPoint[0]-self.grabPoint[0]
                 ny = curPoint[1]-self.grabPoint[1]
                 self.floor.layers[self.currentFloorLayer].resize( nx-self.topLeftLayerClamp.rect.left, 0, ny-self.topLeftLayerClamp.rect.top, 0 )
-                self.setClamps()
             elif self.currentlyGrabbedClamp == 2:
                 if self.snapToGrid:
                     curPoint = gridRound( curMousePos, self.gridX, self.gridY, trueRounding=True )
@@ -467,7 +464,7 @@ class FloorEditState( MenuState ):
                 nx = curPoint[0]-self.grabPoint[0]
                 ny = curPoint[1]-self.grabPoint[1]
                 self.floor.layers[self.currentFloorLayer].resize( 0, nx-self.bottomRightLayerClamp.rect.left, 0, ny-self.bottomRightLayerClamp.rect.top )
-                self.setClamps()
+        self.setClamps()
 
 class FloorEditButton( Button ):
     """The FloorEditButton class, just creates a Button that invokes FloorEditState on the DevMenu."""
