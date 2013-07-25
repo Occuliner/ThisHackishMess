@@ -70,10 +70,14 @@ class NetworkClient:
 
         self.clientPlayerIds = []
 
+        self.hostAddr = None
+        self.hostPort = None
+
     def connect( self, address, port, message_factory=pygnetic.message.message_factory, **kwargs ):
         self.connection = self._client.connect( address, port, message_factory, **kwargs )
         self.handler = networkhandlers.ClientHandler( self )
         self.connection.add_handler( self.handler )
+        self.hostAddr, self.hostPort = address, port
 
     def getLatency( self ):
         return float( sum( self.latencySamples ) )/len( self.latencySamples )

@@ -171,9 +171,9 @@ class ClientHandler(pygnetic.Handler):
         destFile.write( message.mapBuffer )
         destFile.close()
         #Reconnect to load the map this time.
-        addr = self.connection.address
         self.connection.disconnect()
-        self.client().playStateRef().connectToGame( addr, 1337 ) 
+        playState = self.client().playStateRef()
+        playState.connectToGame( self.client().hostAddr, self.client().hostPort ) 
 
     def on_disconnect( self ):
         pass

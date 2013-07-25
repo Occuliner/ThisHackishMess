@@ -32,7 +32,7 @@ class ClientInfo:
         self.idNum = idNum
 
 class NetworkServer:
-    def __init__( self, playState=None, host="", port=1337, con_limit=4, networkingMode=0 ):
+    def __init__( self, playState, host, port, con_limit=4, networkingMode=0 ):
         self._server = pygnetic.Server( host, port, con_limit )
         self._server.handler = networkhandlers.ServerHandler
         self._server.networkServerRef = weakref.ref( self )

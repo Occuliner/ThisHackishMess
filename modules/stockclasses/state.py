@@ -28,6 +28,7 @@ from networkmessages import registerMessages
 from entity import EntityGroup
 from modules.gamelogic.manager import ActualManager
 from getres import getResolution
+from confighandler import ConfigHandler
 
 """This module defines the PlayState class."""
 
@@ -46,6 +47,8 @@ class PlayState:
     Maintains a list of all entity groups, can update them all, draw them all,
     return a list of all their sprites, and run the collision system."""
     def __init__( self ):
+        self.cfg = ConfigHandler( 'thm.cfg' )
+        self.cfg.readConfig()
         self.groups = []
         self.floor = None
         self.space = pymunk.Space()
@@ -141,7 +144,7 @@ class PlayState:
         else:
             self.isHost = True
             self.initNetworking()
-        self.networkNode = NetworkServer( playState=self, networkingMode=1 )
+        self.networkNode = NetworkServer( self, "", int( cfg.getVal("port") ), networkingMode=1 )
 
         self.addGroup( EntityGroup( 'networkPlayers' ), name='networkPlayers' ) 
         print "Beginning hosting..."
