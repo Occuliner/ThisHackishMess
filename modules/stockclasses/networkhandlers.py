@@ -19,7 +19,7 @@
 #    3. This notice may not be removed or altered from any source
 #    distribution.
 
-import extern_modules.pygnetic as pygnetic, weakref, os, gzip
+import extern_modules.pygnetic as pygnetic, weakref, os, gzip, zlib
 
 from idsource import IdSource
 from picklestuff import loadPlayState
@@ -172,7 +172,7 @@ class ClientHandler(pygnetic.Handler):
 
     def net_sendMapBuffer( self, message, **kwargs ):
         destFile = gzip.open( message.mapName, 'wb' )
-        destFile.write( message.mapBuffer )
+        destFile.write( zlib.decompress( message.mapBuffer ) )
         destFile.close()
         #Reconnect to load the map this time.
         self.connection.disconnect()
@@ -283,7 +283,7 @@ class ServerHandler(pygnetic.Handler):
         theFile = gzip.open( fileName, 'rb' )
         loadString = theFile.read()
         theFile.close()
-        self.connection.net_sendMapBuffer( self.server.networkServerRef().networkTick, message.mapName, loadString )
+        self.connection.net_sendMapBuffer( self.server.networkServerRef().networkTick, message.mapName, zlib.compress( loadString ) )
 
     def on_disconnect( self ):
         self.server.networkServerRef().removeClientByConnection( self.connection )
