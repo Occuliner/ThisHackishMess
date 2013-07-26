@@ -111,7 +111,7 @@ class NetworkClient:
     def removeEntities( self, removeTuples ):
         playState = self.playStateRef()
         for eachId in [ each[0] for each in removeTuples ]:
-            eachEnt = self.findEntById( self, eachId )
+            eachEnt = self.findEntById( eachId )
             if eachEnt is not None:
                 eachEnt.removeFromGroup( *eachEnt.groups() )
         
