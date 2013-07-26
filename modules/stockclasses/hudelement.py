@@ -98,6 +98,9 @@ class HudElement:
     def sendInput( self, inputDict ):
         pass
 
+    def keyboardInput( self, someChr ):
+        pass
+
     def update( self, dt ):
         if self.animated:
             self.frameTime -= dt
