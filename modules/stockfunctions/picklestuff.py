@@ -157,7 +157,7 @@ def loadPlayState( fileName, curTileSet, classDefs, networkServer=None, networkC
         givenState.isClient = True
         networkClient.playStateRef = weakref.ref( givenState )
         for eachGhost in stateTuple.entityGhostList:
-            eachGhost.resurrectNetworked( classDefsDict, givenState )
+            eachGhost.resurrect( classDefsDict, givenState )
     else:
         for eachGhost in stateTuple.entityGhostList:
             eachGhost.resurrect( classDefsDict, givenState )
