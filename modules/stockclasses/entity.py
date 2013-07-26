@@ -301,6 +301,7 @@ class Entity( pygame.sprite.DirtySprite ):
             self.frames = sliceImage( self.sheet, tmpRect, colourKey=self.colourKey )
             if len( self.frames ) is 0:
                 self.frames = [self.sheet]
+            self.originalFrames = [ each.copy() for each in self.frames ]
         else:
             for eachFrame in self.frameRects:
                 img = self.sheet.subsurface( eachFrame )
