@@ -148,7 +148,7 @@ class PlayState:
         else:
             self.isHost = True
             self.initNetworking()
-        self.networkNode = NetworkServer( self, "", int( cfg.getVal("port") ), networkingMode=1 )
+        self.networkNode = NetworkServer( self, "", int( self.cfg.getVal("port") ), networkingMode=1 )
 
         self.addGroup( EntityGroup( 'networkPlayers' ), name='networkPlayers' ) 
         print "Beginning hosting..."
