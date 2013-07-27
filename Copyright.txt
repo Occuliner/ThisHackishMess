@@ -1,6 +1,6 @@
 ThisHackishMess, Copyright (c) 2013 Connor Sherson
 
-The included source files are subject to the ZLIB licence, which is as follows:
+The included source files are subject to the ZLIB license, which is as follows:
 
  This software is provided 'as-is', without any express or implied
  warranty. In no event will the authors be held liable for any damages
