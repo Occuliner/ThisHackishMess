@@ -86,6 +86,9 @@ def registerMessages():
     #This message is sent from the host to the client to request a map download.
     pygnetic.register( 'requsetMapBuffer', ('tickNum', 'mapName') )
 
+    #This message is sent from the client to the host on player death.
+    pygnetic.register( 'playerIsDead', ('tickNum', 'entId') )
+
 ###Merge these all into a single event, each being a sub-event. This is to make sure you receive whole updates. There is no interest in partial updates.
 ##This message is to create a network ent on the client side.
 #pygnetic.register( 'createEnt', ('className', 'id', 'animation', 'frameNum') )

@@ -171,6 +171,8 @@ class ClientHandler(pygnetic.Handler):
         playState.gameLogicManager.callMethod( ( message.methodName, message.callArgs, message.callKwargs ) )
 
     def net_sendMapBuffer( self, message, **kwargs ):
+        playState = self.server.networkServerRef().playStateRef()
+        playState.gameLogicManager.preNetworkEvent( message )
         destFile = gzip.open( message.mapName, 'wb' )
         destFile.write( zlib.decompress( message.mapBuffer ) )
         destFile.close()
@@ -178,6 +180,7 @@ class ClientHandler(pygnetic.Handler):
         self.connection.disconnect()
         playState = self.client().playStateRef()
         playState.connectToGame( self.client().hostAddr, self.client().hostPort ) 
+        playState.gameLogicManager.postNetworkEvent( message )
 
     def on_disconnect( self ):
         pass
@@ -278,12 +281,32 @@ class ServerHandler(pygnetic.Handler):
         playState.gameLogicManager.postNetworkEvent( message )
 
     def net_requestMapBuffer( self, message, **kwargs ):
+        playState = self.server.networkServerRef().playStateRef()
+        playState.gameLogicManager.preNetworkEvent( message )
         if not os.path.isfile( message.mapName ):
             return None
         theFile = gzip.open( fileName, 'rb' )
         loadString = theFile.read()
         theFile.close()
         self.connection.net_sendMapBuffer( self.server.networkServerRef().networkTick, message.mapName, zlib.compress( loadString ) )
+        playState.gameLogicManager.postNetworkEvent( message )
+
+    def net_playerIsDead( self, message, **kwargs ):
+        playState = self.server.networkServerRef().playStateRef()
+        playState.gameLogicManager.preNetworkEvent( message )
+        client = networkServer.getClientByConnection( self.connection )
+
+        if client is not None:
+            playerKey = networkServer.getPlayerKey( client )
+            playerEntList = networkServer.players.get( playerKey, [] )
+
+            for eachPlayer in playerEntList:
+                if eachPlayer.id == message.entId:
+                    eachPlayer.kill()
+                    break
+
+        playState.gameLogicManager.postNetworkEvent( message )
+        
 
     def on_disconnect( self ):
         self.server.networkServerRef().removeClientByConnection( self.connection )
