@@ -189,7 +189,7 @@ class NetworkServer:
             playerEntList = self.players[playerKey]
             del self.players[playerKey]
             for each in playerEntList:
-                if each.alive:
+                if each in self.playStateRef().networkPlayers:
                     each.kill()
 
     def disconnectAll( self ):
