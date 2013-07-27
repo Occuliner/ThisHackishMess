@@ -295,6 +295,7 @@ class ServerHandler(pygnetic.Handler):
         playState = self.server.networkServerRef().playStateRef()
         playState.gameLogicManager.preNetworkEvent( message )
         client = networkServer.getClientByConnection( self.connection )
+        networkServer = self.server.networkServerRef()
 
         if client is not None:
             playerKey = networkServer.getPlayerKey( client )
