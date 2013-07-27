@@ -292,10 +292,10 @@ class ServerHandler(pygnetic.Handler):
         playState.gameLogicManager.postNetworkEvent( message )
 
     def net_playerIsDead( self, message, **kwargs ):
-        playState = self.server.networkServerRef().playStateRef()
+        networkServer = self.server.networkServerRef()
+        playState = networkServer.playStateRef()
         playState.gameLogicManager.preNetworkEvent( message )
         client = networkServer.getClientByConnection( self.connection )
-        networkServer = self.server.networkServerRef()
 
         if client is not None:
             playerKey = networkServer.getPlayerKey( client )
