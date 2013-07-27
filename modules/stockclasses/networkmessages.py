@@ -27,7 +27,7 @@ import extern_modules.pygnetic as pygnetic
 
 def registerMessages():
     #This message is sent when the host doesn't instant-kick the client, it also contains the current level name.
-    pygnetic.register( 'requestInfo', ('soundMgrCurPlayId', 'time', 'levelName') )
+    pygnetic.register( 'requestInfo', ('time') )
 
     #This message is sent on info request
     pygnetic.register( 'hereIsMyInfo', ('time', 'name') )
@@ -89,14 +89,18 @@ def registerMessages():
     #This message is sent from the client to the host on player death.
     pygnetic.register( 'playerIsDead', ('tickNum', 'entId') )
 
-###Merge these all into a single event, each being a sub-event. This is to make sure you receive whole updates. There is no interest in partial updates.
-##This message is to create a network ent on the client side.
-#pygnetic.register( 'createEnt', ('className', 'id', 'animation', 'frameNum') )
-#
-##This message is sent to remove a network ent.
-#pygnetic.register( 'removeEnt', ('id') )
-#
-##This message is sent to update object locations,
+    #This message is sent from host to the client on map load.
+    pygnetic.register( 'loadMap', ('tickNum', 'levelName', 'soundMgrCurPlayId') )
+
+    #This message is sent from the client to the host to request the info needed to recreate the the scene as it is at this point.
+    pygnetic.register( 'requestState', ('tickNum') )
+
+    #This message is sent from the client to the host to request a new loadMap message.
+    pygnetic.register( 'requestLoadMap', ('tickNum') )
+
+    #This message is sent from the client to the host so the host can know it can start sending regular updates to the client.
+    pygnetic.register( 'everythingIsSet', ('tickNum') )
+
 #pygnetic.register( 'entityPositionUpdate', ('id', 'newPosition') )
 #
 ##This message is to send that a certain entity is changing animation.

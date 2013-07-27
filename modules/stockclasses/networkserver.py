@@ -25,7 +25,7 @@ from networkupdateclasses import *
 
 #ClientTuple = namedtuple( 'ClientTuple', ['name', 'connection', 'isPlayer', 'time'] )
 class ClientInfo:
-    def __init__( self, idNum, name, connection, isPlayer, time, lastAckClientTime, lastAckServerTime ):
+    def __init__( self, idNum, name, connection, isPlayer, time, lastAckClientTime, lastAckServerTime, readyForUpdates ):
         self.name = name
         self.connection = connection
         self.isPlayer = isPlayer
@@ -34,6 +34,7 @@ class ClientInfo:
         self.lastAckServerTime = lastAckServerTime
         self.inputCount = 0
         self.idNum = idNum
+        self.readyForUpdates = readyForUpdates
 
 class NetworkServer:
     def __init__( self, playState, host, port, con_limit=4, networkingMode=0 ):
@@ -104,7 +105,7 @@ class NetworkServer:
         if not ( connection.address in [each.address for each in self._server.connections()] ):
             return None
 
-        self.clients.append( ClientInfo( len(self.clients), info.name, connection, False, info.time, info.time, self.timer ) )
+        self.clients.append( ClientInfo( len(self.clients), info.name, connection, False, info.time, info.time, self.timer, False ) )
 
     def sendAlreadyExistingState( self, client ):
         playState = self.playStateRef()
@@ -220,7 +221,7 @@ class NetworkServer:
 
         if not self.extrapolationOn:
             #Iterate over every client
-            for eachClient in self.clients[:]:
+            for eachClient in [ each for each in self.clients if each.readyForUpdates ]:
                 #Check if the connection is still valid:
                 if eachClient.connection.connected:
                     #Time since this client last sent anything:
@@ -234,7 +235,7 @@ class NetworkServer:
                     self.clients.remove( eachClient )
         else:
             #Iterate over every client
-            for eachClient in self.clients[:]:
+            for eachClient in [ each for each in self.clients if each.readyForUpdates ]:
                 #Check if the connection is still valid:
                 if eachClient.connection.connected:
                     #print eachClient.time, self.timer

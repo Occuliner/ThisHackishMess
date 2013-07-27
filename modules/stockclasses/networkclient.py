@@ -22,6 +22,8 @@
 import extern_modules.pygnetic as pygnetic, networkhandlers, weakref, extern_modules.pymunk as pymunk
 from genericpolyfuncs import getExtremesAlongAxis, getMidOfPoints
 from dictfuncs import getClosestInBounds, filterDict, getClosestKey, getInterpolatedPairValue, getSurroundingValues, getSurroundingKeys
+from picklestuff import loadPlayState
+from idsource import IdSource
 
 class NetworkClient:
     def __init__( self, playState=None, networkEntsClassDefs=None, conn_limit=1, networkingMode=0, clientSidePrediction=False, clientSideAuthority=True, resimulationMethod=0, *args, **kwargs ):
@@ -114,7 +116,7 @@ class NetworkClient:
             eachEnt = self.findEntById( eachId )
             if eachEnt is not None:
                 eachEnt.removeFromGroup( *eachEnt.groups() )
-        
+
     def resimulationUsingPymunk( self, startTime, lastAckTime, duration, inputCount, positionTuples, velocityTuples ):
         #So, part of this approximation is that it won't bother remaking everything that was removed from the scene in the mean time, this shouldn't be an issue often however.
         #Work on finding every ent in the ids.
@@ -355,6 +357,27 @@ class NetworkClient:
         for eachPlayer in players:
             self.connection.net_playerUpdate( self.networkTick, self.serverTime, eachPlayer.id, eachPlayer.getPosition(), eachPlayer.body.velocity.int_tuple )
 
+    def loadMap( self, mapName, playId ):
+        #So playId is here to make sure the clients always have the same sound id as the host.
+        playState = self.playStateRef()
+        if not (mapName is "Untitled"):
+            #So, if there is a level name, load that level if found.
+            newState = loadPlayState( mapName, playState.floor.tileSet, self.networkEntsClassDefs.values(), networkClient=self )
+            if newState is None:
+                print "Host was on a level you don't have. Requesting download"
+                self.connection.net_requestMapBuffer( self.networkTick, mapName )
+                return None
+            else:
+                playState.swap( newState )
+        
+        playState.soundManager.idGen = IdSource()
+        if playId != 0:
+            for each in xrange( playId+1 ):
+                playState.soundManager.idGen.getId()
+        playState.soundManager.curPlayId = playId
+        #On a successful load, request state info.
+        self.connection.net_requestState( self.networkTick )
+
     def update( self, dt, timeout=0 ):
         self._client.update( timeout )
         #self.timer += dt
@@ -371,5 +394,4 @@ class NetworkClient:
             for eachMessage in messages:
                 getattr( self.handler, "net_" + type( eachMessage ).__name__ )( eachMessage, resimulation=True )
         self.timer += dt
-        
-        
+
