@@ -250,6 +250,8 @@ while not done:
 
     if currentState.stateToSwap is not None:
         currentState = currentState.stateToSwap
+        #Call game logic events.
+        currentState.gameLogicManager.onLoad()
 
     timeTillFpsPrint -= float(timer.get_time())/1000
     if timeTillFpsPrint < 0:

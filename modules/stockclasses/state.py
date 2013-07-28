@@ -180,9 +180,6 @@ class PlayState:
     def swap( self, newState ):
         self.stateToSwap = newState
 
-        #Call game logic events.
-        self.gameLogicManager.onLoad()
-
     def addInterweaveGroup( self, group, index ):
         if self.interweaveOrder.get( index, None ) is None:
             self.interweaveOrder[index] = [group]
