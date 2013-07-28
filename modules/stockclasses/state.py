@@ -134,6 +134,8 @@ class PlayState:
 
         self.useSuggestedGravityEntityPhysics = False
 
+        self.stateToSwap = None
+
     def initNetworking( self ):
         if not self.networkingStarted:
             #pygnetic.init(logging_lvl=logging.DEBUG)
@@ -176,23 +178,7 @@ class PlayState:
         self.space.remove( givenSeg )
 
     def swap( self, newState ):
-        tmpMenuRef = self.devMenuRef
-        tmpPlayStateRef = self.gameLogicManager.playStateRef
-        self.__dict__ = newState.__dict__
-        for eachGroup in self.groups:
-            eachGroup.playState = self
-        for eachKey, eachVal in self.namedGroups.items():
-            setattr( self, eachKey, eachVal )
-        gc.collect()
-        #Pymunk is leaky for me.
-        for obj in gc.garbage:
-            if obj.__class__.__name__ == "Space":
-                del obj.__dict__['_handlers']
-        del gc.garbage[:]
-        self.devMenuRef = tmpMenuRef
-
-        #I should really get rid of this hackish method eventually.
-        self.gameLogicManager.playStateRef = tmpPlayStateRef
+        self.stateToSwap = newState
 
         #Call game logic events.
         self.gameLogicManager.onLoad()
@@ -314,10 +300,9 @@ class PlayState:
         for eachElement in self.hudList:
             eachElement.update( dt )
 
-        self.gameLogicManager.postTick( dt )
-
         self.soundManager.update( dt )
 	self.processNetworkEvents( dt )
+        self.gameLogicManager.postTick( dt )
 
     def setPan( self, x, y ):
         screenW, screenH = getResolution()

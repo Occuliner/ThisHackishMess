@@ -248,6 +248,9 @@ while not done:
 
     updatedArea = []
 
+    if currentState.stateToSwap is not None:
+        currentState = currentState.stateToSwap
+
     timeTillFpsPrint -= float(timer.get_time())/1000
     if timeTillFpsPrint < 0:
         print timer.get_fps()
