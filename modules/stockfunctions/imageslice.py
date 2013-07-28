@@ -25,9 +25,9 @@ def sliceImage( surface, tmpRect, start=0, finish=None, colourKey=None ):
     """Return subsurfces of size rect from and including the section at the 0-index up to and excluding the finish."""
     rect = tmpRect.copy()
     frames = []
-    rowsize = surface.get_width()/rect.w
-    startingY = math.floor( start/rowsize )*rect.h
-    startingX = start%rowsize*rect.w
+    rowsize = float(surface.get_width())/rect.w
+    startingY = int( math.floor( start/rowsize )*rect.h )
+    startingX = int( start%rowsize*rect.w )
     if finish is not None:
         finishingY = int( math.floor( finish/rowsize ) )*rect.h
         finishingX = finish%rowsize*rect.w

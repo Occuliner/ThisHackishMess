@@ -127,6 +127,7 @@ class SensorEditState( MenuState ):
                 destPoint = min( self.curStart[0], curPoint[0] ), min( self.curStart[1], curPoint[1] )
                 w = abs( self.curStart[0] - curPoint[0] )
                 h = abs( self.curStart[1] - curPoint[1] )
+                destPoint = destPoint[0] + w/2, destPoint[1] + h/2
                 destGroup = getattr( self.menu.playState, PureSensor.playStateGroup )
                 PureSensor( pos=destPoint, group=destGroup, width=w, height=h )
                 self.curStart = None
