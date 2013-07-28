@@ -139,7 +139,7 @@ def loadPlayState( fileName, curTileSet, classDefs, networkServer=None, networkC
         givenState.isHost = True
         givenState.networkNode = networkServer
         givenState.networkingStarted = True
-        networkSever.playStateRef = weakref.ref( givenState )
+        networkServer.playStateRef = weakref.ref( givenState )
 
     #Create it's floor, I don't think the res here matters as all layers are replaced later anyway.
     givenState.floor = Floor( curTileSet, ( 800, 608 ) )
