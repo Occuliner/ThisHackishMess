@@ -176,7 +176,8 @@ class PlayState:
         self.space.remove( givenSeg )
 
     def swap( self, newState ):
-        tmpRef = self.devMenuRef
+        tmpMenuRef = self.devMenuRef
+        tmpPlayStateRef = self.gameLogicManager.playStateRef
         self.__dict__ = newState.__dict__
         for eachGroup in self.groups:
             eachGroup.playState = self
@@ -188,7 +189,10 @@ class PlayState:
             if obj.__class__.__name__ == "Space":
                 del obj.__dict__['_handlers']
         del gc.garbage[:]
-        self.devMenuRef = tmpRef
+        self.devMenuRef = tmpMenuRef
+
+        #I should really get rid of this hackish method eventually.
+        self.gameLogicManager.playStateRef = tmpPlayStateRef
 
         #Call game logic events.
         self.gameLogicManager.onLoad()
