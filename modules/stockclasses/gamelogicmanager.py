@@ -52,7 +52,7 @@ class GameLogicManager:
         #But what you want is probably something like this:
         playState = self.playStateRef()
         if clientInfo.isPlayer:
-            playerKey = playState.networkNode.getPlayerKey( client )
+            playerKey = playState.networkNode.getPlayerKey( clientInfo )
             playerEntList = playState.networkNode.players[playerKey]
             del playState.networkNode.players[playerKey]
             for each in playerEntList:
