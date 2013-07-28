@@ -29,6 +29,36 @@ class GameLogicManager:
     def __init__( self, playState ):
         self.playStateRef = weakref.ref( playState )
 
+    def joinGame( self, clientInfo ):
+        #This occurs on the host-end when a client sends the join game message.
+        #This can vary HUGELY.
+        #The idea is that you should probably create a player instance here.
+        #Below is a template for this method
+        playState = self.playStateRef()
+        if not clientInfo.isPlayer:
+            for each in playState.devMenuRef().masterEntSet.individualSets["players"]:
+                if each.__name__ == "NewPlayer":
+                    classDef = each
+                    break
+            destGroup = getattr( playState, "networkPlayers" )
+            playerEntity = classDef( pos=[0,0], vel=[0,0], group=destGroup )
+            playState.networkNode.players[playState.networkNode.getPlayerKey( clientInfo )] = [ playerEntity ]
+            clientInfo.isPlayer = True
+            clientInfo.connection.net_setPlayerEnt( playState.networkNode.networkTick, playerEntity.id )
+
+    def exitGame( self, clientInfo ):
+        #This occurs on host-end when a client disconnects.
+        #Again, this can vary a lot.
+        #But what you want is probably something like this:
+        playState = self.playStateRef()
+        if clientInfo.isPlayer:
+            playerKey = playState.networkNode.getPlayerKey( client )
+            playerEntList = playState.networkNode.players[playerKey]
+            del playState.networkNode.players[playerKey]
+            for each in playerEntList:
+                if each in playState.networkPlayers:
+                    each.kill()
+
     def callMethod( self, callTuple ):
         if not hasattr( callTuple[0] ):
             print "GameLogicManager has been told to call a method that doesn't exist:", callTuple[0]

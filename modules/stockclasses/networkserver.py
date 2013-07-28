@@ -160,38 +160,10 @@ class NetworkServer:
         client = self.getClientByConnection( connection )
         if client is not None:
             self.clients.remove( client )
-            if client.isPlayer:
-                self.removePlayer( client )
+            self.playStateRef().gameLogicManager.exitGame( client )
 
     def getPlayerKey( self, client ):
         return client.idNum
-
-    def addPlayer( self, client ):
-        #This can vary HUGELY.
-        #The idea is that you should probably create a player instance here.
-        #Below is a template for this method
-        
-        if not client.isPlayer:
-            for each in self.playStateRef().devMenuRef().masterEntSet.individualSets["players"]:
-                if each.__name__ == "NewPlayer":
-                    classDef = each
-                    break
-            destGroup = getattr( self.playStateRef(), "networkPlayers" )
-            playerEntity = classDef( pos=[0,0], vel=[0,0], group=destGroup )
-            self.players[self.getPlayerKey( client )] = [ playerEntity ]
-            client.isPlayer = True
-            client.connection.net_setPlayerEnt( self.networkTick, playerEntity.id )
-
-    def removePlayer( self, client ):
-        #Again, this can vary a lot.
-        #But what you want is probably something like this:
-        if client.isPlayer:
-            playerKey = self.getPlayerKey( client )
-            playerEntList = self.players[playerKey]
-            del self.players[playerKey]
-            for each in playerEntList:
-                if each in self.playStateRef().networkPlayers:
-                    each.kill()
 
     def disconnectAll( self ):
         [ each.disconnect() for each in self._server.connections() if each.connected ]

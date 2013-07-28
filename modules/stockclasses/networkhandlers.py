@@ -211,7 +211,9 @@ class ServerHandler(pygnetic.Handler):
         playState.gameLogicManager.preNetworkEvent( message )
         client = self.server.networkServerRef().getClientByConnection( self.connection )
         self.connection.net_acceptPlayer( client.name )
-        self.server.networkServerRef().addPlayer( client )
+        
+        playState.gameLogicManager.joinGame( client )
+
         playState.gameLogicManager.postNetworkEvent( message )
 
     def net_chatToHost( self, message, **kwargs ):
