@@ -126,7 +126,10 @@ class EntityGhost:
         destGroup = getattr( playState, classDef.playStateGroup )
 
         #Init the instance.
-        theInst = classDef( self.loc, group=destGroup )
+        if "PureSensor" in self.className:
+            theInst = classDef( self.loc, group=destGroup, width=self.instanceSpecificVars['w'], height=self.instanceSpecificVars['h'] )
+        else:
+            theInst = classDef( self.loc, group=destGroup )
 
 
         #Set all the Ghost data onto the new physics objects if applicable.

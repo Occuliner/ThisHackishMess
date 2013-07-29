@@ -43,6 +43,8 @@ class PureSensor( Entity ):
         self.visible = 0
         if PureSensor.instanceSpecificVars is None:
             attrList = list( self.__dict__.keys() )
+        
+        self.w, self.h = width, height
         if PureSensor.instanceSpecificVars is None:
             PureSensor.instanceSpecificVars = dict( [ ( eachKey, eachVal ) for eachKey, eachVal in self.__dict__.items() if eachKey not in attrList ] )
 
