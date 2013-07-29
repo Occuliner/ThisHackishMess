@@ -46,6 +46,8 @@ class ClientHandler(pygnetic.Handler):
 
         self.client().loadMap( message.levelName, message.soundMgrCurPlayId )
 
+        self.client().clientPlayerIds = []
+
         playState.gameLogicManager.postNetworkEvent( message )
 
     def net_acceptPlayer( self, message, **kwargs ):
