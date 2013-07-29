@@ -184,6 +184,9 @@ class EntityEditState( MenuState ):
         if len( newEnts ) == len( self.processedEnts ):
             return None
         for eachEnt in [ each for each in newEnts if each not in self.processedEnts ]:
+            if "PureSensor" in eachEnt.__name__:
+                #Don't add PureSensor.
+                continue
             position = ( self.xPos + 21, self.yPos + 30 )
             givenButton = EntButton( eachEnt, self.curEntNum, position, self )
             self.processedEnts.append( eachEnt )

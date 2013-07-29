@@ -23,6 +23,8 @@ from entity import *
 
 import pygame
 
+from masterentityset import *
+
 class PureSensor( Entity ):
     setName = "pureSensors"
     playStateGroup = "genericStuffGroup"
@@ -43,3 +45,5 @@ class PureSensor( Entity ):
             attrList = list( self.__dict__.keys() )
         if PureSensor.instanceSpecificVars is None:
             PureSensor.instanceSpecificVars = dict( [ ( eachKey, eachVal ) for eachKey, eachVal in self.__dict__.items() if eachKey not in attrList ] )
+
+MasterEntitySet.entsToLoad.append( PureSensor )
