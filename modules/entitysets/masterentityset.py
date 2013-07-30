@@ -19,40 +19,29 @@
 #    3. This notice may not be removed or altered from any source
 #    distribution.
 
+import sys
+
 class MasterEntitySet:
     entsToLoad = []
 
     def __init__( self ):
-        self.individualSets = {}
+        self.entityDefs = {}
 
-        self.updateEnts()
+    def getEntityClass( self, className ):
+        classDef = self.entityDefs.get( className )
+        if classDef is not None:
+            return classDef
+        self.importClass( className )
+	classDef = self.entityDefs.get( className )
+        if classDef is not None:
+            return classDef
+
+    def importClass( self, className ):
+        __import__( "_" + className.lower() )
+           
+        self.entityDefs.update( sys.modules[moduleName].__dict__ )
+        
     
-    def addEnt( self, ent ):
-        
-        if ent.setName in self.individualSets:
-            listOfNames = [ each.__name__ for each in self.individualSets[ent.setName] ]
-            if ent.__name__ in listOfNames:
-                self.individualSets[ent.setName][ listOfNames.index( ent.__name__ ) ] = ent
-            else:
-                self.individualSets[ent.setName].append( ent )
-        else:
-            self.individualSets[ent.setName] = [ent]
-        
     def getEnts( self ):
-        returnList = []
-        for eachKey, eachVal in self.individualSets.items():
-            returnList.extend( eachVal )
-        return returnList
-
-    def getEntDict( self ):
-        returnDict = {}
-        for eachKey, eachVal in self.individualSets.items():
-            for eachEnt in eachVal:
-                returnDict[eachEnt.__name__] = eachEnt
-        return returnDict
-
-    def updateEnts( self ):
-        for eachClass in self.entsToLoad:
-            self.addEnt( eachClass )
-            self.entsToLoad.remove( eachClass )
+	return self.entityDefs.values()
 
