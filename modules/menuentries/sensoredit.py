@@ -21,7 +21,7 @@
 
 import pygame, os
 
-from modules.entitysets.puresensor import PureSensor
+from modules.entitysets._puresensor import PureSensor
 
 from imageload import loadImage
 
