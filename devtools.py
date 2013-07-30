@@ -35,8 +35,10 @@ class DevMenu( pygame.sprite.OrderedUpdates ):
     the playState. Ultimately it is a middle-section between the 
     main-loop and the various menu states."""
     
-    def __init__( self,  gamePlayState, ):
+    def __init__( self,  gamePlayState, devMode ):
         pygame.sprite.OrderedUpdates.__init__( self )
+
+        self.devMode = devMode
 
         self.theModuleLoader = ModuleLoader(globals(), locals())
         self.theModuleLoader.loadModules("modules")
@@ -67,6 +69,9 @@ class DevMenu( pygame.sprite.OrderedUpdates ):
         self.playState = gamePlayState
 
         self.masterEntitySet = MasterEntitySet()
+        #If in devMode, force load every damn ent.
+        if self.devMode:
+            self.masterEntitySet.loadAllEnts()
 
         self.defaultMenuState = DefaultMenuState( self )
 

@@ -19,7 +19,7 @@
 #    3. This notice may not be removed or altered from any source
 #    distribution.
 
-import sys
+import sys, os
 
 class MasterEntitySet:
     entsToLoad = []
@@ -44,4 +44,13 @@ class MasterEntitySet:
     
     def getEnts( self ):
 	return self.entityDefs.values()
+
+    def loadAllEnts( self ):
+        listOfNames = os.listdir( os.path.join( 'modules', 'entitysets', ) )
+	listOfNames = [ each for each in listOfNames if ( each[0] == "_" and each[-3:] == ".py" ) ]
+        listOfNames = [ each.replace(".py", "") for each in listOfNames ]
+        
+        for eachName in listOfNames:
+            __import__( eachName )
+            self.entityDefs.update( sys.modules[eachName].__dict__ )
 

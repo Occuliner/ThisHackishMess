@@ -27,7 +27,7 @@ class ConfigHandler:
         #self.fileText = open( 'thm.cfg', 'r' ).readlines()
         self.debug = debug
         self.configVals = dict()
-        self.defaults = { 'screen_width':'800', 'screen_height':'600', 'fullscreen':'False', 'caption':'ThisHackishMess' }
+        self.defaults = { 'screen_width':'800', 'screen_height':'600', 'fullscreen':'0', 'caption':'ThisHackishMess', 'dev_mode':'1' }
 
     def readConfig( self ):
         theFile = open( self.fileName, 'r' )

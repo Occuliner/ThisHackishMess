@@ -100,8 +100,10 @@ currentState.addGroup( playerGroup, isPlayerGroupBool=True )
 
 currentState.addGroup( genericStuffGroup, name="genericStuffGroup", indexValue=0 )
 
+devMode = cfg.getVal('dev_mode') == "1"
+
 #Make the dev menu
-theDevMenu = DevMenu( currentState )
+theDevMenu = DevMenu( currentState, devMode )
 
 #Delete a lot of unneeded stuff.
 del levelWarpGroup, playerGroup, genericStuffGroup, playArea, DevDraftSet, MasterTileSet, prototypeTileGroup
@@ -170,12 +172,9 @@ while not done:
                 inputDict['K_DOWN'] = 'down'
             elif event.key == K_TAB:
                 
-                #OPEN PANEL
-                
-                theDevMenu.toggle()    
-                #pass
-
-                #theYasb.nextFrame()
+                if devMode:
+                    #OPEN PANEL
+                    theDevMenu.toggle()
 
             elif event.key in [ K_LSHIFT, K_RSHIFT ]:
                 shiftHeld = True
