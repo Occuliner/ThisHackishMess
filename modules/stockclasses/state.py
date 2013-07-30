@@ -162,7 +162,7 @@ class PlayState:
         else:
             self.isClient = True
             self.initNetworking()
-        self.networkNode = NetworkClient( self, self.devMenuRef().masterEntSet.getEntDict(), networkingMode=1 )
+        self.networkNode = NetworkClient( self, networkingMode=1 )
         self.networkNode.connect( addr, port )
 
         self.addGroup( EntityGroup( 'networkPlayers' ), name='networkPlayers' ) 

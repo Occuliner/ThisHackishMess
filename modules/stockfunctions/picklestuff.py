@@ -120,7 +120,7 @@ def dumpPlayState( givenState, fileName, saveHud=False ):
 
         
 
-def loadPlayState( fileName, curTileSet, classDefs, networkServer=None, networkClient=None, loadHud=False ):
+def loadPlayState( fileName, curTileSet, networkServer=None, networkClient=None, loadHud=False ):
     #Get the StateStoreTuple.
     stateTuple = loadObjectFromFile( fileName )
     if stateTuple is None:
@@ -147,9 +147,6 @@ def loadPlayState( fileName, curTileSet, classDefs, networkServer=None, networkC
     #Set the amount of ents this file has.
     givenState.amountOfEntsOnLoad = len( stateTuple.entityGhostList )
 
-    #Generate class dict.
-    classDefsDict = dict( [ ( eachClass.__name__, eachClass ) for eachClass in classDefs ] )
-
     #Add all ze entities.
     if not (networkClient is None):
         givenState.networkNode = networkClient
@@ -157,10 +154,10 @@ def loadPlayState( fileName, curTileSet, classDefs, networkServer=None, networkC
         givenState.isClient = True
         networkClient.playStateRef = weakref.ref( givenState )
         for eachGhost in stateTuple.entityGhostList:
-            eachGhost.resurrect( classDefsDict, givenState )
+            eachGhost.resurrect( givenState )
     else:
         for eachGhost in stateTuple.entityGhostList:
-            eachGhost.resurrect( classDefsDict, givenState )
+            eachGhost.resurrect( givenState )
 
     #Replace the floor layers.
     givenState.floor.layers = [ FloorLayer( pos=each[1], image=makeImageFromBuffer( each[0] ) ) for each in stateTuple.floorImageBuffers ]

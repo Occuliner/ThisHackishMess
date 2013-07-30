@@ -26,14 +26,12 @@ from picklestuff import loadPlayState
 from idsource import IdSource
 
 class NetworkClient:
-    def __init__( self, playState=None, networkEntsClassDefs=None, conn_limit=1, networkingMode=0, clientSidePrediction=False, clientSideAuthority=True, resimulationMethod=0, *args, **kwargs ):
+    def __init__( self, playState=None, conn_limit=1, networkingMode=0, clientSidePrediction=False, clientSideAuthority=True, resimulationMethod=0, *args, **kwargs ):
         self._client = pygnetic.Client( conn_limit, *args, **kwargs )
         
         self.playStateRef = weakref.ref( playState )
 
         self.networkTick = None
-
-        self.networkEntsClassDefs = networkEntsClassDefs
 
         self.handler = None
 
@@ -101,7 +99,7 @@ class NetworkClient:
     def createEntities( self, createTuples ):
         for eachTuple in createTuples:
             #Needs to swap from NetworkEntities to normal entities.
-            classDef = self.networkEntsClassDefs[eachTuple[1]]
+            classDef = self.playStateRef().devMenuRef().masterEntitySet.getEntity( eachTuple[1] )
             if classDef.playStateGroup == "playersGroup":
                 destGroup = getattr( self.playStateRef(), "networkPlayers" )
             else:
@@ -116,156 +114,6 @@ class NetworkClient:
             eachEnt = self.findEntById( eachId )
             if eachEnt is not None:
                 eachEnt.removeFromGroup( *eachEnt.groups() )
-
-    def resimulationUsingPymunk( self, startTime, lastAckTime, duration, inputCount, positionTuples, velocityTuples ):
-        #So, part of this approximation is that it won't bother remaking everything that was removed from the scene in the mean time, this shouldn't be an issue often however.
-        #Work on finding every ent in the ids.
-        #print startTime
-
-        playState = self.playStateRef()
-        positionDict = dict( positionTuples )
-        velocityDict = dict( velocityTuples )
-
-        timeKeys = sorted( playState.stateLog.keys() )
-        #If the sent inputCount doesn't match our local one, at that time, then ignore the update.
-        #Naaah
-
-
-        # TODO: This whole thing is toooo daaaamn slow.
-        # I need to add indexing to PlayState so this isn't done over and over.
-        entDict = {}
-        for eachTuple in velocityTuples:
-            eachId = eachTuple[0]
-            eachEnt = self.findEntById( eachId )
-            if eachEnt is None:
-                velocityTuples.remove(eachTuple)
-            else:
-                entDict[eachId] = eachEnt
-        #for eachTuple in [ each for each in positionTuples if entDict.get(each[0]) is None ]:
-        for eachTuple in [ each for each in positionTuples if each[0] not in entDict.keys() ]:
-            eachId = eachTuple[0]
-            eachEnt = self.findEntById( eachId )
-            if eachEnt is None:
-                positionTuples.remove(eachTuple)
-            else:
-                entDict[eachId] = eachEnt
-        #Now, go through every entity, check if the logs are correct, if they're not, flick a boolean and escape the loop.
-        resim = False
-
-        #print 'Vel '.join([ str((velocityTuples[each][1], getClosestInBounds(entDict[each].logOfVelocities, startTime))) for each in entDict.keys() ])
-        #print 'Pos '.join([ str((positionTuples[each][1], getClosestInBounds(entDict[each].logOfVelocities, startTime))) for each in entDict.keys() ])
-        
-        for eachTuple in positionTuples:
-            eachEnt = entDict[eachTuple[0]]
-            #print "Position",
-            posAtTime = getClosestInBounds(eachEnt.logOfPositions, startTime)
-            #posAtTime = getInterpolatedPairValue(eachEnt.logOfPositions, startTime)
-            if posAtTime is None:
-                #print sorted( eachEnt.logOfPositions.keys() ), startTime
-                continue
-            if posAtTime is not None:
-                #print "Position"
-                #print eachTuple[1]
-                deltaPos = eachTuple[1][0]-posAtTime[0], eachTuple[1][1]-posAtTime[1]
-                #print deltaPos
-                if abs( deltaPos[0] ) > 1 or abs( deltaPos[1] ) > 1:
-                    print "Position"
-                    timeOfGottenPos = [ each for each in eachEnt.logOfPositions.keys() if eachEnt.logOfPositions[each] == posAtTime ]
-                    #surroundingTimes = getSurroundingKeys( eachEnt.logOfPositions, startTime )
-                    print posAtTime, eachTuple[1], startTime, timeOfGottenPos, [ ( eachKey, eachEnt.logOfPositions[eachKey] ) for eachKey in sorted( eachEnt.logOfPositions.keys() ) ]#]eachEnt.logOfPositions
-                    #for eachKey, eachVal in eachEnt.logOfPositions.items():
-                    #    if eachVal == eachTuple[1]:
-                    #        print 'trueTime', eachKey, startTime-eachKey#timeOfGottenPos[0]-eachKey
-                    #print eachEnt.logOfPositions[timeKeys.index(posAtTime)-1], eachEnt.logOfPositions[timeKeys.index(posAtTime)+1]
-                    resim = True
-                    break
-        if resim == False:
-            for eachTuple in velocityTuples:
-                eachEnt = entDict[eachTuple[0]]
-                #print "Velocity",
-                velAtTime = getClosestInBounds(eachEnt.logOfVelocities, startTime)
-                #velAtTime = getInterpolatedPairValue(eachEnt.logOfVelocities, startTime)
-                if velAtTime is None:
-                    continue
-                #print "Velocity"
-                #print eachTuple[1]
-                deltaVel = eachTuple[1][0]-velAtTime[0], eachTuple[1][1]-velAtTime[1]
-                deltaPos = deltaVel[0]*(self.timer-startTime), deltaVel[1]*(self.timer-startTime)
-                if abs( deltaPos[0] ) > 1 or abs( deltaPos[1] ) > 1:
-                    print "Velocity"
-                    resim = True
-                    #timeOfGottenPos = [ each for each in eachEnt.logOfVelocities.keys() if eachEnt.logOfVelocities[each] == velAtTime ]
-                    #print velAtTime, eachTuple[1], startTime, timeOfGottenPos, eachEnt.logOfVelocities    
-                    #for eachKey, eachVal in eachEnt.logOfVelocities.items():
-                    #    if eachVal == eachTuple[1]:
-                    #        print 'trueTime', eachKey, timeOfGottenPos[0]-eachKey
-                    #print eachEnt.logOfPositions[timeKeys.index(velAtTime)-1], eachEnt.logOfPositions[timeKeys.index(velAtTime)+1]
-                    break
-        
-        for eachKey in playState.clientSideCorrectionInputBuffer.keys():
-            if eachKey < (startTime):
-                del playState.clientSideCorrectionInputBuffer[eachKey]
-        for eachEnt in entDict.values():
-            #eachEnt.logOfPositions = dict( [ (eachTime, eachEnt.logOfPositions
-            eachEnt.logOfPositions = filterDict( eachEnt.logOfPositions, lambda x: x >= startTime )
-            if eachEnt.collidable:
-                eachEnt.logOfVelocities = filterDict( eachEnt.logOfVelocities, lambda x: x >= startTime )
-
-        if resim:
-            print "Resimulating, startTime:", startTime, "duration:", duration, "self.timer", self.timer
-            #Set everything how it was. By purging everything!
-
-            for eachGroup in playState.groups:
-                eachGroup.remove( *eachGroup.sprites() )
-
-
-            #timeKeys = sorted( playState.stateLog.keys() )
-            
-            #startIndex = timeKeys.index( startTime ) + 1
-            #startIndex = timeKeys.index( getClosestKey( playState.stateLog, startTime ) )
-            #if timeKeys[startIndex] < startTime:
-            #    startIndex += 1
-            #timeKeys = timeKeys[startIndex:]
-            #timeKeys.insert(0, startTime)
-            timeKeys = [ each for each in timeKeys if each > startTime ]
-            timeKeys.insert(0, startTime)
-            startIndex = 1
-            
-            classDefs = playState.devMenuRef().masterEntSet.getEnts()
-            classDefsDict = dict( [ ( eachClass.__name__, eachClass ) for eachClass in classDefs ] )
-            classDefsDict.update( self.networkEntsClassDefs )
-            #for eachGhost in playState.stateLog[startTime]:
-            #for eachGhost in getClosestInBounds( playState.stateLog, startTime ):
-            for eachGhost in getSurroundingValues( playState.stateLog, startTime )[0]:
-                if eachGhost.collidable:
-                    eachGhost.bodyGhost.position = positionDict[eachGhost.id][0], positionDict[eachGhost.id][1]
-                    eachGhost.loc = eachGhost.bodyGhost.position
-                    eachGhost.bodyGhost.velocity = velocityDict[eachGhost.id]
-                else:
-                    eachGhost.loc = positionDict[eachGhost.id][0], positionDict[eachGhost.id][1]
-                eachGhost.resurrectNetworked( classDefsDict, playState )
-
-            self.timer = timeKeys[startIndex]
-            tmpInputBuffer = dict( playState.clientSideCorrectionInputBuffer )
-            playState.stateLog = dict()
-            #Now, LOG PURGE
-            #for eachKey in playState.clientSideCorrectionInputBuffer.keys():
-            #    if eachKey < (startTime):
-            #        del playState.clientSideCorrectionInputBuffer[eachKey]
-
-            for eachIndex in range( startIndex, len( timeKeys ) ):
-                eachTime = timeKeys[eachIndex]
-                dt = eachTime-timeKeys[eachIndex-1]
-                inputDicts = tmpInputBuffer.get( eachTime )
-                
-                if inputDicts is None:
-                    inputDicts = []
-                playState.resimulationUpdate( dt, eachTime, inputDicts )
-        else:
-            #playState.stateLog = dict( [ (eachKey, playState.stateLog[eachKey]) for eachKey in playState.stateLog.keys() if eachKey >= startTime ] )
-            print "Everything's fine."
-            playState.stateLog = filterDict( playState.stateLog, lambda x: x >= startTime )
-        #self.needToFullyResimulate = False
 
     def findEntById( self, theId ):
         for eachEnt in self.playStateRef().sprites():

@@ -180,7 +180,7 @@ class EntityEditState( MenuState ):
         self.menu.loadMenuState( self )
 
     def generateButtons( self ):
-        newEnts = self.menu.masterEntSet.getEnts()
+        newEnts = self.menu.masterEntitySet.getEnts()
         if len( newEnts ) == len( self.processedEnts ):
             return None
         for eachEnt in [ each for each in newEnts if each not in self.processedEnts ]:

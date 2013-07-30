@@ -66,7 +66,7 @@ class DevMenu( pygame.sprite.OrderedUpdates ):
 
         self.playState = gamePlayState
 
-        self.masterEntSet = MasterEntitySet()
+        self.masterEntitySet = MasterEntitySet()
 
         self.defaultMenuState = DefaultMenuState( self )
 
@@ -76,8 +76,8 @@ class DevMenu( pygame.sprite.OrderedUpdates ):
         #Foricbly reload everything in EntitySets so that they're actually added 
         #to the MasterEntSet, I should really find someway of doing this right
         #the first time.
-	self.theModuleLoader.loadModules( os.path.join( "modules", "entitysets" ) )
-        self.masterEntSet.updateEnts()
+	#self.theModuleLoader.loadModules( os.path.join( "modules", "entitysets" ) )
+        #self.masterEntSet.updateEnts()
 
         self.draggingMenu = False
         self.draggedSpot = [0,0]
@@ -150,10 +150,9 @@ class DevMenu( pygame.sprite.OrderedUpdates ):
             #classUpdateInPlace( self.playState, globals(), locals() )
 
             #ISOLATED CODE 1
-            map(lambda eachSprite:classUpdateInPlace(eachSprite, globals(), locals()), self.playState.sprites())
+            #map(lambda eachSprite:classUpdateInPlace(eachSprite, globals(), locals()), self.playState.sprites())
 
             self.playState.floor.tileSet.updateSets()
-            self.masterEntSet.updateEnts()
         if self.playState.forceUpdateEverything:
             map(lambda eachSprite:classUpdateInPlace(eachSprite, globals(), locals()), self.sprites())
             #classUpdateInPlace( self.playState, globals(), locals() )

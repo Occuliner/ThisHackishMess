@@ -113,15 +113,15 @@ class EntityGhost:
 	#Get the childrens' ids.
         self.childrenIds = [ each.id for each in theEntity.children ]
 
-    def resurrect( self, classDefs, playState ):
+    def resurrect( self, playState ):
         """This is the standard resurrect function. It takes a dict of ClassName:Class for finding the right constructor to call,
          and the playState as parameters."""
 
         #PUT TESTS FOR SUPPORTED SERIALIZABLE PYGAME FORMATS. Such as Surfaces.
 
         #Get the appropriate class def.
-        classDef = classDefs[self.className]
-        
+        classDef = playState.devMenuRef().masterEntitySet.getEntity( self.className )
+       
         #Get the dest group.
         destGroup = getattr( playState, classDef.playStateGroup )
 
