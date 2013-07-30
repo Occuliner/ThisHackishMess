@@ -250,7 +250,6 @@ while not done:
     if currentState.stateToSwap is not None:
         currentState = currentState.stateToSwap
         theDevMenu.playState = currentState
-        currentState.devMenuRef = weakref.ref( theDevMenu )
         #Call game logic events.
         currentState.gameLogicManager.onLoad()
 

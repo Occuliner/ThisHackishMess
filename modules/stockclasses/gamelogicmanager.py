@@ -36,7 +36,7 @@ class GameLogicManager:
         #Below is a template for this method
         playState = self.playStateRef()
         if not clientInfo.isPlayer:
-            classDef = playState.devMenuRef().masterEntitySet.getEntity("NewPlayer")
+            classDef = playState.devMenuRef().masterEntitySet.getEntityClass("NewPlayer")
             destGroup = getattr( playState, "networkPlayers" )
             playerEntity = classDef( pos=[0,0], vel=[0,0], group=destGroup )
             playState.networkNode.players[playState.networkNode.getPlayerKey( clientInfo )] = [ playerEntity ]

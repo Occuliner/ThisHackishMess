@@ -120,7 +120,7 @@ class EntityGhost:
         #PUT TESTS FOR SUPPORTED SERIALIZABLE PYGAME FORMATS. Such as Surfaces.
 
         #Get the appropriate class def.
-        classDef = playState.devMenuRef().masterEntitySet.getEntity( self.className )
+        classDef = playState.devMenuRef().masterEntitySet.getEntityClass( self.className )
        
         #Get the dest group.
         destGroup = getattr( playState, classDef.playStateGroup )

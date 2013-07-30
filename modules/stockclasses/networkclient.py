@@ -99,7 +99,7 @@ class NetworkClient:
     def createEntities( self, createTuples ):
         for eachTuple in createTuples:
             #Needs to swap from NetworkEntities to normal entities.
-            classDef = self.playStateRef().devMenuRef().masterEntitySet.getEntity( eachTuple[1] )
+            classDef = self.playStateRef().devMenuRef().masterEntitySet.getEntityClass( eachTuple[1] )
             if classDef.playStateGroup == "playersGroup":
                 destGroup = getattr( self.playStateRef(), "networkPlayers" )
             else:

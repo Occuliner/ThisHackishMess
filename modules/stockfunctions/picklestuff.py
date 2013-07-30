@@ -120,7 +120,7 @@ def dumpPlayState( givenState, fileName, saveHud=False ):
 
         
 
-def loadPlayState( fileName, curTileSet, networkServer=None, networkClient=None, loadHud=False ):
+def loadPlayState( fileName, curTileSet, devMenuRef, networkServer=None, networkClient=None, loadHud=False ):
     #Get the StateStoreTuple.
     stateTuple = loadObjectFromFile( fileName )
     if stateTuple is None:
@@ -129,6 +129,7 @@ def loadPlayState( fileName, curTileSet, networkServer=None, networkClient=None,
 
     #Create a new playState
     givenState = state.PlayState()
+    givenState.devMenuRef = devMenuRef
 
     #Create the groups.
     givenState.addGroup( EntityGroup(), name="levelWarpGroup" )
