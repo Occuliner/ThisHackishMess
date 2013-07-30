@@ -210,7 +210,7 @@ class NetworkClient:
         playState = self.playStateRef()
         if not (mapName is "Untitled"):
             #So, if there is a level name, load that level if found.
-            newState = loadPlayState( mapName, playState.floor.tileSet, self.networkEntsClassDefs.values(), networkClient=self )
+            newState = loadPlayState( mapName, playState.floor.tileSet, playState.devMenuRef, networkClient=self )
             if newState is None:
                 print "Host was on a level you don't have. Requesting download"
                 self.connection.net_requestMapBuffer( self.networkTick, mapName )
