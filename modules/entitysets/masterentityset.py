@@ -37,7 +37,8 @@ class MasterEntitySet:
             return classDef
 
     def importClass( self, className ):
-        __import__( "_" + className.lower() )
+        moduleName = "modules.entitysets." + "_" + className.lower()
+        __import__( moduleName )
            
         self.entityDefs.update( sys.modules[moduleName].__dict__ )
         
@@ -47,10 +48,9 @@ class MasterEntitySet:
 
     def loadAllEnts( self ):
         listOfNames = os.listdir( os.path.join( 'modules', 'entitysets', ) )
-	listOfNames = [ each for each in listOfNames if ( each[0] == "_" and each[-3:] == ".py" ) ]
-        listOfNames = [ each.replace(".py", "") for each in listOfNames ]
+	listOfNames = [ each for each in listOfNames if ( each[0] == "_" and each[-3:] == ".py" and each[:2] != "__" ) ]
+        listOfNames = [ each.replace(".py", "").replace("_", "") for each in listOfNames ]
         
         for eachName in listOfNames:
-            __import__( eachName )
-            self.entityDefs.update( sys.modules[eachName].__dict__ )
+            self.importClass( eachName )
 

@@ -100,7 +100,7 @@ currentState.addGroup( playerGroup, isPlayerGroupBool=True )
 
 currentState.addGroup( genericStuffGroup, name="genericStuffGroup", indexValue=0 )
 
-devMode = cfg.getVal('dev_mode') == "1"
+devMode = cfg.getVal('dev_mode') == "1\n"
 
 #Make the dev menu
 theDevMenu = DevMenu( currentState, devMode )
