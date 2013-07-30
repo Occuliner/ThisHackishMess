@@ -40,7 +40,10 @@ class MasterEntitySet:
         moduleName = "modules.entitysets." + "_" + className.lower()
         __import__( moduleName )
            
-        self.entityDefs.update( sys.modules[moduleName].__dict__ )
+        #self.entityDefs.update( sys.modules[moduleName].__dict__ )
+        for eachClass in MasterEntitySet.entsToLoad:
+            self.entityDefs[eachClass.__name__] = eachClass
+        MasterEntitySet.entsToLoad = []
         
     
     def getEnts( self ):
