@@ -120,7 +120,7 @@ def dumpPlayState( givenState, fileName, saveHud=False ):
 
         
 
-def loadPlayState( fileName, curTileSet, devMenuRef, networkServer=None, networkClient=None, loadHud=False ):
+def loadPlayState( fileName, curTileSet, devMenuRef, networkServer=None, networkClient=None, loadHud=False, justEditing=False ):
     #Get the StateStoreTuple.
     stateTuple = loadObjectFromFile( fileName )
     if stateTuple is None:
@@ -129,6 +129,7 @@ def loadPlayState( fileName, curTileSet, devMenuRef, networkServer=None, network
 
     #Create a new playState
     givenState = state.PlayState()
+    givenState.justEditing = justEditing
     givenState.devMenuRef = devMenuRef
 
     #Create the groups.

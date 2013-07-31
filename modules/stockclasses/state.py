@@ -65,6 +65,7 @@ class PlayState:
         self.postStepQueue = []
 
         self.gameLogicManager = ActualManager( self )
+        self.justEditing = False
 
         self.spaceGhost = None
         
