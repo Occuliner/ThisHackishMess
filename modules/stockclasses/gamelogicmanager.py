@@ -26,6 +26,7 @@ class GameLogicManager:
     on network events, etc."""
     temporaryEvents = {'preTick':[], 'postTick':[], 'preNetworkTick':[], 
                             'postNetworkTick':[], 'onLoad':[], 'onLaunch':[]}
+    allowedClientMethods = []
     def __init__( self, playState ):
         self.playStateRef = weakref.ref( playState )
 
@@ -59,7 +60,17 @@ class GameLogicManager:
     def callMethod( self, callTuple ):
         if not hasattr( callTuple[0] ):
             print "GameLogicManager has been told to call a method that doesn't exist:", callTuple[0]
+            return None
         getattr( self, callTuple[0] )( *callTuple[1], **callTuple[2] )
+
+    def clientCallMethod( self, client, methodName, argDict ):
+        if not hasattr( methodName ):
+            print "GameLogicManager has been told to call a method that doesn't exist:", methodName
+            return None
+        if methodName not in self.allowedClientMethods:
+            print "GameLogicManager has been told to call a method that the client isn't allowed to:", methodName
+            return None
+        getattr( self, methodName )( client, argDict )
 
     def callEvents( self, callList ):
         for eachCall in callList:

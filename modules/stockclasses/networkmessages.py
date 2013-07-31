@@ -80,6 +80,9 @@ def registerMessages():
     #This message is sent from the host to the client to tell the client to perform GameLogicManager call.
     pygnetic.register( 'gameLogicCall', ('tickNum', 'methodName', 'callArgs', 'callKwargs') )
 
+    #This message is sent from the client to the host to call a GLM method, with easy checking to stop people calling ones they're not allowed to.
+    pygnetic.register( 'clientGameLogicCall', ('tickNum', 'methodName', 'argDict') )
+
     #This message is sent from the host to the client, its a damn map.
     pygnetic.register( 'sendMapBuffer', ('tickNum', 'mapName', 'mapBuffer') )
 

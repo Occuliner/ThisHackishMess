@@ -325,6 +325,14 @@ class ServerHandler(pygnetic.Handler):
 
         playState.gameLogicManager.postNetworkEvent( message )
 
+    def net_clientGameLogicCall( self, message, **kwargs ):
+        networkServer = self.server.networkServerRef()
+        playState = networkServer.playStateRef()
+
+        client = networkServer.getClientByConnection( self.connection )
+
+        playState.gameLogicManager.clientCallMethod( client, message.methodName, message.argDict )
+
     def on_disconnect( self ):
         self.server.networkServerRef().removeClientByConnection( self.connection )
 
