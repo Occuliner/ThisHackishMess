@@ -176,3 +176,29 @@ class DefaultMenuState( MenuState ):
             self.field.text += inputText
             if self.field.text != oldText:
                 self.field.createText()
+
+        #Force a text reset on all the LimitFields not selected.
+        playState = self.menu.playState
+        if playState.limitX1 is not None and self.field != self.limitX1:
+            newStr = str(playState.limitX1)
+            if newStr != self.limitX1.text:
+                self.limitX1.text = newStr
+                self.limitX1.createText()
+                
+        if playState.limitX2 is not None and self.field != self.limitX2:
+            newStr = str(playState.limitX2)
+            if newStr != self.limitX2.text:
+                self.limitX2.text = newStr
+                self.limitX2.createText()
+
+        if playState.limitY1 is not None and self.field != self.limitY1:
+            newStr = str(playState.limitY1)
+            if newStr != self.limitY1.text:
+                self.limitY1.text = newStr
+                self.limitY1.createText()
+
+        if playState.limitY2 is not None and self.field != self.limitY2:
+            newStr = str(playState.limitY2)
+            if newStr != self.limitY2.text:
+                self.limitY2.text = newStr
+                self.limitY2.createText()
