@@ -175,16 +175,18 @@ class BoundaryEditState( MenuState ):
         
     def update( self, dt, click, clickKey, curMousePos=None ):
         MenuState.update( self, dt, click, clickKey, curMousePos )
+        playState = self.menu.playState
+        curMousePos = curMousePos[0]-playState.panX, curMousePos[1]-playState.panY
         if self.curStart is not None:
             if self.snapToGrid:
                 curPoint = gridRound( curMousePos, self.gridX, self.gridY, trueRounding=True )
             else:
                 curPoint = curMousePos
-            self.menu.playState.lineVisualiser.devMenuLineGroups = [ [ self.curStart, curPoint ] ]
-            self.menu.playState.lineVisualiser.flush = True
-        self.menu.playState.lineVisualiser.renderLines = True
-        self.menu.playState.lineVisualiser.renderPhysicsLines = True
-        self.menu.playState.lineVisualiser.forceNoRender = True
+            playState.lineVisualiser.devMenuLineGroups = [ [ (self.curStart[0]+playState.panX, self.curStart[1]+playState.panY), (curPoint[0]+playState.panX, curPoint[1]+playState.panY) ] ]
+            playState.lineVisualiser.flush = True
+        playState.lineVisualiser.renderLines = True
+        playState.lineVisualiser.renderPhysicsLines = True
+        playState.lineVisualiser.forceNoRender = True
         if click is not None:
             if clickKey is 'mouse1down' and self.curStart is None and self.addingMode:
                 if self.snapToGrid:
@@ -196,16 +198,16 @@ class BoundaryEditState( MenuState ):
                     curPoint = gridRound( curMousePos, self.gridX, self.gridY, trueRounding=True )
                 else:
                     curPoint = curMousePos
-                self.menu.playState.addBoundary( self.curStart, curPoint )
+                playState.addBoundary( self.curStart, curPoint )
                 self.curStart = None
             elif clickKey is 'mouse1up' and self.removingMode:
                 segment = self.selectSegment( curMousePos, 10 )
                 if segment is not None:
-                    self.menu.playState.removeBoundary( segment )
+                    playState.removeBoundary( segment )
             elif clickKey is 'mouse3down' and self.curStart is None:
                 segmentEndPair = self.selectSegmentEnd( curMousePos, 10 )
                 if segmentEndPair is not None:
-                    self.menu.playState.removeBoundary( segmentEndPair[0] )
+                    playState.removeBoundary( segmentEndPair[0] )
                     if segmentEndPair[1] is 'a':
                         damnPoint = segmentEndPair[0].b
                     else:
@@ -216,5 +218,5 @@ class BoundaryEditState( MenuState ):
                     curPoint = gridRound( curMousePos, self.gridX, self.gridY, trueRounding=True )
                 else:
                     curPoint = curMousePos
-                self.menu.playState.addBoundary( self.curStart, curPoint )
+                playState.addBoundary( self.curStart, curPoint )
                 self.curStart = None
