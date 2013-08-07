@@ -19,8 +19,9 @@
 #    3. This notice may not be removed or altered from any source
 #    distribution.
 
-from entity import *
+from entity import Entity
 from masterentityset import *
+from imageload import loadImage, loadImageNoAlpha
 
 import pygame
 
@@ -48,4 +49,5 @@ class EmptyPoint( Entity ):
         if EmptyPoint.instanceSpecificVars is None:
             EmptyPoint.instanceSpecificVars = dict( [ ( eachKey, eachVal ) for eachKey, eachVal in self.__dict__.items() if eachKey not in attrList ] )
 
-MasterEntitySet.entsToLoad.append( EmptyPoint )
+#MasterEntitySet.entsToLoad.append( EmptyPoint )
+entities = { "EmptyPoint":EmptyPoint }

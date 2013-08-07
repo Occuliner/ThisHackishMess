@@ -19,13 +19,14 @@
 #    3. This notice may not be removed or altered from any source
 #    distribution.
 
-import sys, os
+import sys, os, zlib
 
 class MasterEntitySet:
     entsToLoad = []
 
     def __init__( self ):
         self.entityDefs = {}
+        self.files = {}
 
     def getEntityClass( self, className ):
         classDef = self.entityDefs.get( className )
@@ -37,13 +38,20 @@ class MasterEntitySet:
             return classDef
 
     def importClass( self, className ):
-        moduleName = "modules.entitysets." + "_" + className.lower()
+        moduleName = "modules.entitysets._" + className.lower()
+        print moduleName
         __import__( moduleName )
-           
-        #self.entityDefs.update( sys.modules[moduleName].__dict__ )
-        for eachClass in MasterEntitySet.entsToLoad:
-            self.entityDefs[eachClass.__name__] = eachClass
+        
+        self.entityDefs.update( sys.modules[moduleName].entities )
+        #for eachClass in MasterEntitySet.entsToLoad:
+        #   print eachClass, self.entityDefs.get(eachClass.__name__)
+        #    self.entityDefs[eachClass.__name__] = eachClass
         MasterEntitySet.entsToLoad = []
+
+        classFile = open( moduleName.replace(".", os.sep) + ".py" )
+        fileData = classFile.read()
+        self.files[moduleName] = zlib.adler32( fileData )
+        classFile.close()
         
     
     def getEnts( self ):
@@ -56,4 +64,14 @@ class MasterEntitySet:
         
         for eachName in listOfNames:
             self.importClass( eachName )
+
+    def reloadAllEnts( self ):
+        for eachName in self.files.keys():
+            classFile = open( eachName.replace(".", os.sep) + ".py" )
+            fileData = classFile.read()
+            classFile.close()
+            checkSum = zlib.adler32( fileData )
+            if self.files[eachName] != checkSum:
+                print "Different classfiles!", eachName, eachName.split(".")[-1].replace("_", "")
+                self.importClass( eachName.split(".")[-1].replace("_", "") )
 

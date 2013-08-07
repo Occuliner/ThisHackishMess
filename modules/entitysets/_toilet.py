@@ -19,11 +19,11 @@
 #    3. This notice may not be removed or altered from any source
 #    distribution.
 
-from entity import *
+from entity import Entity
 import pygame
-from pygame.locals import *
 
 from masterentityset import *
+from imageload import loadImageNoAlpha
 
 class Toilet( Entity ):
     width = 16
@@ -66,4 +66,5 @@ class Toilet( Entity ):
             self.oldTag = curTag
         Entity.update( self, dt )
 
-MasterEntitySet.entsToLoad.append( Toilet )
+#MasterEntitySet.entsToLoad.append( Toilet )
+entities = { "Toilet":Toilet }

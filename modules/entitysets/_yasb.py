@@ -19,13 +19,15 @@
 #    3. This notice may not be removed or altered from any source
 #    distribution.
 
-from entity import *
+from entity import Entity
 from vector import Vector
-from pygame.locals import *
 from tint import tint
 
 from masterentityset import *
     
+from imageload import loadImage, loadImageNoAlpha
+import pygame
+
 class KickUp( Entity ):
     width = 16
     height = 16
@@ -276,6 +278,7 @@ class YasbClass( Entity ):
 
     def update( self, dt ):
             
+        #print "DerP"
         self.body.reset_forces()
 
         walk = self.applyWalk()
@@ -291,4 +294,5 @@ class YasbClass( Entity ):
         setStandingAt( self )
 
 
-MasterEntitySet.entsToLoad.append( YasbClass )
+#MasterEntitySet.entsToLoad.append( YasbClass )
+entities = { "YasbClass":YasbClass }

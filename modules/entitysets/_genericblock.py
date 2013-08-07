@@ -19,9 +19,9 @@
 #    3. This notice may not be removed or altered from any source
 #    distribution.
 
-from entity import *
+from entity import Entity
 import pygame
-from pygame.locals import *
+from imageload import loadImage, loadImageNoAlpha
 
 from masterentityset import *
 
@@ -63,4 +63,5 @@ class GenericBlock( Entity ):
     def update( self, dt ):
         Entity.update( self, dt )
 
-MasterEntitySet.entsToLoad.append( GenericBlock )
+#MasterEntitySet.entsToLoad.append( GenericBlock )
+entities = { "GenericBlock":GenericBlock }

@@ -26,4 +26,11 @@ def classUpdateInPlace( givenObject, givenGlobals, givenLocals ):
         givenObject.classUpdated = True
         print "An instance of: " + theClass.__name__ + " updated!"
 
+def entityUpdateInPlace( givenObject, entityDefs ):
+    theClass = entityDefs.get(givenObject.__class__.__name__)
+    if theClass is not None and theClass is not givenObject.__class__ :
+        givenObject.__class__ = theClass
+        givenObject.classUpdated = True
+        print "An instance of: " + theClass.__name__ + " updated!"
+
 

@@ -19,13 +19,14 @@
 #    3. This notice may not be removed or altered from any source
 #    distribution.
 
-from entity import *
+from entity import Entity
 import pygame
-from pygame.locals import *
 
 from masterentityset import *
 
 import math
+
+from imageload import loadImage, loadImageNoAlpha
 
 class Anvil( Entity ):
     width = 32
@@ -55,4 +56,5 @@ class Anvil( Entity ):
         Entity.update( self, dt )
         
 
-MasterEntitySet.entsToLoad.append( Anvil )
+#MasterEntitySet.entsToLoad.append( Anvil )
+entities = { "Anvil":Anvil }

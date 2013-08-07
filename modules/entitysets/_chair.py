@@ -19,9 +19,10 @@
 #    3. This notice may not be removed or altered from any source
 #    distribution.
 
-from entity import *
+from entity import Entity
 import pygame
-from pygame.locals import *
+
+from imageload import loadImage, loadImageNoAlpha
 
 from masterentityset import *
 
@@ -73,4 +74,5 @@ class Chair( Entity ):
             self.oldTag = curTag
         Entity.update( self, dt )
 
-MasterEntitySet.entsToLoad.append( Chair )
+#MasterEntitySet.entsToLoad.append( Chair )
+entities = { "Chair":Chair }

@@ -21,7 +21,8 @@
 
 from imageload import *
 
-from entity import *
+from imageload import loadImage, loadImageNoAlpha
+from entity import Entity
 
 class TestEnt( Entity ):
     #sheet = loadImage( MAKEADAMNIMAGECONNOR )
@@ -29,3 +30,5 @@ class TestEnt( Entity ):
     
     def __init__( self, group, pos = [0,0], vel = [0,0]):
         Entity.__init__( self, pos, vel, image=None, group=group, rect=None, animated=None )
+
+entities = {}

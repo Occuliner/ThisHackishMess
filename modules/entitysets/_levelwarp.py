@@ -19,9 +19,9 @@
 #    3. This notice may not be removed or altered from any source
 #    distribution.
 
-from entity import *
+from entity import Entity
 import pygame, os
-from pygame.locals import *
+from imageload import loadImage, loadImageNoAlpha
 
 from masterentityset import *
 
@@ -101,4 +101,5 @@ class LevelWarp( Entity ):
         self.collidedWith = set([])
         
 
-MasterEntitySet.entsToLoad.append( LevelWarp )
+#MasterEntitySet.entsToLoad.append( LevelWarp )
+entities = { "LevelWarp":LevelWarp }

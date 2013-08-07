@@ -19,9 +19,10 @@
 #    3. This notice may not be removed or altered from any source
 #    distribution.
 
-from entity import *
+from entity import Entity
 
 import pygame
+from imageload import loadImage, loadImageNoAlpha
 
 from masterentityset import *
 
@@ -49,4 +50,5 @@ class PureSensor( Entity ):
         if PureSensor.instanceSpecificVars is None:
             PureSensor.instanceSpecificVars = dict( [ ( eachKey, eachVal ) for eachKey, eachVal in self.__dict__.items() if eachKey not in attrList ] )
 
-MasterEntitySet.entsToLoad.append( PureSensor )
+#MasterEntitySet.entsToLoad.append( PureSensor )
+entities = { "PureSensor" : PureSensor }

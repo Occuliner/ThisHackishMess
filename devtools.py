@@ -156,6 +156,8 @@ class DevMenu( pygame.sprite.OrderedUpdates ):
 
             #ISOLATED CODE 1
             #map(lambda eachSprite:classUpdateInPlace(eachSprite, globals(), locals()), self.playState.sprites())
+            self.masterEntitySet.reloadAllEnts()
+            map( lambda eachSprite:entityUpdateInPlace(eachSprite, self.masterEntitySet.entityDefs), self.playState.sprites() )
 
             self.playState.floor.tileSet.updateSets()
         if self.playState.forceUpdateEverything:
