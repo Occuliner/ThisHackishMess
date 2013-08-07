@@ -40,7 +40,11 @@ class MasterEntitySet:
     def importClass( self, className ):
         moduleName = "modules.entitysets._" + className.lower()
         print moduleName
-        __import__( moduleName )
+
+        if ( sys.modules.get(moduleName) is None ):
+            __import__( moduleName )
+        else:
+            reload( sys.modules[moduleName] )
         
         self.entityDefs.update( sys.modules[moduleName].entities )
         #for eachClass in MasterEntitySet.entsToLoad:
@@ -72,6 +76,5 @@ class MasterEntitySet:
             classFile.close()
             checkSum = zlib.adler32( fileData )
             if self.files[eachName] != checkSum:
-                print "Different classfiles!", eachName, eachName.split(".")[-1].replace("_", "")
                 self.importClass( eachName.split(".")[-1].replace("_", "") )
 
