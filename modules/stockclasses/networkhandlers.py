@@ -177,7 +177,7 @@ class ClientHandler(pygnetic.Handler):
 class ServerHandler(pygnetic.Handler):
     def on_connect( self ):
         playState = self.server.networkServerRef().playStateRef()
-        playState.gameLogicManager.preNetworkEvent( None )
+        playState.gameLogicManager.preNetworkEvent( None, self.connection )
         #Check this address isn't in the banlist.
         for eachSet in self.server.networkServerRef().ipBanList:
             if eachSet[0] == self.connection.address:
@@ -187,7 +187,7 @@ class ServerHandler(pygnetic.Handler):
         self.connection.net_requestInfo( self.server.networkServerRef().timer )
         self.connection.net_loadMap( self.server.networkServerRef().networkTick, playState.fileName, playState.soundManager.curPlayId )
         pygnetic.Handler.on_connect( self )
-        playState.gameLogicManager.postNetworkEvent( None )
+        playState.gameLogicManager.postNetworkEvent( None, self.connection )
 
     def net_hereIsMyInfo( self, message, **kwargs ):
         playState = self.server.networkServerRef().playStateRef()
