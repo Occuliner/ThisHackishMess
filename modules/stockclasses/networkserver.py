@@ -81,9 +81,11 @@ class NetworkServer:
             vel = [0.0,0.0]
         #self.createdEnts.append( CreateEnt( ent.id, ent.__class__.__name__, ent.getPosition(), vel ) )
         if not forceReturn:
-            self.createdEnts.append( CreateEnt( ent.id, ent.__class__.__name__, ent.rect.topleft, vel ) )
+            kwargList = [ ( each, getattr(ent, each) ) for each in ent.importantParams ]
+            self.createdEnts.append( CreateEnt( ent.id, ent.__class__.__name__, ent.rect.topleft, vel, dict( kwargList ) )
         else:
-            return CreateEnt( ent.id, ent.__class__.__name__, ent.rect.topleft, vel )
+            kwargList = [ ( each, getattr(ent, each) ) for each in ent.importantParams ]
+            return CreateEnt( ent.id, ent.__class__.__name__, ent.rect.topleft, vel, dict( kwargList ) )
 
     def addRemoveEnt( self, ent ):
         self.removedEnts.append( RemoveEnt( ent.id ) )

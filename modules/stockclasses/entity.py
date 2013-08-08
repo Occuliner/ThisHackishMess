@@ -127,6 +127,9 @@ class Entity( pygame.sprite.DirtySprite ):
     #If this flag is set to true, then this entity in ghost form is stored by its parent, not by the usual methods.
     isChild = False
 
+    #Important params. This is a list of strings that is the variable names for important kwargs that need to be recreated in networking.
+    importantParams =[]
+
     circular = False
     radius = 1
     def __init__( self, pos, vel, image=None, group=None, rect=None, animated=None, collidable=None, collideId=None, collideWith=None, mass=None, specialCollision=None, solid=None, pureSensor=None, circular=None, radius=None ):

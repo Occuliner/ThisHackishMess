@@ -92,10 +92,10 @@ class GameLogicManager:
     def postNetworkTick( self, dt ):
         self.performTempEvents( 'postNetworkTick' )
 
-    def preNetworkEvent( self, message ):
+    def preNetworkEvent( self, message, connection ):
         pass
 
-    def postNetworkEvent( self, message ):
+    def postNetworkEvent( self, message, connection ):
         pass
 
     def onLoad( self ):

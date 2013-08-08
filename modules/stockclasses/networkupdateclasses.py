@@ -22,7 +22,7 @@
 from collections import namedtuple
 
 #This object describes the event of an entity being created
-CreateEnt = namedtuple( 'CreateEnt', ['entId', 'className', 'position', 'velocity'] )
+CreateEnt = namedtuple( 'CreateEnt', ['entId', 'className', 'position', 'velocity', 'kwargs'] )
 
 #This object describes the event of removing an ent.
 RemoveEnt = namedtuple( 'RemoveEnt', ['entId'] )

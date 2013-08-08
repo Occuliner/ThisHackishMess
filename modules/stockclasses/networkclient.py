@@ -105,7 +105,7 @@ class NetworkClient:
             else:
                 destGroup = getattr( self.playStateRef(), classDef.playStateGroup )
            
-            inst = classDef( pos=eachTuple[2], vel=eachTuple[3], group=destGroup )
+            inst = classDef( pos=eachTuple[2], vel=eachTuple[3], group=destGroup, **eachTuple[4] )
             inst.id = eachTuple[0]
 
     def removeEntities( self, removeTuples ):
