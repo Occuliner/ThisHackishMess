@@ -58,13 +58,13 @@ class GameLogicManager:
                     each.kill()
 
     def callMethod( self, callTuple ):
-        if not hasattr( callTuple[0] ):
+        if not hasattr( self, callTuple[0] ):
             print "GameLogicManager has been told to call a method that doesn't exist:", callTuple[0]
             return None
         getattr( self, callTuple[0] )( *callTuple[1], **callTuple[2] )
 
     def clientCallMethod( self, client, methodName, argDict ):
-        if not hasattr( methodName ):
+        if not hasattr( self, methodName ):
             print "GameLogicManager has been told to call a method that doesn't exist:", methodName
             return None
         if methodName not in self.allowedClientMethods:
