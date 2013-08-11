@@ -44,6 +44,7 @@ class ConfigHandler:
         theFile.close()
             
     def processFile( self, text ):
+        text.replace("\n", "")
         for eachLine in text:
             vals = eachLine.split(',', 1)
             if len( vals ) == 1:
