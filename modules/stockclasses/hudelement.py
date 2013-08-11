@@ -44,7 +44,7 @@ class HudElement:
         self.defaultAnim = {'fps':1, 'frames':[0]}
         self.changeAnimation( self.defaultAnim )
 
-    def changeAnimation( self, anim )
+    def changeAnimation( self, anim ):
         self.frame = 0
         self.curAnimation = anim
         self.maxFrameTime = 1.000/self.curAnimation['fps']
