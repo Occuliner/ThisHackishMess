@@ -53,7 +53,7 @@ class ConfigHandler:
                 self.configVals[vals[0]] = vals[1]
 
     def setVal( self, key, val ):
-        self.confgVals[key] = val
+        self.configVals[key] = val
 
     def getVal( self, key ):
         if self.configVals.has_key( key ):
