@@ -42,9 +42,14 @@ class HudElement:
         self.frame = 0
         self.image = self.frames[self.frame]
         self.defaultAnim = {'fps':1, 'frames':[0]}
-        self.curAnimation = self.defaultAnim
+        self.changeAnimation( self.defaultAnim )
+
+    def changeAnimation( self, anim )
+        self.frame = 0
+        self.curAnimation = anim
         self.maxFrameTime = 1.000/self.curAnimation['fps']
         self.frameTime = self.maxFrameTime
+        self.image = self.frames[self.curAnimation['frames'][self.frame]]
 
     def makePicklable( self ):
         self.image = None
