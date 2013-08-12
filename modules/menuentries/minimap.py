@@ -30,7 +30,6 @@ class MiniMap( Button ):
         self.width = width
         self.height = height
         self.scale = None
-        self.floor = parentState.menu.playState.floor
         self.image = self.generateImage()
         self.rect = self.image.get_rect()
         if self.pos is None:
@@ -41,17 +40,21 @@ class MiniMap( Button ):
         self.dragging = False
         self.panning = False
 
+    def getFloor( self ):
+        return self.parentState.menu.playState.floor
+
     def generateImage( self ):
-        rightMostPoint = max( [ each.rect.right for each in self.floor.layers ] )
-        leftMostPoint = min( [ each.rect.left for each in self.floor.layers ] )
-        topMostPoint = min( [ each.rect.top for each in self.floor.layers ] )
-        bottomMostPoint = max( [ each.rect.bottom for each in self.floor.layers ] )
+        floor = self.getFloor()
+        rightMostPoint = max( [ each.rect.right for each in floor.layers ] )
+        leftMostPoint = min( [ each.rect.left for each in floor.layers ] )
+        topMostPoint = min( [ each.rect.top for each in floor.layers ] )
+        bottomMostPoint = max( [ each.rect.bottom for each in floor.layers ] )
         worldWidth = rightMostPoint-leftMostPoint
         worldHeight = bottomMostPoint-topMostPoint
         sizeRect = pygame.Rect( 0, 0, worldWidth, worldHeight )
         playState = self.parentState.menu.playState
         img = pygame.Surface( (sizeRect.w, sizeRect.h) ).convert()
-        for eachLayer in self.floor.layers:
+        for eachLayer in floor.layers:
             loc = (eachLayer.rect.left-leftMostPoint, eachLayer.rect.top-topMostPoint)
             img.blit( eachLayer.image, loc )
         scale = 1.0
