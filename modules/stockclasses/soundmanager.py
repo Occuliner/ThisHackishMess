@@ -146,6 +146,13 @@ class SoundManager:
         self.playStateRef = weakref.ref( playState )
         self.idGen = IdSource()
         self.curPlayId = 0
+        self.masterVolume = 1.0
+        
+    def setMasterVolume( self, masterVolume ):
+        masterVolume = min( [max( [0.0, masterVolume] ), 1.0] )
+        self.masterVolume = masterVolume
+        for eachChannel in self.channels:
+            eachChannel.set_volume(masterVolume)
 
     def update( self, dt ):
         """Basically all this method does is remove playInstances that are no longer valid."""
@@ -191,6 +198,7 @@ class SoundManager:
             self.sounds[eachKey] = weakref.ref( eachVal )
         for eachInst in self.playInstances:
             eachInst.makeUnpicklable( self )
+        self.masterVolume = 1.0
 
     def getChannel( self, priority ):
         usedChannelIds = [ each.channelId for each in self.playInstances ]
