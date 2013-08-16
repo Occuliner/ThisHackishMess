@@ -107,7 +107,7 @@ def dumpPlayState( givenState, fileName, saveHud=False ):
         givenState.fileName = fileName
 
     except:
-        print "Saving failed apparently:", sys.exc_info()[0]
+        print "Saving failed apparently:", sys.exc_info()
 
         #I think it's safe to just unpicklablize the sounds and hud elements, even if some aren't picklable.
         
