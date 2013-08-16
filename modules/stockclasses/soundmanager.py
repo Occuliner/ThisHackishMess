@@ -182,9 +182,11 @@ class SoundManager:
         self.channels = None
         self.playStateRef = None
         for eachKey, eachVal in self.sounds.items():
-            self.sounds[eachKey] = eachVal()
+            if eachVal is not None:
+                self.sounds[eachKey] = eachVal()
         for eachSound in self.sounds.values():
-            eachSound.makePicklable()
+            if eachSound is not None:
+                eachSound.makePicklable()
         for eachInst in self.playInstances:
             eachInst.makePicklable()
 
