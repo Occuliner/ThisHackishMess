@@ -193,9 +193,11 @@ class SoundManager:
         self.channelCount = pygame.mixer.get_num_channels()
         self.channels = [ pygame.mixer.Channel(idNum) for idNum in range( self.channelCount ) ]
         for eachSound in self.sounds.values():
-            eachSound.makeUnpickable( self )
+            if eachSound is not None:
+                eachSound.makeUnpickable( self )
         for eachKey, eachVal in self.sounds.items():
-            self.sounds[eachKey] = weakref.ref( eachVal )
+            if eachval is not None:
+                self.sounds[eachKey] = weakref.ref( eachVal )
         for eachInst in self.playInstances:
             eachInst.makeUnpicklable( self )
         self.masterVolume = 1.0
