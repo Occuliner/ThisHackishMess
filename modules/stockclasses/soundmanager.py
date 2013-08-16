@@ -196,7 +196,7 @@ class SoundManager:
             if eachSound is not None:
                 eachSound.makeUnpickable( self )
         for eachKey, eachVal in self.sounds.items():
-            if eachval is not None:
+            if eachVal is not None:
                 self.sounds[eachKey] = weakref.ref( eachVal )
         for eachInst in self.playInstances:
             eachInst.makeUnpicklable( self )
