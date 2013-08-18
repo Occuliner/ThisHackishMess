@@ -37,6 +37,16 @@ from selectionbox import SelectionBox
 
 from label import Label
 
+class RemoveSensorButton( Button ):
+    image = loadImage("remove.png", 2 )
+    def __init__( self, menu=None ):
+        Button.__init__( self, None, None, menu )
+        self.rect = self.image.get_rect()
+        self.rect.topleft = ( 54, 24 )
+    def push( self, clickKey, click ):
+        if "up" in clickKey:
+            self.parentState.toggleRemove()
+
 class SnapToGridButton( Button ):
     image = loadImage( "gridbutton.png", 2 )
     def __init__( self, menu=None ):
@@ -71,15 +81,22 @@ class SensorEditState( MenuState ):
         self.snapToGridButton = SnapToGridButton( self )
         self.addButton( self.snapToGridButton )
         
+        self.removeButton = RemoveSensorButton( self )
+        self.addButton( self.removeButton )
+
         self.gridButtonSelectionBox = None
+        self.removeButtonSelectionBox = None
 
         self.addingMode = True
         self.removingMode = False
 
+        self.curGrabbedSens = None
+
         self.curStart = None
-        self.gridX = 32
-        self.gridY = 32
+        self.gridX = 40
+        self.gridY = 40
         self.snapToGrid = False
+        self.whereEntWasGrabbed = None
 
     def toggleSnapToGrid( self ):
         self.snapToGrid = not self.snapToGrid
@@ -89,6 +106,16 @@ class SensorEditState( MenuState ):
         else:
             self.removeSprite( self.gridButtonSelectionBox )
             self.gridButtonSelectionBox = None
+        self.menu.loadMenuState( self )
+
+    def toggleRemove( self ):
+        self.removingMode = not self.removingMode
+        if self.removeButtonSelectionBox is None:
+            self.removeButtonSelectionBox = SelectionBox( self.removeButton.rect, self )
+            self.addSprite( self.removeButtonSelectionBox )
+        else:
+            self.removeSprite( self.removeButtonSelectionBox )
+            self.removeButtonSelectionBox = None
         self.menu.loadMenuState( self )
         
     def getPressedSensor( self, point ):
@@ -131,8 +158,22 @@ class SensorEditState( MenuState ):
                 destGroup = getattr( self.menu.playState, PureSensor.playStateGroup )
                 PureSensor( pos=destPoint, group=destGroup, width=w, height=h )
                 self.curStart = None
+            elif clickKey is 'mouse3down':
+                self.curGrabbedSens = self.getPressedSensor( curMousePos )
+                if self.curGrabbedSens is not None:
+                    entPos = self.curGrabbedSens.getPosition()
+                    self.whereEntWasGrabbed = curMousePos[0] - entPos[0], curMousePos[1] - entPos[1]
             elif clickKey is 'mouse3up':
                 pickedSensor = self.getPressedSensor( curMousePos )
                 if pickedSensor is not None:
-                    pickedSensor.kill()
-                #REMOVE SENSOR HERE
+                    if self.removingMode:
+                        pickedSensor.kill()
+                self.curGrabbedSens = None
+                self.whereEntWasGrabbed = None
+        elif curMousePos is not None:
+            if self.curGrabbedSens is not None:
+                curEnt = self.curGrabbedSens
+                newPos = curMousePos[0]-self.whereEntWasGrabbed[0]-curEnt.w/2, curMousePos[1]-self.whereEntWasGrabbed[1]-curEnt.h-2
+                if self.snapToGrid:
+                    newPos = gridRound( newPos, self.gridX, self.gridY )
+                curEnt.setPosition( (newPos[0]+curEnt.w/2, newPos[1]+curEnt.h/2) )

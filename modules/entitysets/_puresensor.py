@@ -36,7 +36,7 @@ class PureSensor( Entity ):
     #sheet = pygame.Surface( ( 1, 1 ) ).convert_alpha()
     #sheet.fill( pygame.Color( 0, 0, 0, 0 ) )
     sheetFileName = None
-    notDirectlyRemovable = True
+    notEditable = True
 
     instanceSpecificVars = None
     def __init__( self, pos=[0,0], vel=[0,0], group=None, width=0, height=0, **kwargs ):
