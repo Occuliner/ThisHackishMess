@@ -85,9 +85,9 @@ def idleCentricVelocityUpdate( body, gravity, damping, dt ):
 
 class Entity( pygame.sprite.DirtySprite ):
     
-    #If this is true on an entity, then the Entity cannot be removed from the Entity Edit Menu.
-    notDirectlyRemovable = False
-    
+    #If this is true on an entity, then it will neither appear in the Entity Edit menu nor be editable in the Entity Edit Menu.
+    notEditable = False
+
     mass = 1
     
     #Set this just so that everything has a sheetFileName attr, really each class should specify its own one.

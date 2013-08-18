@@ -184,7 +184,7 @@ class EntityEditState( MenuState ):
         if len( newEnts ) == len( self.processedEnts ):
             return None
         for eachEnt in [ each for each in newEnts if each not in self.processedEnts ]:
-            if "PureSensor" in eachEnt.__name__:
+            if "PureSensor" in eachEnt.__name__ or eachEnt.notEditable:
                 #Don't add PureSensor.
                 continue
             position = ( self.xPos + 21, self.yPos + 30 )
@@ -228,7 +228,7 @@ class EntityEditState( MenuState ):
         """See which ent is at this point"""
         escape = False
         for eachSpriteList in ( eachGroup.sprites() for eachGroup in self.menu.playState.groups ):
-            for eachSprite in [ sprite for sprite in eachSpriteList if not sprite.notDirectlyRemovable]:
+            for eachSprite in [ sprite for sprite in eachSpriteList if not sprite.notEditable]:
                 if eachSprite.bWidth is not None:
                     start = eachSprite.rect.topleft
                     givenRect = pygame.Rect( (start[0] + eachSprite.bdx, start[1] + eachSprite.bdy), (eachSprite.bWidth, eachSprite.bHeight) )
