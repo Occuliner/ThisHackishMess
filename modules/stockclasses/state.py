@@ -348,7 +348,16 @@ class PlayState:
                 [ changeRects.extend( eachGroup.draw( surface ) ) for eachGroup in eachGroupSet ]
 
         else:
-            renderList = sorted( self.sprites()+self.floor.layers[1:], lambda x, y: cmp( x.rect.bottom, y.rect.bottom ) )
+            yTuples = []
+            for eachSprite in self.sprites():
+                if eachSprite.flatInDrawByFeet:
+                    y = eachSprite.rect.top
+                else:
+                    y = eachSprite.rect.bottom
+                yTuples.append( (y, eachSprite) )
+            yTuples.extend( [ (each.rect.bottom, each) for each in self.floor.layers[1:] ] )
+
+            renderList = [ each[1] for each in sorted( yTuples, lambda x, y: cmp( x[0], y[0] ) ) ]
             #I probably shouldn't be doing this.
             tmpDrawGroup = pygame.sprite.LayeredDirty( self.floor.layers[0], renderList )
             changeRects.extend( tmpDrawGroup.draw( surface ) )
