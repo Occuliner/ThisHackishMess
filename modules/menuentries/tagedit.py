@@ -78,7 +78,7 @@ class TagButton( Button ):
         self.rect.topleft = oldX, oldY
 
     def getKeyValuePair( self ):
-        return self.text.rsplit( ":", 1 )
+        return str(self.text).rsplit( ":", 1 )
 
     def toggleSelect( self ):
         if self.selected:
