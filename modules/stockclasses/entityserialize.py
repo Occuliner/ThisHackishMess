@@ -160,7 +160,8 @@ class EntityGhost:
         theInst.frameTime = self.frameTime
 
 	#Rotate
-        theInst.setRotation( self.angle )
+        if self.angle != 0.0:
+            theInst.setRotation( self.angle )
 
         #Now set the instance specific vars.
         for eachKey, eachVal in self.instanceSpecificVars.items():
