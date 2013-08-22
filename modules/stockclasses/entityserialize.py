@@ -32,6 +32,8 @@ class EntityGhost:
         #Grab the class name of the Entity.
         self.className = theEntity.__class__.__name__
 
+        playState = theEntity.playStateRef()
+
         self.id = theEntity.id
         ## ANIMATION STUFF
 
@@ -62,7 +64,7 @@ class EntityGhost:
         if theEntity.collidable:
             self.loc = vecToTuple( theEntity.body.position )
         else:
-            self.loc = theEntity.rect.topleft
+            self.loc = (theEntity.rect.left-playState.panX, theEntity.rect.top-playState.panY)
 
 
         ## PHYSICS STUFF

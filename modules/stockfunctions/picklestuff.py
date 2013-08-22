@@ -69,7 +69,7 @@ def dumpPlayState( givenState, fileName, saveHud=False ):
     #To avoid crashers of anykind when saving. Everything is in a try block.
     try:
         #Store all the Floor layers.
-        floorImageBuffers = [ ( makeImageBuffer( each.image ), each.rect.topleft ) for each in givenState.floor.layers ]
+        floorImageBuffers = [ ( makeImageBuffer( each.image ), (each.rect.left-givenState.panX, each.rect.top-givenState.panY) ) for each in givenState.floor.layers ]
 
         #Make the sound State picklable.
         givenState.soundManager.makePicklable()
