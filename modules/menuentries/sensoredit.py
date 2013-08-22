@@ -128,32 +128,28 @@ class SensorEditState( MenuState ):
     
     def update( self, dt, click, clickKey, curMousePos=None ):
         MenuState.update( self, dt, click, clickKey, curMousePos )
+        playState = self.menu.playState
+        curMousePos = curMousePos[0]-playState.panX, curMousePos[1]-playState.panY
+        if self.snapToGrid:
+            curMousePos = gridRound( curMousePos, self.gridX, self.gridY, trueRounding=True )
+        else:
+            curMousePos = curMousePos
         if self.curStart is not None:
-            if self.snapToGrid:
-                curPoint = gridRound( curMousePos, self.gridX, self.gridY, trueRounding=True )
-            else:
-                curPoint = curMousePos
-            self.menu.playState.lineVisualiser.devMenuLineGroups = [ [ self.curStart, ( self.curStart[0], curPoint[1] ) ],
-                     [ ( self.curStart[0], curPoint[1] ), curPoint ], [ curPoint, ( curPoint[0], self.curStart[1] ) ], [ ( curPoint[0], self.curStart[1] ), self.curStart ] ]
+            self.menu.playState.lineVisualiser.devMenuLineGroups = [ [ self.curStart, ( self.curStart[0], curMousePos[1] ) ],
+                     [ ( self.curStart[0], curMousePos[1] ), curMousePos ], [ curMousePos, ( curMousePos[0], self.curStart[1] ) ], [ ( curMousePos[0], self.curStart[1] ), self.curStart ] ]
+            self.menu.playState.lineVisualiser.devMenuLineGroups = [ [ (each[0]+playState.panX, each[1]+playState.panY) for each in eachLine ] for eachLine in self.menu.playState.lineVisualiser.devMenuLineGroups ]
             self.menu.playState.lineVisualiser.flush = True
         self.menu.playState.lineVisualiser.renderLines = True
         self.menu.playState.lineVisualiser.renderPhysicsLines = True
         self.menu.playState.lineVisualiser.forceNoRender = True
         if click is not None:
             if clickKey is 'mouse1down' and self.curStart is None:
-                if self.snapToGrid:
-                    self.curStart = gridRound( curMousePos, self.gridX, self.gridY, trueRounding=True )
-                else:
-                    self.curStart = curMousePos
+                self.curStart = curMousePos
             elif clickKey is 'mouse1up':
-                if self.snapToGrid:
-                    curPoint = gridRound( curMousePos, self.gridX, self.gridY, trueRounding=True )
-                else:
-                    curPoint = curMousePos
                 #ADD SENSOR HERE
-                destPoint = min( self.curStart[0], curPoint[0] ), min( self.curStart[1], curPoint[1] )
-                w = abs( self.curStart[0] - curPoint[0] )
-                h = abs( self.curStart[1] - curPoint[1] )
+                destPoint = min( self.curStart[0], curMousePos[0] ), min( self.curStart[1], curMousePos[1] )
+                w = abs( self.curStart[0] - curMousePos[0] )
+                h = abs( self.curStart[1] - curMousePos[1] )
                 destPoint = destPoint[0] + w/2, destPoint[1] + h/2
                 destGroup = getattr( self.menu.playState, PureSensor.playStateGroup )
                 PureSensor( pos=destPoint, group=destGroup, width=w, height=h )
@@ -174,6 +170,4 @@ class SensorEditState( MenuState ):
             if self.curGrabbedSens is not None:
                 curEnt = self.curGrabbedSens
                 newPos = curMousePos[0]-self.whereEntWasGrabbed[0]-curEnt.w/2, curMousePos[1]-self.whereEntWasGrabbed[1]-curEnt.h-2
-                if self.snapToGrid:
-                    newPos = gridRound( newPos, self.gridX, self.gridY )
                 curEnt.setPosition( (newPos[0]+curEnt.w/2, newPos[1]+curEnt.h/2) )
