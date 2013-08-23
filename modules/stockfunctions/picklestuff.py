@@ -87,7 +87,7 @@ def dumpPlayState( givenState, fileName, saveHud=False ):
         stateTuple = StateStoreTuple( [], floorImageBuffers, givenState.soundManager, hudList, bndList )
     
         #Ignore children, they're handled by their parents.
-        for eachSprite in [ each for each in givenState.sprites() if not each.isChild ]:
+        for eachSprite in [ each for each in givenState.sprites() if (not each.isChild) and (not each.dontSave) ]:
             #Create EntityGhost.
             ghost = EntityGhost( eachSprite )
             #Add the the ghost list.

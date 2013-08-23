@@ -110,7 +110,7 @@ class EntityGhost:
         ## CHILDREN STUFF
 
         #Turn the children into ghosts.
-        self.childrenGhosts = [ EntityGhost( each ) for each in theEntity.children ]
+        self.childrenGhosts = [ EntityGhost( each ) for each in theEntity.children if not each.dontSave ]
 
 	#Get the childrens' ids.
         self.childrenIds = [ each.id for each in theEntity.children ]
