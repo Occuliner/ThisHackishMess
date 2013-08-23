@@ -210,6 +210,7 @@ class EntityEditState( MenuState ):
             if self.yPos > 318:
                 self.yPos = 0
                 self.maxPage += 1
+                self.tallest = 0
             self.curEntNum += 1
         [ self.addButton( each ) for each in self.pages[self.curPage] if each not in self.buttons ] 
         self.menu.loadMenuState( self )
