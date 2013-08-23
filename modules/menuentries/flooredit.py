@@ -321,10 +321,11 @@ class FloorEditState( MenuState ):
                     break
 
     def setClamps( self ):
-        tlp = self.floor.layers[self.currentFloorLayer].rect.topleft
-        brp = self.floor.layers[self.currentFloorLayer].rect.bottomright
-        self.topLeftLayerClamp.rect.topleft = tlp[0]-15, tlp[1]-15
-        self.bottomRightLayerClamp.rect.topleft = brp[0]-15, brp[1]-15
+        if len( self.floor.layers ) > 0:
+            tlp = self.floor.layers[self.currentFloorLayer].rect.topleft
+            brp = self.floor.layers[self.currentFloorLayer].rect.bottomright
+            self.topLeftLayerClamp.rect.topleft = tlp[0]-15, tlp[1]-15
+            self.bottomRightLayerClamp.rect.topleft = brp[0]-15, brp[1]-15
 
     def setClampVisibility( self, val ):
         if val and self.topLeftLayerClamp not in self.sprites:
@@ -342,8 +343,10 @@ class FloorEditState( MenuState ):
             if eachLayer.rect.collidepoint( click ):
                 theNum = eachNum
                 break
-        if theNum is not None:
+        if theNum is not None and theNum is not 0:
             self.floor.layers.pop( theNum )
+            if theNum is self.currentFloorLayer:
+                self.currentFloorLayer = min( theNum - 1, 0 )
 
     def repage( self, newPageNum ):
         map( self.removeButton, self.pages[self.curPage] )

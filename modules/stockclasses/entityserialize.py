@@ -32,6 +32,8 @@ class EntityGhost:
         #Grab the class name of the Entity.
         self.className = theEntity.__class__.__name__
 
+        playState = theEntity.playStateRef()
+
         self.id = theEntity.id
         ## ANIMATION STUFF
 
@@ -62,7 +64,7 @@ class EntityGhost:
         if theEntity.collidable:
             self.loc = vecToTuple( theEntity.body.position )
         else:
-            self.loc = theEntity.rect.topleft
+            self.loc = (theEntity.rect.left-playState.panX, theEntity.rect.top-playState.panY)
 
 
         ## PHYSICS STUFF
@@ -108,7 +110,7 @@ class EntityGhost:
         ## CHILDREN STUFF
 
         #Turn the children into ghosts.
-        self.childrenGhosts = [ EntityGhost( each ) for each in theEntity.children ]
+        self.childrenGhosts = [ EntityGhost( each ) for each in theEntity.children if not each.dontSave ]
 
 	#Get the childrens' ids.
         self.childrenIds = [ each.id for each in theEntity.children ]
@@ -160,13 +162,14 @@ class EntityGhost:
         theInst.frameTime = self.frameTime
 
 	#Rotate
-        theInst.setRotation( self.angle )
+        if self.angle != 0.0:
+            theInst.setRotation( self.angle )
 
         #Now set the instance specific vars.
         for eachKey, eachVal in self.instanceSpecificVars.items():
             setattr( theInst, eachKey, eachVal )
 
 	#Now recreate the children.
-        theInst.children = [ each.resurrect( classDefs, playState ) for each in self.childrenGhosts ]
+        theInst.children.extend( [ each.resurrect( playState ) for each in self.childrenGhosts ] )
 
         return theInst

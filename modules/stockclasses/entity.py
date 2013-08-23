@@ -130,6 +130,11 @@ class Entity( pygame.sprite.DirtySprite ):
     #Important params. This is a list of strings that is the variable names for important kwargs that need to be recreated in networking.
     importantParams =[]
 
+    #If this flag is true and state is set to drawByFeet, then this will be rendered before things without this flag on, so it should appear below other things.
+    flatInDrawByFeet = False
+
+    dontSave = False
+
     circular = False
     radius = 1
     def __init__( self, pos, vel, image=None, group=None, rect=None, animated=None, collidable=None, collideId=None, collideWith=None, mass=None, specialCollision=None, solid=None, pureSensor=None, circular=None, radius=None ):

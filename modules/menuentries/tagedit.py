@@ -31,6 +31,8 @@ from staticimage import StaticImage
 
 from label import Label
 
+from selectionbox import SelectionBox
+
 class TagEditButton( Button ):
     image = loadImage( "tageditbutton.png", 2 )
     rect = image.get_rect()
@@ -132,6 +134,16 @@ class SubTagButton( Button ):
                     del curEnt.tags[curTag.getKeyValuePair()[0]]
                     self.parentState.getTagButtons()
 
+class SensorButton( Button ):
+    image = loadImage( "physicsvis.png", 2 )
+    def __init__( self, parentState=None ):
+        Button.__init__( self, None, None, parentState )
+        self.rect = self.image.get_rect()
+        self.rect.topleft = ( 90, 370 )
+    def push( self, clickKey, click ):
+        if "up" in clickKey:
+            self.parentState.toggleSensor()
+
 #
 class TagEditState( MenuState ):
     def __init__( self, menu, sprites=[] ):
@@ -145,6 +157,8 @@ class TagEditState( MenuState ):
         self.addButton( self.plusTagButton )
         self.subTagButton = SubTagButton( self )
         self.addButton( self.subTagButton )
+        self.sensorButton = SensorButton( self )
+        self.addButton( self.sensorButton )
 
         self.curEnt = None
 
@@ -156,8 +170,23 @@ class TagEditState( MenuState ):
         self.curTag = None
         self.tagButtons = []
 
-        self.carryMeOverButtons = [self.plusTagButton, self.subTagButton]
+        self.carryMeOverButtons = [self.plusTagButton, self.subTagButton, self.sensorButton]
         self.carryMeOverSprites = [self.panel,self.fileNameLabel] + self.carryMeOverButtons
+
+        self.sensorMode = False
+        self.sensorButtonSelectionBox = None
+
+    def toggleSensor( self ):
+        self.sensorMode = not self.sensorMode
+        if self.sensorButtonSelectionBox is None:
+            self.sensorButtonSelectionBox = SelectionBox( self.sensorButton.rect, self )
+            self.addSprite( self.sensorButtonSelectionBox )
+            self.carryMeOverSprites.append( self.sensorButtonSelectionBox )
+        else:
+            self.carryMeOverSprites.remove( self.sensorButtonSelectionBox )
+            self.removeSprite( self.sensorButtonSelectionBox )
+            self.sensorButtonSelectionBox = None
+        self.menu.loadMenuState( self )
 
     def addButton( self, givenButton ):
         MenuState.addButton( self, givenButton )
@@ -186,7 +215,7 @@ class TagEditState( MenuState ):
                     givenRect = pygame.Rect( (start[0] + eachSprite.bdx, start[1] + eachSprite.bdy), (eachSprite.bWidth, eachSprite.bHeight) )
                 else:
                     givenRect = eachSprite.rect
-                if givenRect.collidepoint( point ):
+                if givenRect.collidepoint( point ) and ( self.sensorMode or not eachSprite.pureSensor ):
                     return eachSprite
 
     def getDictionaryFromTags( self ):

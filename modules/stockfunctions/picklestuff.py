@@ -69,7 +69,7 @@ def dumpPlayState( givenState, fileName, saveHud=False ):
     #To avoid crashers of anykind when saving. Everything is in a try block.
     try:
         #Store all the Floor layers.
-        floorImageBuffers = [ ( makeImageBuffer( each.image ), each.rect.topleft ) for each in givenState.floor.layers ]
+        floorImageBuffers = [ ( makeImageBuffer( each.image ), (each.rect.left-givenState.panX, each.rect.top-givenState.panY) ) for each in givenState.floor.layers ]
 
         #Make the sound State picklable.
         givenState.soundManager.makePicklable()
@@ -87,7 +87,7 @@ def dumpPlayState( givenState, fileName, saveHud=False ):
         stateTuple = StateStoreTuple( [], floorImageBuffers, givenState.soundManager, hudList, bndList )
     
         #Ignore children, they're handled by their parents.
-        for eachSprite in [ each for each in givenState.sprites() if not each.isChild ]:
+        for eachSprite in [ each for each in givenState.sprites() if (not each.isChild) and (not each.dontSave) ]:
             #Create EntityGhost.
             ghost = EntityGhost( eachSprite )
             #Add the the ghost list.
