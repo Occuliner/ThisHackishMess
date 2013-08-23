@@ -168,7 +168,7 @@ class SoundManager:
         [ self.playInstances.remove( each ) for each in removeList ]
 
     def getSound( self, fileName ):
-        if self.sounds.has_key( fileName ):
+        if self.sounds.get( fileName ) is not None:
             snd = self.sounds[fileName]()
             if not (snd is None):
                 return snd
