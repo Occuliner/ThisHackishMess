@@ -156,12 +156,12 @@ class SensorEditState( MenuState ):
                     PureSensor( pos=destPoint, group=destGroup, width=w, height=h )
                 self.curStart = None
             elif clickKey is 'mouse3down':
-                self.curGrabbedSens = self.getPressedSensor( curMousePos )
+                self.curGrabbedSens = self.getPressedSensor( (curMousePos[0]+playState.panX, curMousePos[1]+playState.panY) )
                 if self.curGrabbedSens is not None:
                     entPos = self.curGrabbedSens.getPosition()
                     self.whereEntWasGrabbed = curMousePos[0] - entPos[0], curMousePos[1] - entPos[1]
             elif clickKey is 'mouse3up':
-                pickedSensor = self.getPressedSensor( curMousePos )
+                pickedSensor = self.getPressedSensor( (curMousePos[0]+playState.panX, curMousePos[1]+playState.panY) )
                 if pickedSensor is not None:
                     if self.removingMode:
                         pickedSensor.kill()
