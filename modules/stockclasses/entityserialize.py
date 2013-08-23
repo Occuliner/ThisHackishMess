@@ -170,6 +170,6 @@ class EntityGhost:
             setattr( theInst, eachKey, eachVal )
 
 	#Now recreate the children.
-        theInst.children = [ each.resurrect( playState ) for each in self.childrenGhosts ]
+        theInst.children.extend( [ each.resurrect( playState ) for each in self.childrenGhosts ] )
 
         return theInst
