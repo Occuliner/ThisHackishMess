@@ -219,10 +219,10 @@ class EntityEditState( MenuState ):
         map( self.removeButton, self.pages[self.curPage] )
         self.curPage = newPageNum
         map( self.addButton, self.pages[self.curPage] )
-        if self.entNum not in [ each.entNum for each in self.pages[self.curPage] ] and self.tileSelectionBox in self.sprites:
-            self.removeSprite( self.tileSelectionBox )
-        elif self.entNum in [ each.entNum for each in self.pages[self.curPage] ] and self.tileSelectionBox not in self.sprites:
-            self.addSprite( self.tileSelectionBox )
+        if self.entNum not in [ each.entNum for each in self.pages[self.curPage] ] and self.entSelectionBox in self.sprites:
+            self.removeSprite( self.entSelectionBox )
+        elif self.entNum in [ each.entNum for each in self.pages[self.curPage] ] and self.entSelectionBox not in self.sprites:
+            self.addSprite( self.entSelectionBox )
         self.menu.loadMenuState( self )
 
     def getPressedEnt( self, point ):
