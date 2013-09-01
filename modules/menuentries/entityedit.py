@@ -66,7 +66,8 @@ class EntButton( Button ):
                 return None
             self.parentState.selectedButton = self
             self.parentState.entNum = self.entNum
-            self.parentState.removeSprite( self.parentState.entSelectionBox )
+            if self.parentState.entSelectionBox in self.parentState.sprites:
+                self.parentState.removeSprite( self.parentState.entSelectionBox )
             self.parentState.entSelectionBox = SelectionBox( self.rect, self.parentState )
             self.parentState.addSprite( self.parentState.entSelectionBox )
             self.parentState.menu.loadMenuState( self.parentState )
