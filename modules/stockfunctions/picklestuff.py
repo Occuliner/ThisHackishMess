@@ -34,7 +34,7 @@ from entity import EntityGroup
 from physicsserialize import SpaceGhost
 from linevisualiser import LineVisualiser
 
-StateStoreTuple = collections.namedtuple( "StateStoreTuple", [ "entityGhostList", "floorImageBuffers", "soundManager", "hudElements", "boundaries" ] )
+StateStoreTuple = collections.namedtuple( "StateStoreTuple", [ "entityGhostList", "floorImageBuffers", "soundManager", "hudElements", "boundaries", "panLimits" ] )
 
 ImageBuffer = collections.namedtuple( "ImageBuffer", [ "size", "stringBuffer" ] )
 
@@ -82,9 +82,12 @@ def dumpPlayState( givenState, fileName, saveHud=False ):
             hudList = [ each.makePicklable() for each in givenState.hudList ]
         else:
             hudList = []
+
+        #Get the pan limits
+        limits = (givenState.limitX1, givenState.limitY1, givenState.limitX2, givenState.limitY2)
     
         #Create the StateStoreTuple, this will store all the data, and be serialized.
-        stateTuple = StateStoreTuple( [], floorImageBuffers, givenState.soundManager, hudList, bndList )
+        stateTuple = StateStoreTuple( [], floorImageBuffers, givenState.soundManager, hudList, bndList, limits )
     
         #Ignore children, they're handled by their parents.
         for eachSprite in [ each for each in givenState.sprites() if (not each.isChild) and (not each.dontSave) ]:
@@ -174,6 +177,9 @@ def loadPlayState( fileName, curTileSet, devMenuRef, networkServer=None, network
 
     #Add the boundaries.
     [ givenState.addBoundary( each[0], each[1] ) for each in stateTuple.boundaries ]
+
+    #Set the panLimits.
+    givenState.limitX1, givenState.limitY1, givenState.limitX2, givenState.limitY2 = stateTuple.panLimits
 
     if loadHud:
         #Make the hud elements unpicklable, then add them.
