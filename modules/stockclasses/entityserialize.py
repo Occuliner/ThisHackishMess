@@ -64,7 +64,7 @@ class EntityGhost:
         if theEntity.collidable:
             self.loc = vecToTuple( theEntity.body.position )
         else:
-            self.loc = (theEntity.rect.left-playState.panX, theEntity.rect.top-playState.panY)
+            self.loc = (theEntity.rect.left-theEntity.oldPan[0], theEntity.rect.top-theEntity.oldPan[1])
 
 
         ## PHYSICS STUFF
