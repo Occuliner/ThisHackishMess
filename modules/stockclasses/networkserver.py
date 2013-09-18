@@ -167,6 +167,25 @@ class NetworkServer:
     def getPlayerKey( self, client ):
         return client.idNum
 
+    def getClientFromKey( self, key ):
+        for eachClient in self.clients:
+            if self.getPlayerKey( eachClient ) == key:
+                return eachClient
+        return None
+
+    def getKeyFromPlayer( self, playerEnt ):
+        clientId = None
+        for eachId, eachPlayerList in self.players.iteritems():
+            if playerEnt in eachPlayerList:
+                clientId = eachId
+                break
+        if clientId is not None:
+            return clientId
+        return None
+
+    def getClientFromPlayer( self, playerEnt ):
+        return self.getClientFromKey( self.getKeyFromPlayer( playerEnt ) )
+
     def disconnectAll( self ):
         [ each.disconnect() for each in self._server.connections() if each.connected ]
 
