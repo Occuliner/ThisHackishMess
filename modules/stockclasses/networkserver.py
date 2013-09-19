@@ -128,7 +128,7 @@ class NetworkServer:
         #Make a list of the animations to change them each to, and the forceAnim list.
         changeAnimList = []
         forceAnimList = []
-        for each in listOfEntsToSend:
+        for each in playState.sprites():
             for eachAnimName, eachAnim in each.animations.items():
                 if eachAnim == each.curAnimation:
                     changeAnimList.append( ChangeAnim( each.id, eachAnimName ) )
