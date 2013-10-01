@@ -152,6 +152,11 @@ def loadPlayState( fileName, curTileSet, devMenuRef, networkServer=None, network
     #Set the amount of ents this file has.
     givenState.amountOfEntsOnLoad = len( stateTuple.entityGhostList )
 
+    #Replace the sound manager.
+    stateTuple.soundManager.makeUnpicklable( givenState )
+    givenState.soundManager = stateTuple.soundManager
+    givenState.soundManager.playStateRef = weakref.ref( givenState )
+
     #Add all ze entities.
     if not (networkClient is None):
         givenState.networkNode = networkClient
@@ -166,11 +171,6 @@ def loadPlayState( fileName, curTileSet, devMenuRef, networkServer=None, network
 
     #Replace the floor layers.
     givenState.floor.layers = [ FloorLayer( pos=each[1], image=makeImageFromBuffer( each[0] ) ) for each in stateTuple.floorImageBuffers ]
-
-    #Replace the sound manager.
-    stateTuple.soundManager.makeUnpicklable( givenState )
-    givenState.soundManager = stateTuple.soundManager
-    givenState.soundManager.playStateRef = weakref.ref( givenState )
 
     #Set the filename property.
     givenState.fileName = fileName
