@@ -24,7 +24,7 @@ It creates the window, DevMenu, basic playState, an empty playerGroup.
 It then runs the main-loop. Rendering everything in the playState and 
 sending a dictionary of key inputs to the playerGroup in the playState."""
 
-import pygame, weakref, sys#, objgraph
+import pygame, weakref, sys, platform, msgpack#, objgraph
 
 #from pygame.locals import QUIT, KEYDOWN, K_UP, K_LEFT, K_RIGHT, K_DOWN, K_RETURN, KEYUP, MOUSEBUTTONDOWN, MOUSEBUTTONUP
 
