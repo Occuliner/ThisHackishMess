@@ -140,7 +140,7 @@ class PlayState:
     def initNetworking( self ):
         if not self.networkingStarted:
             #pygnetic.init(logging_lvl=logging.DEBUG)
-            pygnetic.init(logging_lvl=logging.ERROR)
+            pygnetic.init(logging_lvl=logging.ERROR, n_module='socket')
             self.networkingStarted = True
             registerMessages()
 
