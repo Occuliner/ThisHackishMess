@@ -25,4 +25,7 @@ class Scheduler:
 
     def checkTimerGoing( self, timeName ):
         return self.timers[timeName] != None
+
+    def start( self, timeName ):
+        self.timers[timeName] = 0.0
         
