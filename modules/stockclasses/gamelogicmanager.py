@@ -44,6 +44,11 @@ class GameLogicManager:
             clientInfo.isPlayer = True
             clientInfo.connection.net_setPlayerEnt( playState.networkNode.networkTick, playerEntity.id )
 
+    def playerDisconnect( self, clientInfo ):
+        playState = self.playStateRef()
+        if playState.isHost:
+            del playState.networkNode.players[playState.networkNode.getPlayerKey(clientInfo)]
+
     def exitGame( self, clientInfo ):
         #This occurs on host-end when a client disconnects.
         #Again, this can vary a lot.

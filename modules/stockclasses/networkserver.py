@@ -224,7 +224,7 @@ class NetworkServer:
                     #eachClient.time += dt
                 else:
                     #Remove associated players and the client tuple.
-                    self.removePlayer( eachClient )
+                    self.playStateRef().gameLogicManager.playerDisconnect( eachClient )
                     self.clients.remove( eachClient )
         else:
             #Iterate over every client
@@ -242,7 +242,7 @@ class NetworkServer:
                     #eachClient.time += dt
                 else:
                     #Remove associated players and the client tuple.
-                    self.removePlayer( eachClient )
+                    self.playStateRef().gameLogicManager.playerDisconnect( eachClient )
                     self.clients.remove( eachClient )
 
         #Clear for the next update
