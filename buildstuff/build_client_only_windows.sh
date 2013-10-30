@@ -1,7 +1,7 @@
 rm -rf dist
 rm -rf build
 rm main.spec
-wine ~/.wine/drive_c/Python27/python.exe pyinstaller-2.0/pyinstaller.py --onefile ../main.py
+wine ~/.wine/drive_c/Python27/python.exe pyinstaller-2.0/pyinstaller.py ../main.py
 rm -rf client_only_modules
 python makeclientonlycode.py ../modules/
 cp -ir client_only_modules dist/modules

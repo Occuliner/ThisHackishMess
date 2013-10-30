@@ -1,3 +1,6 @@
+rm -rf dist
+rm -rf build
+rm main.spec
 python pyinstaller-2.0/pyinstaller.py --onefile ../main.py
 cp -r ../modules/ dist/modules
 cp -r ../extern_modules dist/extern_modules
