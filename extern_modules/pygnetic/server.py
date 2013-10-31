@@ -16,19 +16,30 @@ class Server(object):
     :param string host: IP address or name of host (default: "" - any)
     :param int port: port of host (default: 0 - any)
     :param int con_limit: maximum amount of created connections (default: 4)
+    :param handler: custom :class:`~.handler.Handler` derived class
+       (default: :attr:`.Server.handler`)
+    :param message_factory: custom instance of :class:`~.message.MessageFactory`
+       (default: :attr:`.Server.message_factory`)
     :param args: additional arguments for :term:`network adapter`
     :param kwargs: additional keyword arguments for :term:`network adapter`
     """
+    address = ('', '')
     message_factory = message.message_factory
     handler = None
 
-    def __init__(self, host='', port=0, conn_limit=4, *args, **kwargs):
+    def __init__(self, host='', port=0, conn_limit=4, handler=None,
+                 message_factory=None, *args, **kwargs):
         super(Server, self).__init__(*args, **kwargs)
         _logger.info('Server created %s:%d, connections limit: %d',
                      host, port, conn_limit)
         self.message_factory.set_frozen()
         self.conn_map = {}
         self.conn_limit = conn_limit
+        if handler is not None:
+            self.handler = handler
+            _logger.debug("Using %s handler", handler.__name__)
+        if message_factory is not None:
+            self.message_factory = message_factory
 
     def update(self, timeout=0):
         """Process network traffic and update connections.
@@ -37,33 +48,37 @@ class Server(object):
             waiting time for network events in milliseconds
             (default: 0 - no waiting)
         """
-        pass
+        raise NotImplementedError('Should be implemented by adapter class')
 
-    def _accept(self, connection, socket, address, c_id, mf_hash):
+    def _create_connection(self, socket, message_factory):
+        raise NotImplementedError('Should be implemented by adapter class')
+
+    def _accept(self, socket, address, mf_hash):
         if mf_hash == self.message_factory.get_hash():
             _logger.info('Connection with %s accepted', address)
-            conn = connection(self, socket, self.message_factory)
+            connection, c_key = self._create_connection(socket,
+                    self.message_factory)
             if self.handler is not None and issubclass(self.handler, Handler):
                 handler = self.handler()
                 handler.server = proxy(self)
-                conn.add_handler(handler)
-            self.conn_map[c_id] = conn
+                connection.add_handler(handler)
+            else:
+                _logger.error('xxx') # TODO
+            self.conn_map[c_key] = connection
+            connection._key = c_key
             event.accepted(self)
-            conn._connect()
+            connection._connect()
             return True
         else:
-            _logger.info('Connection with %s refused, MessageFactory'\
+            _logger.info('Connection with %s refused, MessageFactory'
                             ' hash incorrect', address)
             return False
 
-    def _disconnect(self, c_id):
-        conn = self.conn_map.get(c_id)
-        if conn is not None:
-            conn._disconnect()
-            del self.conn_map[c_id]
+    def _get(self, c_key):
+        return self.conn_map[c_key]
 
-    def _receive(self, c_id, data, **kwargs):
-        self.conn_map[c_id]._receive(data, **kwargs)
+    def _remove(self, c_key):
+        del self.conn_map[c_key]
 
     def connections(self, exclude=None):
         """Returns iterator over connections.
@@ -91,8 +106,3 @@ class Server(object):
         else:
             return (c.handlers[0] for c in self.conn_map.itervalues()
                     if c not in exclude)
-
-    @property
-    def address(self):
-        """Server address."""
-        return None, None

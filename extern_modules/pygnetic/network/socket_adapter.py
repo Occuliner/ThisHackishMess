@@ -4,9 +4,10 @@
 import logging
 import socket
 import struct
-import localasyncore as asyncore
+import asyncore
 from collections import deque
 from .. import connection, server, client
+from .._utils import lazyproperty
 
 _logger = logging.getLogger(__name__)
 _connect_struct = struct.Struct('!I')
@@ -76,31 +77,30 @@ class Connection(connection.Connection, Dispacher):
 #            return
 
     def handle_connect(self):
-        self.addr = self.socket.getpeername()
         self._connect()
 
     def handle_close(self):
-        self.parent._disconnect(self.socket.fileno())
+        self._disconnect()
         self.close()
 
     def log_info(self, message, type='info'):
         return getattr(_logger, type)(message)
 
     def disconnect(self, *args):
-        self.parent._disconnect(self.socket.fileno())
+        self._disconnect()
         self.close()
 
-    @property
+    @lazyproperty
     def address(self):
-        return self.addr
+        return self.socket.getpeername()
 
 
 class Server(server.Server, Dispacher):
     connection = Connection
 
-    def __init__(self, host='', port=0, con_limit=4, *args, **kwargs):
+    def __init__(self, host='', port=0, conn_limit=4, handler=None, message_factory=None, *args, **kwargs):
         super(Server, self).__init__(
-            host, port, con_limit,
+            host, port, conn_limit,  handler, message_factory,
             None, None,
             *args, **kwargs)
         self.create_socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -108,20 +108,36 @@ class Server(server.Server, Dispacher):
         self.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
         self.set_reuse_addr()
         self.bind((host, port))
-        self.listen(con_limit)
+        self.listen(conn_limit)
+
+    def _create_connection(self, socket, message_factory):
+        connection = Connection(self, socket, message_factory)
+        return connection, socket.fileno()
 
     def handle_accept(self):
         pair = self.accept()
         if pair is not None:
             sock, addr = pair
-            sock.settimeout(0.5)  # TODO: sth better?
-            mf_hash = _connect_struct.unpack(sock.recv(4))[0]
-            sock.setblocking(0)
-            if not self._accept(Connection, sock, addr, self._fileno, mf_hash):
-                sock.close()
+            # TODO: sth better?
+            sock.settimeout(0.5) # enable blocking read with 0.5s timeout
+            try:
+                data = sock.recv(4) # wait for hash data
+                mf_hash = _connect_struct.unpack(data)[0]
+                sock.setblocking(0) # disable blocking read
+                if self._accept(sock, addr, mf_hash):
+                    return # end if hash is correct
+            except socket.timeout:
+                _logger.info('Connection with %s refused, MessageFactory'
+                                ' hash not received', addr)
+            sock.shutdown(socket.SHUT_RDWR)
+            sock.close()
 
     def update(self, timeout=0):
         asyncore.loop(timeout / 1000.0, False, None, 1)
+
+    @lazyproperty
+    def address(self):
+        return self.socket.getsockname()
 
 
 class Client(client.Client):
@@ -130,13 +146,13 @@ class Client(client.Client):
         self._sock_cnt = 0
 
     def _create_connection(self, host, port, message_factory, **kwargs):
-        conn = Connection(self, None, message_factory)
-        conn.create_socket(socket.AF_INET, socket.SOCK_STREAM)
+        connection = Connection(self, None, message_factory)
+        connection.create_socket(socket.AF_INET, socket.SOCK_STREAM)
         # disable Nagle buffering algorithm
-        conn.socket.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
-        conn.connect((host, port))
-        conn.socket.send(_connect_struct.pack(message_factory.get_hash()))
-        return conn, conn.socket.fileno()
+        connection.socket.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
+        connection.connect((host, port))
+        connection._send_data(_connect_struct.pack(message_factory.get_hash()))
+        return connection, connection.socket.fileno()
 
     def update(self, timeout=0):
-        asyncore.loop(timeout / 1000.0, False, self.conn_map, 1)
+        asyncore.poll(timeout / 1000.0, self.conn_map)

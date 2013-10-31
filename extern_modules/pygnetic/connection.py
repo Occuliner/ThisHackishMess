@@ -7,7 +7,6 @@ import re
 import logging
 from weakref import proxy
 from functools import partial
-import message
 import event
 
 _logger = logging.getLogger(__name__)
@@ -19,18 +18,10 @@ class Connection(object):
     :param parent: parent :class:`~.client.Client` or :class:`~.server.Server`
     :param conn_obj: connection object
     :param message_factory: :class:`~.message.MessageFactory` object
-
-    .. note::
-        It's created by :class:`~.client.Client` or :class:`~.server.Server`
-        and shouldn't be created manually.
-
-    Sending is possible in two ways:
-
-    * using :meth:`net_message_name` methods, where ``message_name``
-      is name of message registered in :class:`~.message.MessageFactory`
-    * using :meth:`send` method with message as argument
     """
-    address = ('', '')
+    address = ('', '') # \
+    connected = False  # / default values, should be overridden by adapter class
+    __id_cnt = 0
 
     def __init__(self, parent, conn_obj, message_factory, *args, **kwargs):
         super(Connection, self).__init__(*args, **kwargs)
@@ -42,6 +33,8 @@ class Connection(object):
         self.data_received = 0
         self.messages_sent = 0
         self.messages_received = 0
+        self.id = self.__class__.__id_cnt = self.__id_cnt + 1
+        self._key = None
 
     def __getattr__(self, name):
         parts = name.split('_', 1)
@@ -74,7 +67,7 @@ class Connection(object):
 
     def _send_message(self, message, *args, **kwargs):
         name = message.__name__
-        params = self.message_factory.get_params(message)[1]
+        params = self.message_factory.get_params(message)
         try:
             message_ = message(*args, **kwargs)
         except TypeError, e:
@@ -82,39 +75,43 @@ class Connection(object):
             raise TypeError('%s takes exactly %d arguments (%d given)' %
                 (message.__doc__, int(e) - 1, int(f) - 1))
         data = self.message_factory.pack(message_)
-        _logger.info('Sent %s message to %s', name, self.address)
+        _logger.info('#%s Sent %s message', self.id, name)
         self.data_sent += len(data)
         self.messages_sent += 1
         return self._send_data(data, **params)
+
+    def _send_data(self, data, channel=0, **kwargs):
+        raise NotImplementedError('Should be implemented by adapter class')
 
     def _receive(self, data, **kwargs):
         self.data_received += len(data)
         for message in self.message_factory.unpack_all(data, self):
             self.messages_received += 1
             name = message.__class__.__name__
-            _logger.info('Received %s message from %s', name, self.address)
+            _logger.info('#%s Received %s message', self.id, name)
             event.received(self, message)
             for h in self.handlers:
                 getattr(h, 'net_' + name, h.on_recive)(message, **kwargs)
 
     def _connect(self):
-        _logger.info('Connected to %s', self.address)
+        _logger.info('#%s Connected to %s', self.id, self.address)
         event.connected(self)
         for h in self.handlers:
             h.on_connect()
 
     def _disconnect(self):
-        _logger.info('Disconnected from %s', self.address)
+        _logger.info('#%s Disconnected from %s', self.id, self.address)
         event.disconnected(self)
         for h in self.handlers:
             h.on_disconnect()
+        self.parent._remove(self._key)
 
     def disconnect(self, *args):
         """Request a disconnection.
 
         :param args: additional arguments for :term:`network adapter`
         """
-        pass
+        raise NotImplementedError('Should be implemented by adapter class')
 
     def add_handler(self, handler):
         """Add new Handler to handle messages.

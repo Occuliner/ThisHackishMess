@@ -17,6 +17,7 @@ class Handler(object):
         """Called when message is received, but no corresponding
         net_message_name method exist.
 
+        :param message: received message
         :param kwargs:
             additional keyword arguments from :term:`network adapter`
         """

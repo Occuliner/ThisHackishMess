@@ -4,6 +4,7 @@
 import logging
 import enet
 from .. import connection, server, client
+from .._utils import lazyproperty
 
 _logger = logging.getLogger(__name__)
 
@@ -41,7 +42,7 @@ class Connection(connection.Connection):
         """Connection state."""
         return self.peer.state == enet.PEER_STATE_CONNECTED
 
-    @property
+    @lazyproperty
     def address(self):
         """Connection address."""
         address = self.peer.address
@@ -49,34 +50,32 @@ class Connection(connection.Connection):
 
 
 class Server(server.Server):
-    def __init__(self, host='', port=0, con_limit=4, *args, **kwargs):
-        super(Server, self).__init__(host, port, con_limit, *args, **kwargs)
+    def __init__(self, host='', port=0, conn_limit=4, handler=None, message_factory=None, *args, **kwargs):
+        super(Server, self).__init__(host, port, conn_limit, handler, message_factory, *args, **kwargs)
         host = enet.Address(host, port)
-        self.host = enet.Host(host, con_limit, *args, **kwargs)
-        self._peer_cnt = 0
+        self.host = enet.Host(host, conn_limit, *args, **kwargs)
+
+    def _create_connection(self, peer, message_factory):
+        connection = Connection(self, peer, message_factory)
+        peer_id = peer.data = str(connection.id)
+        return connection, peer_id
 
     def update(self, timeout=0):
         host = self.host
         event = host.service(timeout)
         while event is not None:
             if event.type == enet.EVENT_TYPE_CONNECT:
-                peer_id = str(self._peer_cnt + 1)
-                if self._accept(Connection, event.peer, event.peer.address,
-                                peer_id, event.data):
-                    event.peer.data = peer_id
-                    self._peer_cnt += 1
-                else:
+                if not self._accept(event.peer, event.peer.address, event.data):
                     event.peer.disconnect_now()
             elif event.type == enet.EVENT_TYPE_DISCONNECT:
-                self._disconnect(event.peer.data)
+                self._get(event.peer.data)._disconnect()
             elif event.type == enet.EVENT_TYPE_RECEIVE:
-                self._receive(event.peer.data, event.packet.data,
-                    channel=event.channelID)
+                self._get(event.peer.data)._receive(event.packet.data,
+                        channel=event.channelID)
             event = host.check_events()
 
-    @property
+    @lazyproperty
     def address(self):
-        """Server address."""
         address = self.host.address
         return address.host, address.port
 
@@ -85,16 +84,13 @@ class Client(client.Client):
     def __init__(self, conn_limit=1, *args, **kwargs):
         super(Client, self).__init__(*args, **kwargs)
         self.host = enet.Host(None, conn_limit)
-        self._peer_cnt = 0
 
     def _create_connection(self, host, port, message_factory, channels=1,
                            **kwargs):
         host = enet.Address(host, port)
-        peer_id = self._peer_cnt = self._peer_cnt + 1
-        peer_id = str(peer_id)
         peer = self.host.connect(host, channels, message_factory.get_hash())
-        peer.data = peer_id
         connection = Connection(self, peer, message_factory)
+        peer_id = peer.data = str(connection.id)
         return connection, peer_id
 
     def update(self, timeout=0):
@@ -104,10 +100,10 @@ class Client(client.Client):
         event = host.service(timeout)
         while event is not None:
             if event.type == enet.EVENT_TYPE_CONNECT:
-                self._connect(event.peer.data)
+                self._get(event.peer.data)._connect()
             elif event.type == enet.EVENT_TYPE_DISCONNECT:
-                self._disconnect(event.peer.data)
+                self._get(event.peer.data)._disconnect()
             elif event.type == enet.EVENT_TYPE_RECEIVE:
-                self._receive(event.peer.data, event.packet.data,
-                              channel=event.channelID)
+                self._get(event.peer.data)._receive(event.packet.data,
+                                                    channel=event.channelID)
             event = host.check_events()
