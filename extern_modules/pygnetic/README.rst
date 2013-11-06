@@ -19,10 +19,11 @@ Installation
 ------------
 
 **pygnetic** can be installed with
-`windows installer <http://pypi.python.org/pypi/pygnetic/#downloads>`_
-or with `pip <http://www.pip-installer.org>`_::
 
-   pip install pygnetic
+* `pip <http://www.pip-installer.org>`_ command -- ``pip install pygnetic``
+* `windows installer <http://pypi.python.org/pypi/pygnetic/#downloads>`_
+* ``python setup.py install`` command run from directory of 
+  `source distribution <http://pypi.python.org/pypi/pygnetic/#downloads>`_
 
 
 Optional requirements

@@ -2,48 +2,81 @@
 """Network adapters."""
 
 from .. import _utils
+from .. import client
+from .. import server
 
 selected_adapter = None
 
 
 def select_adapter(names):
+    """Select first found adapter
+
+    :param names: string or list of strings with names of libraries
+    :return: adapter module
+    """
     global selected_adapter
     selected_adapter = _utils.find_adapter(__name__, names)
+    return selected_adapter
 
 
-def get_adapter(name):
-    return _utils.find_adapter(__name__, name)
+def get_adapter(names):
+    """Return adapter
+
+    :param names: string or list of strings with names of libraries
+    :return: adapter module
+    """
+    return _utils.find_adapter(__name__, names)
 
 
 class Client(object):
-    "Class creating its instance based on selected :term:`network adapter`."
+    """Proxy class for selected :term:`network adapter`.
 
-    def __new__(cls, *args, **kwargs):
-        "Create instance of Client class depending on selected network adapter"
-	#del kwargs['playState']
-	#del kwargs['networkEntsClassDefs']
-        b = cls.__bases__
-        if Client in b and not ( selected_adapter.Client in b ):  # creation by inheritance
-            i = b.index(Client) + 1
-            cls.__bases__ = b[:i] + (selected_adapter.Client,) + b[i:]
-            return super(Client, cls).__new__(cls, *args, **kwargs)
-        else:  # direct object creation
-            # can't assign to __bases__ - bugs.python.org/issue672115
-            return selected_adapter.Client(*args, **kwargs)
+    :keyword n_adapter: override default :term:`network adapter` for
+        class instance (default: None - module selected with :func:`.init`)
+    """
+    n_adapter = None
+
+    def __init__(self, *args, **kwargs):
+        n_adapter = kwargs.pop('n_adapter', self.n_adapter)
+        if n_adapter is not None:
+            if not isinstance(n_adapter, client.Client):
+                n_adapter = get_adapter(n_adapter)
+        elif selected_adapter is not None:
+            n_adapter = selected_adapter
+        else:
+            raise AttributeError("Client adapter is not selected")
+        n_adapter = n_adapter.Client(*args, **kwargs)
+        object.__setattr__(self, 'n_adapter', n_adapter)
+
+    def __getattr__(self, attr):
+        return getattr(self.n_adapter, attr)
+
+    def __setattr__(self, attr, value):
+        setattr(self.n_adapter, attr, value)
 
 
 class Server(object):
-    "Class creating its instance based on selected :term:`network adapter`."
+    """Proxy class for selected :term:`network adapter`.
 
-    def __new__(cls, *args, **kwargs):
-        "Create instance of Server class depending on selected network adapter"
-        #del kwargs['playState']
+    :keyword n_adapter: override default :term:`network adapter` for
+        class instance (default: None - module selected with :func:`.init`)
+    """
+    n_adapter = None
 
-	b = cls.__bases__
-        if Server in b and not ( selected_adapter.Server in b ):  # creation by inheritance
-            i = b.index(Server) + 1
-            cls.__bases__ = b[:i] + (selected_adapter.Server,) + b[i:]
-            return super(Server, cls).__new__(cls, *args, **kwargs)
-        else:  # direct object creation
-            # can't assign to __bases__ - bugs.python.org/issue672115
-            return selected_adapter.Server(*args, **kwargs)
+    def __init__(self, *args, **kwargs):
+        n_adapter = kwargs.pop('n_adapter', self.n_adapter)
+        if n_adapter is not None:
+            if not isinstance(n_adapter, server.Server):
+                n_adapter = get_adapter(n_adapter)
+        elif selected_adapter is not None:
+            n_adapter = selected_adapter
+        else:
+            raise AttributeError("Server adapter is not selected")
+        n_adapter = n_adapter.Server(*args, **kwargs)
+        object.__setattr__(self, 'n_adapter', n_adapter)
+
+    def __getattr__(self, attr):
+        return getattr(self.n_adapter, attr)
+
+    def __setattr__(self, attr, value):
+        setattr(self.n_adapter, attr, value)

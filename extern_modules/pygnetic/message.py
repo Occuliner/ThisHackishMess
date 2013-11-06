@@ -14,7 +14,7 @@ class MessageFactory(object):
 
     :param s_adapter:
         :term:`serialization adapter`
-        (default: None - library selected with :func:`.init`)
+        (default: None - module selected with :func:`.init`)
     """
     def __init__(self, s_adapter=None):
         self._message_names = {}  # name -> message
@@ -39,6 +39,7 @@ class MessageFactory(object):
         if self._frozen == True:
             _logger.warning("Can't register new messages after connection "
                             "establishment")
+            return
         type_id = self._type_id_cnt = self._type_id_cnt + 1
         packet = namedtuple(name, field_names)
         self._message_names[name] = packet
@@ -52,7 +53,7 @@ class MessageFactory(object):
         :param message: object of class created by register
         :return: string
         """
-        type_id = self._message_params[message.__class__][0]
+        type_id = self.get_type_id(message.__class__)
         message = (type_id,) + message
         data = self.s_adapter.pack(message)
         _logger.debug("Packing message (length: %d)", len(data))
@@ -117,7 +118,11 @@ class MessageFactory(object):
         :param name: name of message
         :return: message class (namedtuple)
         """
-        return self._message_names[name]
+        try:
+            return self._message_names[name]
+        except KeyError:
+            raise ValueError('Unknown message name')
+
 
     def get_by_type(self, type_id):
         """Returns message class with given type_id.
@@ -125,15 +130,32 @@ class MessageFactory(object):
         :param type_id: type identifier of message
         :return: message class (namedtuple)
         """
-        return self._message_types[type_id]
+        try:
+            return self._message_types[type_id]
+        except KeyError:
+            raise ValueError('Unknown message type_id')
 
     def get_params(self, message_cls):
-        """Return tuple containing type_id, and sending keyword arguments
+        """Return dict containing sending keyword arguments
 
         :param message_cls: message class created by register
-        :return: int, dict
+        :return: dict
         """
-        return self._message_params[message_cls]
+        try:
+            return self._message_params[message_cls][1]
+        except KeyError:
+            raise ValueError('Unregistered message')
+
+    def get_type_id(self, message_cls):
+        """Return message class type_id
+
+        :param message_cls: message class created by register
+        :return: int
+        """
+        try:
+            return self._message_params[message_cls][0]
+        except KeyError:
+            raise ValueError('Unregistered message')
 
     def get_hash(self):
         """Calculate and return hash.

@@ -30,12 +30,13 @@ def received(connection, message):
     pass
 
 
-def init(event_val=1):
+def init(event_val=None):
     global NETWORK, connected, disconnected, received
     import pygame
     from pygame.event import Event
     from pygame.locals import USEREVENT
-    NETWORK = USEREVENT + event_val
+    if event_val is not None:
+        NETWORK = USEREVENT + event_val
 
     def _accepted(connection):
         pygame.event.post(Event(NETWORK, {
