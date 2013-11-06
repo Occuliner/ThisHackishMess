@@ -124,7 +124,7 @@ class PlayState:
         self.keyboardInputEnabled = False
         self.deleteLastChar = False
         self.checkFocus = True
-	self.pausedByFocus = False
+        self.pausedByFocus = False
 
         #So this is quite an important boolean.
         #If this is true everything in the PlayState will be drawn in order of the bottom of it's bounding rect, which I will refer
@@ -299,7 +299,7 @@ class PlayState:
             eachElement.update( dt )
 
         self.soundManager.update( dt )
-	self.processNetworkEvents( dt )
+        self.processNetworkEvents( dt )
         self.gameLogicManager.postTick( dt )
 
     def setPan( self, x, y ):
