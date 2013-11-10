@@ -251,8 +251,6 @@ class PlayState:
         Sends input dictionaries to playerGroups.
         Updates all the child groups, runs the collision system."""
         
-        self.floor.update( self.panX, self.panY )
-        
         self.checkForFocus()
         if self.paused or self.pausedByFocus:
             self.processNetworkEvents( dt )
@@ -301,6 +299,8 @@ class PlayState:
         self.soundManager.update( dt )
         self.processNetworkEvents( dt )
         self.gameLogicManager.postTick( dt )
+
+        self.floor.update( self.panX, self.panY )
 
     def setPan( self, x, y ):
         screenW, screenH = getResolution()
