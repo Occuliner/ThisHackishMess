@@ -327,6 +327,7 @@ class Entity( pygame.sprite.DirtySprite ):
         if self.collidable:
             self.body.angle = angle
         self.angle = angle
+        self.rect = self.image.get_rect().move(self.rect.topleft)
 
     def setVisible( self, theBool ):
         if theBool:
