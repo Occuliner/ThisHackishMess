@@ -19,6 +19,20 @@
 #    3. This notice may not be removed or altered from any source
 #    distribution.
 
+def popSmallestPrior( itemList, priorTable ):
+    minP = 9.9e100
+    res = None
+    i = None
+    for eachI in xrange(len(itemList)):
+        each = itemList[eachI]
+        if priorTable[each] < minP:
+            minP = priorTable[each]
+            res = each
+            i = eachI
+    if i != None:
+        itemList.pop(i)
+    return res
+
 class AIPathFinder(object):
     def __init__( self, graph ):
         self.graph = graph
@@ -30,12 +44,23 @@ class AIPathFinder(object):
         #First get each current path with the same dest.
         possibleOverlaps = [ each for each in self.currentTraversals if each[0] == endId ]
         result = []
-        queue = [startId]
+        #queue = [(0.0, startId)]
         escape = False
-        #Dictionary, key is id of visited node, val is pred. 
-        visited = {startId:None}
-        while len(queue) > 0:
-            curId = queue.pop(0)
+        #Dictionary, key is id of visited node, val is pred.
+
+        costTable = {}
+        unvisited = []
+        for each in self.graph.nodes.keys():
+            costTable[each] = 9.9e99
+            unvisited.append(each)
+
+        costTable[startId] = 0.0
+        predTable = {}
+        predTable[startId] = None
+        while len(unvisited) > 0:
+            curId = popSmallestPrior(unvisited, costTable)
+            curCost = costTable[curId]
+
             #If curId is endId, congrats
             if curId != endId:
                 for eachPath in possibleOverlaps:
@@ -50,15 +75,17 @@ class AIPathFinder(object):
                 if escape:
                     break
                 for eachId in self.graph.getNeighbours(curId):
-                    if eachId not in visited:
-                        queue.append( eachId )
-                        visited[eachId] = curId
+                    eachCost = curCost+self.graph.getCostOfEdge(curId, eachId)
+                    if eachCost < costTable[eachId]:
+                        costTable[eachId] = eachCost
+                        predTable[eachId] = curId
+
             else:
                 break
         
         while curId != startId:
             result.insert( 0, curId )
-            curId = visited[curId]
+            curId = predTable[curId]
 
         self.currentTraversals.append((endId, result))
 

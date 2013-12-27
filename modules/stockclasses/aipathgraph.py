@@ -27,13 +27,19 @@ class AIPathGraph(object):
         assert self.nodes.has_key(id) == False
         self.nodes[id] = []
 
-    def connect( self, id1, id2, bidirectional=True ):
-        self.nodes[id1].append(id2)
+    def getCostOfEdge( self, id1, id2 ):
+        for each in self.nodes[id1]:
+            if each[0] == id2:
+                return each[1]
+        raise Exception("AIPathGraph.costOfEdge was given info for a non-existing edge.")
+
+    def connect( self, id1, id2, cost=1.0, bidirectional=True ):
+        self.nodes[id1].append((id2, cost))
         if bidirectional:
-            self.connect(id2, id1, False)
+            self.connect(id2, id1, cost, False)
 
     def getNeighbours( self, id ):
-        return self.nodes[id]
+        return [ each[0] for each in self.nodes[id] ]
 
     def canTraverse( self, id1, id2 ):
         return id2 in self.nodes[id1]

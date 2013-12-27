@@ -64,19 +64,19 @@ class AIGraphBuilder(object):
                 notVeryTop = eachY > self.pathWidth/2
                 if notVeryLeft:
                     if self.checkForConnection( (eachX, eachY), (eachX-self.pathWidth, eachY), space ):
-                        graph.connect( newId, str((eachX-self.pathWidth, eachY)) )
+                        graph.connect( newId, str((eachX-self.pathWidth, eachY)), self.pathWidth )
                         #print "connecting to", str((eachX-self.pathWidth, eachY)),
                 if notVeryTop:
                     if self.checkForConnection( (eachX, eachY), (eachX, eachY-self.pathWidth), space ):
-                        graph.connect( newId, str((eachX, eachY-self.pathWidth)) )
+                        graph.connect( newId, str((eachX, eachY-self.pathWidth)), self.pathWidth )
                         #print "connecting to", str((eachX, eachY-self.pathWidth)),
                 if notVeryLeft and notVeryTop:
                     if self.checkForConnection( (eachX, eachY), (eachX-self.pathWidth, eachY-self.pathWidth), space ):
-                        graph.connect( newId, str((eachX-self.pathWidth, eachY-self.pathWidth)) )
+                        graph.connect( newId, str((eachX-self.pathWidth, eachY-self.pathWidth)), math.sqrt(2)*self.pathWidth )
                         #print "connecting to", str((eachX-self.pathWidth, eachY-self.pathWidth))
                 if notVeryTop and eachX < (self.limitX-self.pathWidth/2):
                     if self.checkForConnection( (eachX, eachY), (eachX+self.pathWidth, eachY-self.pathWidth), space ):
-                        graph.connect( newId, str((eachX+self.pathWidth, eachY-self.pathWidth)) )
+                        graph.connect( newId, str((eachX+self.pathWidth, eachY-self.pathWidth)), math.sqrt(2)*self.pathWidth )
                         #print "connecting to", str((eachX+self.pathWidth, eachY-self.pathWidth)),
 
                 #print
