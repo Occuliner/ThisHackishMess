@@ -24,18 +24,18 @@ class AIPathFinder(object):
         self.graph = graph
         #Each traversal path is a tuple, first item is the dest id, second is a list of path ids.
         self.currentTraversals = []
-
-    "Uses simple breadth-first-search to find a path in a graph, with a autocompletion-type feature based off currently active paths."
+    
     def find( self, startId, endId ):
+        """Uses simple breadth-first-search to find a path in a graph, with an autocompletion-type feature based off currently active paths."""
         #First get each current path with the same dest.
         possibleOverlaps = [ each for each in self.currentTraversals if each[0] == endId ]
         result = []
         queue = [startId]
         escape = False
         #Dictionary, key is id of visited node, val is pred. 
-        visited = {}
+        visited = {startId:None}
         while len(queue) > 0:
-            curId = queue.pop()
+            curId = queue.pop(0)
             #If curId is endId, congrats
             if curId != endId:
                 for eachPath in possibleOverlaps:
@@ -50,9 +50,11 @@ class AIPathFinder(object):
                 if escape:
                     break
                 for eachId in self.graph.getNeighbours(curId):
-                    if curId not in visited:
+                    if eachId not in visited:
                         queue.append( eachId )
                         visited[eachId] = curId
+            else:
+                break
         
         while curId != startId:
             result.insert( 0, curId )
